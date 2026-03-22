@@ -1,0 +1,39 @@
+import { useRef } from 'react';
+import { useTheme } from '@/utils/useTheme';
+
+interface SpotlightCardProps {
+    children: React.ReactNode;
+    className?: string;
+    spotlightColorLight?: string;
+    spotlightColorDark?: string;
+}
+
+export default function SpotlightCard({
+    children,
+    className = '',
+    spotlightColorLight = 'rgba(0, 0, 0, 0.06)',
+    spotlightColorDark = 'rgba(255, 255, 255, 0.12)',
+}: SpotlightCardProps) {
+    const divRef = useRef<HTMLDivElement>(null);
+    const isDark = useTheme();
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const rect = divRef.current?.getBoundingClientRect();
+        if (!rect || !divRef.current) return;
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        divRef.current.style.setProperty('--mouse-x', `${x}px`);
+        divRef.current.style.setProperty('--mouse-y', `${y}px`);
+        divRef.current.style.setProperty('--spotlight-color', isDark ? spotlightColorDark : spotlightColorLight);
+    };
+
+    return (
+        <div
+            ref={divRef}
+            onMouseMove={handleMouseMove}
+            className={`card-spotlight ${className}`}
+        >
+            {children}
+        </div>
+    );
+}

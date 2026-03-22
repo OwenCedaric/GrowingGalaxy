@@ -1,0 +1,223 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import type {
+    GetStaticPaths,
+    InferGetStaticPropsType,
+} from "astro";
+import { SITE_CONFIG } from "@/config";
+import { getSlug } from "@/utils/slug";
+import Layout from "@/layouts/Layout.astro";
+import TextReveal from "@/components/ui/TextReveal";
+import SpotlightCard from "@/components/ui/SpotlightCard";
+import FadeContent from "@/components/ui/FadeContent";
+import ScrollFloat from "@/components/ui/ScrollFloat";
+
+type BlogPost =
+    CollectionEntry<"blog">;
+
+export const getStaticPaths =
+    (async ({
+        paginate,
+    }) => {
+        const posts =
+            (
+                await getCollection(
+                    "blog",
+                )
+            ).sort(
+                (
+                    a,
+                    b,
+                ) =>
+                    b.data.pubDate.valueOf() -
+                    a.data.pubDate.valueOf(),
+            );
+
+        return paginate(
+            posts,
+            {
+                pageSize:
+                    SITE_CONFIG.postsPerPage,
+            },
+        );
+    }) satisfies GetStaticPaths;
+
+type Props =
+    InferGetStaticPropsType<
+        typeof getStaticPaths
+    >;
+
+const {
+    page,
+} =
+    Astro.props;
+---
+
+<Layout
+    title=`Blog | ${SITE_CONFIG.title}`
+    description="A collection of digital narratives."
+>
+    <div
+        class="max-w-4xl mx-auto pt-20 px-6"
+    >
+        <div
+            class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center"
+        >
+            <TextReveal
+                client:load
+                text="Blog"
+                type="char"
+                className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
+                style={{
+                    writingMode:
+                        "vertical-rl",
+                    textOrientation:
+                        "mixed",
+                }}
+            />
+        </div>
+
+        <div
+            class="flex flex-col gap-32"
+        >
+            {
+                page.data.map(
+                    (
+                        post: BlogPost,
+                        index: number,
+                    ) => (
+                        <FadeContent
+                            client:visible
+                            className="w-full"
+                            delay={
+                                index *
+                                100
+                            }
+                            duration={
+                                800
+                            }
+                            blur={
+                                true
+                            }
+                        >
+                            <SpotlightCard
+                                client:visible
+                                className="p-6 md:p-8"
+                            >
+                                <article class="flex flex-col md:grid md:grid-cols-12 gap-8 group relative z-10">
+                                    <div class="md:col-span-2 text-right hidden md:block text-gray-400 dark:text-gray-400 font-mono text-sm pt-3">
+                                        {post.data.pubDate.toLocaleDateString(
+                                            "en-US",
+                                            {
+                                                month: "short",
+                                                day: "numeric",
+                                                year: "numeric",
+                                            },
+                                        )}
+                                    </div>
+
+                                    <div class="md:col-span-10 space-y-6">
+                                        <a
+                                            href={`/${getSlug(post)}`}
+                                            class="block"
+                                        >
+                                            <h2 class="text-4xl md:text-5xl font-bold tracking-tight hover:text-secondary-text transition-colors">
+                                                <ScrollFloat
+                                                    client:visible
+                                                    text={
+                                                        post
+                                                            .data
+                                                            .title
+                                                    }
+                                                    className="text-4xl md:text-5xl font-bold tracking-tight"
+                                                    scrollStart="top bottom-=50"
+                                                    scrollEnd="top center+=100"
+                                                    stagger={
+                                                        0.04
+                                                    }
+                                                />
+                                            </h2>
+                                        </a>
+
+                                        <div class="space-y-6">
+                                            <p class="text-xl text-secondary-text leading-relaxed">
+                                                {
+                                                    post
+                                                        .data
+                                                        .description
+                                                }
+                                            </p>
+
+                                            <div class="flex items-center gap-3 text-xs font-medium uppercase tracking-widest opacity-60 dark:opacity-80">
+                                                <span>
+                                                    {post.data.category}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </SpotlightCard>
+                        </FadeContent>
+                    ),
+                )
+            }
+        </div>
+
+        <!-- Pagination Navigation -->
+        <div
+            class="flex justify-between items-center mt-32 pt-12 border-t border-black/5 dark:border-white/5 opacity-60 dark:opacity-80"
+        >
+            {
+                page
+                    .url
+                    .prev ? (
+                    <a
+                        href={
+                            page
+                                .url
+                                .prev
+                        }
+                        class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
+                    >
+                        ←
+                        Previous
+                    </a>
+                ) : (
+                    <span />
+                )
+            }
+            <span
+                class="text-xs font-mono"
+            >
+                Page
+                {
+                    page.currentPage
+                }
+                of
+                {
+                    page.lastPage
+                }
+            </span>
+            {
+                page
+                    .url
+                    .next ? (
+                    <a
+                        href={
+                            page
+                                .url
+                                .next
+                        }
+                        class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
+                    >
+                        Next
+                        →
+                    </a>
+                ) : (
+                    <span />
+                )
+            }
+        </div>
+    </div>
+</Layout>

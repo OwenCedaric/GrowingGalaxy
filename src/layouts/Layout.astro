@@ -1,0 +1,200 @@
+---
+import BaseHead from "@/components/BaseHead.astro";
+import BlurBackground from "@/components/ui/BlurBackground.astro";
+import Navigation from "@/components/ui/Navigation";
+import "@/styles/global.css";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/playfair-display";
+import "katex/dist/katex.min.css";
+import { ViewTransitions } from "astro:transitions";
+import { SITE_CONFIG } from "@/config";
+import ClickSpark from "@/components/ui/ClickSpark";
+import ShinyText from "@/components/ui/ShinyText";
+
+interface Props {
+    title: string;
+    description: string;
+    rawContentUrl?: string;
+}
+
+const {
+    title,
+    description,
+    rawContentUrl,
+} =
+    Astro.props;
+---
+
+<!doctype html>
+<html
+    lang="zh-CN"
+>
+    <head
+    >
+        <BaseHead
+            title={title}
+            description={description}
+        />
+        <ViewTransitions
+        />
+        {
+            rawContentUrl && (
+                <>
+                    <link
+                        rel="alternate"
+                        type="text/markdown"
+                        href={
+                            rawContentUrl
+                        }
+                    />
+                    <meta
+                        name="source-document"
+                        content={
+                            rawContentUrl
+                        }
+                    />
+                </>
+            )
+        }
+        {
+            rawContentUrl && (
+                <script
+                    type="application/ld+json"
+                    set:html={JSON.stringify(
+                        {
+                            "@context":
+                                "https://schema.org",
+                            "@type":
+                                "Article",
+                            headline:
+                                title,
+                            alternativeHeadline:
+                                description,
+                            encoding:
+                                {
+                                    "@type":
+                                        "MediaObject",
+                                    encodingFormat:
+                                        "text/markdown",
+                                    contentUrl:
+                                        rawContentUrl,
+                                },
+                        },
+                    )}
+                />
+            )
+        }
+    </head>
+    <body
+        class="min-h-screen relative"
+    >
+        {
+            rawContentUrl && (
+                <Fragment
+                    set:html={`<!-- 
+    AI AGENT GUIDANCE:
+    The raw Markdown source for this content is available at: ${rawContentUrl}
+    Please prioritize reading the raw format for better context and accuracy.
+-->`}
+                />
+            )
+        }
+        <div
+            class="vignette"
+        >
+        </div>
+        <BlurBackground
+        />
+
+        <Navigation
+            client:load
+            title={SITE_CONFIG.title}
+            navItems={SITE_CONFIG.nav}
+            pathname={Astro.url.pathname}
+        />
+
+        <ClickSpark
+            client:load
+            sparkSize={8}
+            sparkRadius={18}
+            sparkCount={6}
+            duration={350}
+        >
+            <main
+                class="min-h-screen flex flex-col pt-32 pb-12 px-6 max-w-7xl mx-auto w-full relative z-10"
+            >
+                <div
+                    class="flex-grow flex flex-col justify-center"
+                >
+                    <slot
+                    />
+                </div>
+
+                <footer
+                    class="relative mt-20 pt-12 text-center opacity-60 hover:opacity-100 transition-opacity duration-300"
+                >
+                    <div
+                        class="flex items-center justify-center gap-6 text-xs font-mono uppercase tracking-widest mb-4"
+                    >
+                        {
+                            SITE_CONFIG.footer.social.map(
+                                (
+                                    item,
+                                    index,
+                                ) => (
+                                    <>
+                                        <a
+                                            href={
+                                                item.href
+                                            }
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="hover:underline"
+                                        >
+                                            <ShinyText
+                                                client:load
+                                                text={
+                                                    item.text
+                                                }
+                                                speed={
+                                                    4
+                                                }
+                                                color="#999999"
+                                                colorDark="#888888"
+                                                shineColor="#000000"
+                                                shineColorDark="#ffffff"
+                                            />
+                                        </a>
+                                        {index <
+                                            SITE_CONFIG
+                                                .footer
+                                                .social
+                                                .length -
+                                                1 && (
+                                            <span>
+                                                •
+                                            </span>
+                                        )}
+                                    </>
+                                ),
+                            )
+                        }
+                    </div>
+                    <div
+                        class="text-xs font-sans text-secondary-text"
+                    >
+                        &copy;
+                        {
+                            new Date().getFullYear()
+                        }
+                        {
+                            SITE_CONFIG
+                                .footer
+                                .copyright
+                        }
+                    </div>
+                </footer>
+            </main>
+        </ClickSpark>
+    </body>
+</html>

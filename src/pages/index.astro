@@ -1,0 +1,400 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { SITE_CONFIG } from "@/config";
+
+import DecryptedText from "@/components/ui/DecryptedText";
+import GradientText from "@/components/ui/GradientText";
+import ShinyText from "@/components/ui/ShinyText";
+import FadeContent from "@/components/ui/FadeContent";
+import GlassGrid from "@/components/ui/GlassGrid.astro";
+import PaperPlanes from "@/components/ui/PaperPlanes.astro";
+import CursorGlow from "@/components/ui/CursorGlow";
+---
+
+<Layout
+    title={SITE_CONFIG.title}
+    description={SITE_CONFIG.description}
+>
+    <!-- Cursor Glow -->
+    <CursorGlow
+        client:load
+    />
+
+    <!-- Hero Section -->
+    <section
+        class="hero-section"
+    >
+        <!-- Eyebrow -->
+        <FadeContent
+            client:load
+            delay={100}
+            duration={800}
+            blur={true}
+        >
+            <div
+                class="hero-eyebrow"
+            >
+                <span
+                    class="eyebrow-line"
+                >
+                </span>
+                <span
+                    >Digital
+                    Narratives</span
+                >
+            </div>
+        </FadeContent>
+
+        <!-- Main Title -->
+        <div
+            class="hero-title-wrap"
+        >
+            <DecryptedText
+                client:load
+                text={SITE_CONFIG
+                    .homepage
+                    .title}
+                speed={40}
+                maxIterations={20}
+                sequential={true}
+                revealDirection="start"
+                animateOn="view"
+                parentClassName="hero-title"
+            />
+        </div>
+
+        <!-- Subtitle -->
+        <h2
+            class="hero-subtitle-wrap"
+        >
+            <GradientText
+                client:load
+                colors={[
+                    "#b0b0b0",
+                    "#808080",
+                    "#a0a0a0",
+                    "#c0c0c0",
+                ]}
+                colorsDark={[
+                    "#666666",
+                    "#999999",
+                    "#777777",
+                    "#555555",
+                ]}
+                animationSpeed={8}
+            >
+                {
+                    SITE_CONFIG
+                        .homepage
+                        .subtitle
+                }
+            </GradientText>
+        </h2>
+
+        <!-- Description -->
+        <div
+            class="hero-desc"
+        >
+            {
+                SITE_CONFIG.homepage.description.map(
+                    (
+                        paragraph,
+                        index,
+                    ) => (
+                        <FadeContent
+                            client:visible
+                            delay={
+                                index *
+                                    150 +
+                                200
+                            }
+                            duration={
+                                800
+                            }
+                            blur={
+                                true
+                            }
+                        >
+                            <p class="hero-desc-p">
+                                {
+                                    paragraph
+                                }
+                            </p>
+                        </FadeContent>
+                    ),
+                )
+            }
+        </div>
+
+        <!-- CTA Links -->
+        <FadeContent
+            client:visible
+            delay={500}
+            duration={800}
+            blur={true}
+        >
+            <div
+                class="hero-links"
+            >
+                {
+                    SITE_CONFIG.homepage.links.map(
+                        (
+                            link,
+                        ) => (
+                            <a
+                                href={
+                                    link.href
+                                }
+                                class="hero-link"
+                            >
+                                <ShinyText
+                                    client:load
+                                    text={
+                                        link.text
+                                    }
+                                    speed={
+                                        3
+                                    }
+                                    color="#888888"
+                                    colorDark="#777777"
+                                    shineColor="#000000"
+                                    shineColorDark="#ffffff"
+                                />
+                                <span class="hero-link-arrow">
+                                    →
+                                </span>
+                            </a>
+                        ),
+                    )
+                }
+            </div>
+        </FadeContent>
+
+        <!-- Paper Planes Decoration (Desktop) -->
+        <PaperPlanes
+        />
+
+        <!-- Glass Grid Decoration (Desktop) -->
+        <GlassGrid
+        />
+    </section>
+</Layout>
+
+<style
+>
+    /* ========================================
+       HERO SECTION LAYOUT
+       ======================================== */
+    .hero-section {
+        position: relative;
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    /* Eyebrow */
+    .hero-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(
+            --color-secondary-text
+        );
+        margin-bottom: 28px;
+    }
+
+    .eyebrow-line {
+        display: block;
+        width: 40px;
+        height: 1px;
+        background: var(
+            --color-border-custom
+        );
+    }
+
+    :global(
+            .dark
+        )
+        .eyebrow-line {
+        background: var(
+            --color-border-custom-dark
+        );
+    }
+
+    /* Title */
+    .hero-title-wrap {
+        margin-bottom: 0;
+    }
+
+    .hero-title-wrap
+        :global(
+            .hero-title
+        ) {
+        font-family: var(
+            --font-serif
+        );
+        font-size: clamp(
+            3.5rem,
+            10vw,
+            8rem
+        );
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: var(
+            --color-primary-text
+        );
+    }
+
+    :global(
+            .dark
+        )
+        .hero-title-wrap
+        :global(
+            .hero-title
+        ) {
+        color: var(
+            --color-primary-text-dark
+        );
+    }
+
+    /* Subtitle */
+    .hero-subtitle-wrap {
+        font-family: var(
+            --font-serif
+        );
+        font-size: clamp(
+            2rem,
+            5vw,
+            3.5rem
+        );
+        font-weight: 400;
+        font-style: italic;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        margin-top: 0;
+        margin-bottom: 40px;
+        overflow: visible;
+        max-width: 60%;
+    }
+
+    /* Description */
+    .hero-desc {
+        max-width: 520px;
+        margin-bottom: 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .hero-desc-p {
+        font-size: 16px;
+        line-height: 1.75;
+        color: var(
+            --color-secondary-text
+        );
+        font-weight: 300;
+        margin: 0;
+    }
+
+    /* CTA Links */
+    .hero-links {
+        display: flex;
+        gap: 32px;
+    }
+
+    .hero-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(
+            --color-secondary-text
+        );
+        text-decoration: none;
+        position: relative;
+        padding-bottom: 6px;
+        transition: color
+            0.3s
+            ease;
+    }
+
+    .hero-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: var(
+            --color-secondary-text
+        );
+        transform: scaleX(
+            0
+        );
+        transform-origin: left;
+        transition: transform
+            0.4s
+            cubic-bezier(
+                0.4,
+                0,
+                0.2,
+                1
+            );
+    }
+
+    .hero-link:hover {
+        color: var(
+            --color-primary-text
+        );
+    }
+
+    :global(
+            .dark
+        )
+        .hero-link:hover {
+        color: var(
+            --color-primary-text-dark
+        );
+    }
+
+    .hero-link:hover::after {
+        transform: scaleX(
+            1
+        );
+    }
+
+    .hero-link-arrow {
+        display: inline-block;
+        transition: transform
+            0.3s
+            ease;
+        font-size: 14px;
+    }
+
+    .hero-link:hover
+        .hero-link-arrow {
+        transform: translateX(
+            4px
+        );
+    }
+
+    /* ========================================
+       RESPONSIVE
+       ======================================== */
+    @media (max-width: 768px) {
+        .hero-links {
+            flex-direction: column;
+            gap: 16px;
+        }
+    }
+</style>

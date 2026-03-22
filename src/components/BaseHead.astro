@@ -1,0 +1,221 @@
+---
+import { SITE_CONFIG } from "@/config";
+
+interface Props {
+    title: string;
+    description: string;
+    image?: string;
+}
+
+const canonicalURL =
+    new URL(
+        Astro
+            .url
+            .pathname,
+        Astro.site ||
+            SITE_CONFIG.site,
+    );
+
+const {
+    title,
+    description,
+    image = SITE_CONFIG.defaultImage,
+} = Astro.props;
+---
+
+<!-- Global Metadata -->
+<meta
+    charset="utf-8"
+/>
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+/>
+<link
+    rel="icon"
+    type="image/svg+xml"
+    href="/favicon.svg"
+/>
+<meta
+    name="generator"
+    content={Astro.generator}
+/>
+<meta
+    name="theme-color"
+    content="#ffffff"
+    media="(prefers-color-scheme: light)"
+/>
+<meta
+    name="theme-color"
+    content="#0a0a0a"
+    media="(prefers-color-scheme: dark)"
+/>
+
+{
+    SITE_CONFIG.imageServer && SITE_CONFIG.imageServer.map((server) => (
+        <>
+            <link
+                rel="dns-prefetch"
+                href={server}
+            />
+            <link
+                rel="preconnect"
+                href={server}
+                crossorigin
+            />
+        </>
+    ))
+}
+
+<!-- Font Preloads -->
+<!-- Fonts are imported locally in Layout.astro -->
+
+<!-- Canonical URL -->
+<link
+    rel="canonical"
+    href={canonicalURL}
+/>
+
+<!-- Primary Meta Tags -->
+<title
+>
+    {
+        title
+    }
+</title>
+<meta
+    name="title"
+    content={title}
+/>
+<meta
+    name="description"
+    content={description}
+/>
+<meta
+    name="author"
+    content={SITE_CONFIG.author}
+/>
+<meta
+    name="robots"
+    content="index, follow"
+/>
+
+<!-- Open Graph / Facebook -->
+<meta
+    property="og:type"
+    content="website"
+/>
+<meta
+    property="og:url"
+    content={Astro.url}
+/>
+<meta
+    property="og:title"
+    content={title}
+/>
+<meta
+    property="og:description"
+    content={description}
+/>
+<meta
+    property="og:image"
+    content={new URL(
+        image,
+        Astro.url,
+    )}
+/>
+
+<!-- Twitter -->
+<meta
+    property="twitter:card"
+    content="summary_large_image"
+/>
+<meta
+    property="twitter:url"
+    content={Astro.url}
+/>
+<meta
+    property="twitter:title"
+    content={title}
+/>
+<meta
+    property="twitter:description"
+    content={description}
+/>
+<meta
+    property="twitter:image"
+    content={new URL(
+        image,
+        Astro.url,
+    )}
+/>
+
+<script
+    is:inline
+>
+    const getTheme =
+        () => {
+            if (
+                typeof localStorage !==
+                    "undefined" &&
+                localStorage.getItem(
+                    "theme",
+                )
+            ) {
+                return localStorage.getItem(
+                    "theme",
+                );
+            }
+            return window.matchMedia(
+                "(prefers-color-scheme: dark)",
+            )
+                .matches
+                ? "dark"
+                : "light";
+        };
+
+    const theme =
+        getTheme();
+    if (
+        theme ===
+        "dark"
+    ) {
+        document.documentElement.classList.add(
+            "dark",
+        );
+    } else {
+        document.documentElement.classList.remove(
+            "dark",
+        );
+    }
+
+    if (
+        typeof localStorage !==
+        "undefined"
+    ) {
+        localStorage.setItem(
+            "theme",
+            theme,
+        );
+    }
+
+    document.addEventListener(
+        "astro:after-swap",
+        () => {
+            const theme =
+                getTheme();
+            if (
+                theme ===
+                "dark"
+            ) {
+                document.documentElement.classList.add(
+                    "dark",
+                );
+            } else {
+                document.documentElement.classList.remove(
+                    "dark",
+                );
+            }
+        },
+    );
+</script>

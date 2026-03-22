@@ -1,0 +1,724 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { SITE_CONFIG } from "@/config";
+import { getPhotos } from "@/utils/photos";
+import { TimeRewindAnimation } from "@/components/gallery/TimeRewindAnimation";
+import TiltedCard from "@/components/ui/TiltedCard";
+
+import FadeContent from "@/components/ui/FadeContent";
+import {
+    User,
+    MapPin,
+    Tag,
+    ArrowLeft,
+} from "lucide-react";
+
+export async function getStaticPaths() {
+    const photos =
+        await getPhotos();
+
+    return photos.map(
+        (
+            photo,
+            index,
+        ) => {
+            return {
+                params: {
+                    slug: photo.slug,
+                },
+                props: {
+                    photo,
+                    prevPhoto:
+                        index <
+                        photos.length -
+                            1
+                            ? photos[
+                                  index +
+                                      1
+                              ]
+                            : null,
+                    nextPhoto:
+                        index >
+                        0
+                            ? photos[
+                                  index -
+                                      1
+                              ]
+                            : null,
+                },
+            };
+        },
+    );
+}
+
+const {
+    photo,
+    prevPhoto,
+    nextPhoto,
+} =
+    Astro.props;
+const siteUrl =
+    Astro.site
+        ? Astro.site
+              .toString()
+              .replace(
+                  /\/$/,
+                  "",
+              )
+        : `${SITE_CONFIG.site}`;
+const currentYear =
+    new Date().getFullYear();
+const startYear =
+    (
+        SITE_CONFIG.footer as any
+    )
+        ?.startTime ||
+    currentYear;
+const yearRange =
+    startYear ===
+    currentYear
+        ? currentYear
+        : `${startYear} - ${currentYear}`;
+
+const ldJsons =
+    photo.images.map(
+        (
+            img,
+        ) => ({
+            "@context":
+                "https://schema.org/",
+            "@type":
+                "ImageObject",
+            contentUrl:
+                img.url,
+            license: `${siteUrl}/license`,
+            acquireLicensePage: `${siteUrl}/about`,
+            creditText:
+                photo.author,
+            creator:
+                {
+                    "@type":
+                        "Person",
+                    name: photo.author,
+                },
+            copyrightNotice: `© ${photo.author} ${currentYear}. All rights reserved.`,
+            datePublished:
+                photo.date,
+            keywords:
+                photo.tag?.join(
+                    ", ",
+                ),
+            description:
+                img.description ||
+                photo.name,
+            name: photo.name,
+            contentLocation:
+                photo.location,
+        }),
+    );
+
+const bodyImages =
+    photo.images;
+const formattedDate =
+    new Date(
+        photo.date,
+    ).toLocaleDateString(
+        "en-US",
+        {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+        },
+    );
+---
+
+<Layout
+    title={`${photo.name.replace(/\n/g, " ")} | ${SITE_CONFIG.title}`}
+    description={bodyImages[0]
+        ?.description ||
+        photo.name.replace(
+            /\n/g,
+            " ",
+        )}
+>
+    <Fragment
+        slot="head"
+    >
+        <meta
+            property="og:image"
+            content={bodyImages[0]
+                ?.url}
+        />
+        <meta
+            property="og:type"
+            content="article"
+        />
+        {
+            ldJsons.map(
+                (
+                    schema,
+                ) => (
+                    <script
+                        type="application/ld+json"
+                        is:inline
+                        set:html={JSON.stringify(
+                            schema,
+                        )}
+                    />
+                ),
+            )
+        }
+    </Fragment>
+
+    <main
+        class="w-full max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 py-8 md:py-16 pt-12 md:pt-20"
+    >
+        <!-- 1. Header & Metadata -->
+        <header
+            class="mb-24 border-b border-zinc-200 dark:border-zinc-800 pb-12"
+        >
+            <h1
+                class="max-w-3xl text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-zinc-800 to-zinc-400 dark:from-zinc-100 dark:to-zinc-500 leading-tight mb-12"
+            >
+                {
+                    photo.name
+                        .split(
+                            "\n",
+                        )
+                        .map(
+                            (
+                                line,
+                            ) => (
+                                <div>
+                                    {
+                                        line
+                                    }
+                                </div>
+                            ),
+                        )
+                }
+            </h1>
+
+            <div
+                class="flex flex-col md:flex-row md:items-start md:justify-between gap-8 md:gap-8"
+            >
+                <div
+                    class="flex flex-col md:flex-row md:flex-wrap md:items-center gap-4 md:gap-6 text-sm text-zinc-500 dark:text-zinc-300 tracking-wider font-light md:pt-0.5"
+                >
+                    <div
+                        class="flex items-center"
+                    >
+                        <User
+                            className="w-4 h-4 mr-2.5 shrink-0 stroke-[1.5]"
+                        />
+                        {
+                            photo.author
+                        }
+                    </div>
+                    {
+                        photo.location && (
+                            <div class="flex items-center">
+                                <MapPin className="w-4 h-4 mr-2.5 shrink-0 stroke-[1.5]" />
+                                {
+                                    photo.location
+                                }
+                            </div>
+                        )
+                    }
+                    {
+                        photo.tag &&
+                            photo
+                                .tag
+                                .length >
+                                0 && (
+                                <div class="flex items-center flex-wrap gap-y-2">
+                                    <Tag className="w-4 h-4 mr-2.5 shrink-0 stroke-[1.5] hidden md:block" />
+                                    <div class="flex items-center md:hidden w-4 h-4 mr-2.5 shrink-0">
+                                        <Tag className="w-4 h-4 stroke-[1.5]" />
+                                    </div>
+                                    <span class="leading-relaxed">
+                                        {photo.tag.join(
+                                            " · ",
+                                        )}
+                                    </span>
+                                </div>
+                            )
+                    }
+                </div>
+
+                <div
+                    class="shrink-0 flex flex-col pt-2 md:pt-0 md:items-end"
+                >
+                    <TimeRewindAnimation
+                        client:visible
+                        targetDate={photo.date}
+                    />
+                </div>
+            </div>
+        </header>
+
+        <!-- 2. 正文图文区域 -->
+        <section
+            class="w-full mx-auto"
+        >
+            {
+                bodyImages.map(
+                    (
+                        img,
+                        index,
+                    ) => {
+                        const total =
+                            String(
+                                photo
+                                    .images
+                                    .length,
+                            ).padStart(
+                                2,
+                                "0",
+                            );
+                        const num =
+                            String(
+                                index +
+                                    1,
+                            ).padStart(
+                                2,
+                                "0",
+                            );
+                        const isFirst =
+                            index ===
+                            0;
+                        const isLast =
+                            index ===
+                            bodyImages.length -
+                                1;
+
+                        let variant =
+                            "B";
+                        if (
+                            isFirst
+                        )
+                            variant =
+                                "A";
+                        else if (
+                            isLast
+                        )
+                            variant =
+                                "D";
+                        else if (
+                            index %
+                                2 ===
+                            1
+                        )
+                            variant =
+                                "C";
+
+                        return (
+                            <FadeContent
+                                client:visible
+                                delay={
+                                    index *
+                                    100
+                                }
+                                duration={
+                                    800
+                                }
+                                blur={
+                                    true
+                                }
+                                className="mb-24 md:mb-40 font-serif"
+                            >
+                                {variant ===
+                                    "A" && (
+                                    <div class="relative">
+                                        <span class="absolute -top-6 -left-2 text-xs text-zinc-300 dark:text-zinc-500 font-mono tracking-wider">
+                                            {
+                                                num
+                                            }{" "}
+                                            /{" "}
+                                            {
+                                                total
+                                            }
+                                        </span>
+                                        <TiltedCard
+                                            client:load
+                                            imageSrc={
+                                                img.url
+                                            }
+                                            altText={
+                                                img.alt ||
+                                                "Gallery Photo"
+                                            }
+                                            captionText=""
+                                            containerHeight="85vh"
+                                            containerWidth="100%"
+                                            imageHeight="100%"
+                                            imageWidth="100%"
+                                            rotateAmplitude={
+                                                8
+                                            }
+                                            scaleOnHover={
+                                                1.02
+                                            }
+                                            showMobileWarning={
+                                                false
+                                            }
+                                            showTooltip={
+                                                false
+                                            }
+                                            displayOverlayContent={
+                                                false
+                                            }
+                                            objectFit="contain"
+                                        />
+                                        {img.description && (
+                                            <div class="mt-8 md:mt-16 flex md:justify-end">
+                                                <div class="w-full md:w-1/3 flex flex-col gap-4">
+                                                    {img.description
+                                                        .split(
+                                                            "\n",
+                                                        )
+                                                        .map(
+                                                            (
+                                                                p,
+                                                            ) =>
+                                                                p.trim(),
+                                                        )
+                                                        .filter(
+                                                            Boolean,
+                                                        )
+                                                        .map(
+                                                            (
+                                                                paragraph,
+                                                            ) => (
+                                                                <p class="text-left md:text-right text-zinc-500 dark:text-zinc-300 text-base md:text-lg font-light italic leading-loose tracking-wide">
+                                                                    {
+                                                                        paragraph
+                                                                    }
+                                                                </p>
+                                                            ),
+                                                        )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {variant ===
+                                    "B" && (
+                                    <div class="relative flex flex-col md:flex-row items-start justify-between">
+                                        <div class="relative w-full md:w-[60%] shrink-0">
+                                            <span class="absolute -top-6 -left-2 text-xs text-zinc-300 dark:text-zinc-500 font-mono tracking-wider">
+                                                {
+                                                    num
+                                                }{" "}
+                                                /{" "}
+                                                {
+                                                    total
+                                                }
+                                            </span>
+                                            <TiltedCard
+                                                client:load
+                                                imageSrc={
+                                                    img.url
+                                                }
+                                                altText={
+                                                    img.alt ||
+                                                    "Gallery Photo"
+                                                }
+                                                captionText=""
+                                                containerHeight="85vh"
+                                                containerWidth="100%"
+                                                imageHeight="100%"
+                                                imageWidth="100%"
+                                                rotateAmplitude={
+                                                    8
+                                                }
+                                                scaleOnHover={
+                                                    1.02
+                                                }
+                                                showMobileWarning={
+                                                    false
+                                                }
+                                                showTooltip={
+                                                    false
+                                                }
+                                                displayOverlayContent={
+                                                    false
+                                                }
+                                                objectFit="contain"
+                                            />
+                                        </div>
+                                        {img.description && (
+                                            <div class="mt-8 md:mt-0 md:pl-16 flex-1 flex md:items-start md:justify-center">
+                                                <div class="flex flex-col md:flex-row-reverse gap-4 md:gap-8">
+                                                    {img.description
+                                                        .split(
+                                                            "\n",
+                                                        )
+                                                        .map(
+                                                            (
+                                                                p,
+                                                            ) =>
+                                                                p.trim(),
+                                                        )
+                                                        .filter(
+                                                            Boolean,
+                                                        )
+                                                        .map(
+                                                            (
+                                                                paragraph,
+                                                            ) => (
+                                                                <p class="text-zinc-500 dark:text-zinc-300 text-base md:text-lg font-light leading-loose text-left md:[writing-mode:vertical-rl] tracking-widest break-words shrink-0">
+                                                                    {
+                                                                        paragraph
+                                                                    }
+                                                                </p>
+                                                            ),
+                                                        )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {variant ===
+                                    "C" && (
+                                    <div class="relative flex flex-col md:flex-row-reverse items-start justify-between">
+                                        <div class="relative w-full md:w-[60%] shrink-0">
+                                            <span class="absolute -top-6 -left-2 text-xs text-zinc-300 dark:text-zinc-500 font-mono tracking-wider">
+                                                {
+                                                    num
+                                                }{" "}
+                                                /{" "}
+                                                {
+                                                    total
+                                                }
+                                            </span>
+                                            <TiltedCard
+                                                client:load
+                                                imageSrc={
+                                                    img.url
+                                                }
+                                                altText={
+                                                    img.alt ||
+                                                    "Gallery Photo"
+                                                }
+                                                captionText=""
+                                                containerHeight="85vh"
+                                                containerWidth="100%"
+                                                imageHeight="100%"
+                                                imageWidth="100%"
+                                                rotateAmplitude={
+                                                    8
+                                                }
+                                                scaleOnHover={
+                                                    1.02
+                                                }
+                                                showMobileWarning={
+                                                    false
+                                                }
+                                                showTooltip={
+                                                    false
+                                                }
+                                                displayOverlayContent={
+                                                    false
+                                                }
+                                                objectFit="contain"
+                                            />
+                                        </div>
+                                        {img.description && (
+                                            <div class="mt-8 md:mt-0 md:pr-16 flex-1 flex md:items-start md:justify-center">
+                                                <div class="flex flex-col md:flex-row-reverse gap-4 md:gap-8">
+                                                    {img.description
+                                                        .split(
+                                                            "\n",
+                                                        )
+                                                        .map(
+                                                            (
+                                                                p,
+                                                            ) =>
+                                                                p.trim(),
+                                                        )
+                                                        .filter(
+                                                            Boolean,
+                                                        )
+                                                        .map(
+                                                            (
+                                                                paragraph,
+                                                            ) => (
+                                                                <p class="text-zinc-500 dark:text-zinc-300 text-base md:text-lg font-light leading-loose text-left md:[writing-mode:vertical-rl] tracking-widest break-words shrink-0">
+                                                                    {
+                                                                        paragraph
+                                                                    }
+                                                                </p>
+                                                            ),
+                                                        )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {variant ===
+                                    "D" && (
+                                    <div class="relative flex flex-col items-center">
+                                        <div class="relative w-full md:w-[75%]">
+                                            <span class="absolute -top-6 -left-2 text-xs text-zinc-300 dark:text-zinc-500 font-mono tracking-wider">
+                                                {
+                                                    num
+                                                }{" "}
+                                                /{" "}
+                                                {
+                                                    total
+                                                }
+                                            </span>
+                                            <TiltedCard
+                                                client:load
+                                                imageSrc={
+                                                    img.url
+                                                }
+                                                altText={
+                                                    img.alt ||
+                                                    "Gallery Photo"
+                                                }
+                                                captionText=""
+                                                containerHeight="85vh"
+                                                containerWidth="100%"
+                                                imageHeight="100%"
+                                                imageWidth="100%"
+                                                rotateAmplitude={
+                                                    8
+                                                }
+                                                scaleOnHover={
+                                                    1.02
+                                                }
+                                                showMobileWarning={
+                                                    false
+                                                }
+                                                showTooltip={
+                                                    false
+                                                }
+                                                displayOverlayContent={
+                                                    false
+                                                }
+                                                objectFit="contain"
+                                            />
+                                        </div>
+                                        {img.description && (
+                                            <div class="mt-8 md:mt-20 w-full flex justify-start md:justify-center">
+                                                <div class="max-w-2xl flex flex-col gap-4">
+                                                    {img.description
+                                                        .split(
+                                                            "\n",
+                                                        )
+                                                        .map(
+                                                            (
+                                                                p,
+                                                            ) =>
+                                                                p.trim(),
+                                                        )
+                                                        .filter(
+                                                            Boolean,
+                                                        )
+                                                        .map(
+                                                            (
+                                                                paragraph,
+                                                            ) => (
+                                                                <p class="text-zinc-500 dark:text-zinc-300 text-base md:text-lg font-light leading-loose text-left md:text-center tracking-wide break-words">
+                                                                    {
+                                                                        paragraph
+                                                                    }
+                                                                </p>
+                                                            ),
+                                                        )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </FadeContent>
+                        );
+                    },
+                )
+            }
+        </section>
+
+        <!-- 3. 上一篇 / 下一篇导航 -->
+        <footer
+            class="mt-16 pt-12 border-t border-black/5 dark:border-white/5 space-y-12"
+        >
+            <div
+                class="flex flex-col sm:flex-row justify-between gap-6"
+            >
+                <div
+                    class="flex-1 text-left"
+                >
+                    {
+                        nextPhoto && (
+                            <a
+                                href={`/gallery/${nextPhoto.slug}`}
+                                class="group block"
+                            >
+                                <span class="text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 block mb-2 group-hover:opacity-100 transition-opacity">
+                                    ←
+                                    Next
+                                    Post
+                                </span>
+                                <span class="text-lg font-bold group-hover:underline">
+                                    {nextPhoto.name.replace(
+                                        /\n/g,
+                                        " ",
+                                    )}
+                                </span>
+                            </a>
+                        )
+                    }
+                </div>
+                <div
+                    class="flex-1 text-right"
+                >
+                    {
+                        prevPhoto && (
+                            <a
+                                href={`/gallery/${prevPhoto.slug}`}
+                                class="group block"
+                            >
+                                <span class="text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 block mb-2 group-hover:opacity-100 transition-opacity">
+                                    Previous
+                                    Post
+                                    →
+                                </span>
+                                <span class="text-lg font-bold group-hover:underline">
+                                    {prevPhoto.name.replace(
+                                        /\n/g,
+                                        " ",
+                                    )}
+                                </span>
+                            </a>
+                        )
+                    }
+                </div>
+            </div>
+
+            <div
+                class="flex justify-between items-center opacity-60 dark:opacity-80"
+            >
+                <a
+                    href="/gallery"
+                    class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
+                >
+                    Back
+                    to
+                    Gallery
+                </a>
+                <span
+                    class="text-xs font-mono"
+                >
+                    {
+                        formattedDate
+                    }
+                </span>
+            </div>
+        </footer>
+    </main>
+</Layout>

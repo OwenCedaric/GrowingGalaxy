@@ -1,0 +1,109 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { SITE_CONFIG } from "@/config";
+import { getPhotos } from "@/utils/photos";
+import { PhotoGrid } from "@/components/gallery/PhotoGrid";
+import TextReveal from "@/components/ui/TextReveal";
+
+const photos =
+    await getPhotos();
+const siteUrl =
+    Astro.site
+        ? Astro.site
+              .toString()
+              .replace(
+                  /\/$/,
+                  "",
+              )
+        : `${SITE_CONFIG.site}`;
+const currentYear =
+    new Date().getFullYear();
+
+const ldJsons =
+    photos.map(
+        (
+            photo,
+        ) => ({
+            "@context":
+                "https://schema.org/",
+            "@type":
+                "ImageObject",
+            contentUrl:
+                photo
+                    .images[0]
+                    .url,
+            license: `${siteUrl}/license`,
+            acquireLicensePage: `${siteUrl}/about`,
+            creditText:
+                photo.author,
+            creator:
+                {
+                    "@type":
+                        "Person",
+                    name: photo.author,
+                },
+            copyrightNotice: `© ${photo.author} ${currentYear}. All rights reserved.`,
+            datePublished:
+                photo.date,
+            keywords:
+                photo.tag?.join(
+                    ", ",
+                ),
+            description:
+                photo
+                    .images[0]
+                    .description ||
+                photo.name,
+            name: photo.name,
+            contentLocation:
+                photo.location,
+        }),
+    );
+---
+
+<Layout
+    title={`Gallery | ${SITE_CONFIG.title}`}
+    description="Gallery Portfolio"
+>
+    {
+        ldJsons.map(
+            (
+                schema,
+            ) => (
+                <script
+                    type="application/ld+json"
+                    is:inline
+                    set:html={JSON.stringify(
+                        schema,
+                    )}
+                />
+            ),
+        )
+    }
+
+    <main
+        class="max-w-7xl w-full mx-auto pt-20 px-6"
+    >
+        <div
+            class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center"
+        >
+            <TextReveal
+                client:load
+                text="Gallery"
+                type="char"
+                className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
+                style={{
+                    writingMode:
+                        "vertical-rl",
+                    textOrientation:
+                        "mixed",
+                }}
+            />
+        </div>
+
+        <PhotoGrid
+            client:load
+            photos={photos}
+        />
+    </main>
+</Layout>

@@ -1,0 +1,61 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { SITE_CONFIG } from "@/config";
+import MotionWrapper from "@/components/ui/MotionWrapper";
+import TextReveal from "@/components/ui/TextReveal";
+---
+
+<Layout
+    title=`404 - Page Not Found | ${SITE_CONFIG.title}`
+    description="The page you're looking for doesn't exist."
+>
+    <!-- Background Watermark -->
+    <div
+        class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center"
+    >
+        <TextReveal
+            client:load
+            text="404"
+            type="char"
+            className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[18vh] lg:text-[25vh] leading-none whitespace-nowrap"
+            style={{
+                writingMode:
+                    "vertical-rl",
+                textOrientation:
+                    "mixed",
+            }}
+        />
+    </div>
+
+    <!-- Main Content -->
+    <section
+        class="w-full flex flex-col items-center justify-center text-center min-h-[60vh]"
+    >
+        <MotionWrapper
+            client:idle
+            delay={0.1}
+            className="w-full max-w-3xl px-6"
+        >
+            <!-- Heading -->
+            <h1
+                class="text-6xl md:text-8xl font-bold tracking-tighter mb-6 text-primary-text dark:text-primary-text-dark leading-tight"
+            >
+                Lost
+                in
+                Space
+            </h1>
+
+            <!-- Subtitle -->
+            <p
+                class="text-xl md:text-2xl text-secondary-text font-light italic"
+            >
+                The
+                page
+                you
+                seek
+                doesn't
+                exist
+            </p>
+        </MotionWrapper>
+    </section>
+</Layout>

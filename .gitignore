@@ -1,0 +1,47 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.*
+
+# Generated Search/Metadata
+public/pagefind/
+public/mcp/
+vectors.ndjson
+
+# macOS-specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows-specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Cloudflare
+.wrangler/
+
+# Temp Agent Files
+.reactbits-temp/

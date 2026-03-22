@@ -1,0 +1,53 @@
+{
+    "name": "growing-galaxy",
+    "type": "module",
+    "version": "0.0.1",
+    "scripts": {
+        "dev": "astro dev",
+        "build": "astro build && pagefind --site dist",
+        "postbuild": "cp -r dist/pagefind public/pagefind || true",
+        "preview": "astro preview",
+        "astro": "astro",
+        "check": "astro check",
+        "audit": "pnpm audit",
+        "build_index": "tsx scripts/build_index.ts"
+    },
+    "dependencies": {
+        "@astrojs/mdx": "^4.3.13",
+        "@astrojs/react": "^4.4.2",
+        "@astrojs/rss": "^4.0.14",
+        "@astrojs/sitemap": "^3.6.0",
+        "@fontsource-variable/inter": "^5.2.8",
+        "@fontsource-variable/playfair-display": "^5.2.8",
+        "@remixicon/react": "^4.9.0",
+        "@tailwindcss/typography": "^0.5.19",
+        "@tailwindcss/vite": "^4.1.18",
+        "astro": "^5.18.0",
+        "framer-motion": "^12.30.0",
+        "gsap": "^3.14.2",
+        "katex": "^0.16.28",
+        "lucide-react": "^0.562.0",
+        "motion": "^12.34.3",
+        "react": "^19.2.3",
+        "react-dom": "^19.2.3",
+        "react-masonry-css": "^1.0.16",
+        "rehype-katex": "^7.0.1",
+        "remark-math": "^6.0.0",
+        "sharp": "^0.34.5",
+        "tailwindcss": "^4.1.18"
+    },
+    "devDependencies": {
+        "@astrojs/check": "^0.9.6",
+        "@cloudflare/workers-types": "^4.20260317.1",
+        "@huggingface/transformers": "^3.8.1",
+        "@types/react": "^19.2.10",
+        "@types/react-dom": "^19.2.3",
+        "dotenv": "^17.3.1",
+        "gray-matter": "^4.0.3",
+        "pagefind": "^1.4.0",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3",
+        "uuid": "^13.0.0",
+        "wrangler": "^4.76.0"
+    }
+}

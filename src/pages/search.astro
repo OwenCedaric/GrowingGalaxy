@@ -1,0 +1,11 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SearchResults from "@/components/ui/SearchResults";
+import { SITE_CONFIG } from "@/config";
+---
+
+<Layout title="Search Results" description=`Search the ${SITE_CONFIG.title} archive`>
+    <div class="max-w-3xl mx-auto w-full pt-4 md:pt-12">
+        <SearchResults client:load />
+    </div>
+</Layout>
