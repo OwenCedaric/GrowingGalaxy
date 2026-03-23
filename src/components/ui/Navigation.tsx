@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { RiSearchLine, RiCloseLine } from "@remixicon/react";
 import AnimatedNavLink from "@/components/ui/AnimatedNavLink";
+import { useTheme } from "@/utils/useTheme";
 
 interface NavItem {
     text: string;
@@ -16,6 +17,7 @@ interface NavigationProps {
 }
 
 export default function Navigation({ title, navItems, pathname = "" }: NavigationProps) {
+    const isDark = useTheme();
     const [isSearchActive, setIsSearchActive] = useState(pathname.includes("/search"));
     const [searchQuery, setSearchQuery] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);

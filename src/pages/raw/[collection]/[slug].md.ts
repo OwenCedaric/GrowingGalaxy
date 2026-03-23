@@ -1,6 +1,7 @@
 
+/// <reference types="astro/client" />
 import type { APIContext } from 'astro';
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getSlug } from '@/utils/slug';
@@ -12,13 +13,13 @@ export async function getStaticPaths() {
 
 
     const paths = [
-        ...blogs.map(entry => ({
+        ...blogs.map((entry: CollectionEntry<'blog'>) => ({
             params: { collection: 'blog', slug: getSlug(entry) },
-            props: { entry, baseDir: 'src/content/blog' }
+            props: { entry, baseDir: 'src/content/blog', collection: 'blog' }
         })),
-        ...pages.map(entry => ({
+        ...pages.map((entry: CollectionEntry<'pages'>) => ({
             params: { collection: 'pages', slug: getSlug(entry) },
-            props: { entry, baseDir: 'src/content/pages' }
+            props: { entry, baseDir: 'src/content/pages', collection: 'pages' }
         }))
     ];
 

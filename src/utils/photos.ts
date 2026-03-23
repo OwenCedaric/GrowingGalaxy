@@ -1,7 +1,7 @@
-import { getCollection } from 'astro:content';
+/// <reference types="astro/client" />
+import { getCollection, type CollectionEntry } from 'astro:content';
 import type { PhotoEntry, PhotoImage } from '@/types/photo';
 import { SITE_CONFIG } from '@/config';
-import { getSlug } from '@/utils/slug';
 
 export function parsePhotoBody(body: string): PhotoImage[] {
     if (!body) return [];
@@ -28,7 +28,7 @@ export function parsePhotoBody(body: string): PhotoImage[] {
 export async function getPhotos(): Promise<PhotoEntry[]> {
     const collection = await getCollection('photos');
 
-    const photos = collection.map((entry) => {
+    const photos = collection.map((entry: CollectionEntry<'photos'>) => {
         const bodyText = entry.body || '';
         const images = parsePhotoBody(bodyText);
 
@@ -56,5 +56,5 @@ export async function getPhotos(): Promise<PhotoEntry[]> {
     });
 
     // Sort by date descending
-    return photos.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return photos.sort((a: PhotoEntry, b: PhotoEntry) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }

@@ -1,3 +1,4 @@
+/// <reference types="astro/client" />
 import type { APIRoute } from 'astro';
 
 const robotsTxt = `

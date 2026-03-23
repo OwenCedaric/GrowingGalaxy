@@ -1,4 +1,5 @@
 import matter from 'gray-matter';
+import { SITE_CONFIG } from '@/config';
 
 export interface MCPMeta {
     id: string;
@@ -14,6 +15,7 @@ export interface MCPMeta {
         exclude_sections: string[];
     };
     canonical_url: string;
+    raw_url: string;
 }
 
 export function supplementMCPMeta(content: string, filePath: string, overrideNamespace?: string): string {
@@ -78,9 +80,16 @@ export function supplementMCPMeta(content: string, filePath: string, overrideNam
         }
     }
 
-    const standardCanonical = `/${namespace}/${basename}`;
+    const standardCanonical = `${SITE_CONFIG.site}/${namespace}/${basename}`.replace(/\/+/g, '/').replace(':/', '://');
+    const standardRaw = `${SITE_CONFIG.site}/raw/${namespace}/${basename}.md`.replace(/\/+/g, '/').replace(':/', '://');
+    
     if (!data.canonical_url || data.canonical_url !== standardCanonical) {
         data.canonical_url = standardCanonical;
+        updated = true;
+    }
+
+    if (!data.raw_url || data.raw_url !== standardRaw) {
+        data.raw_url = standardRaw;
         updated = true;
     }
 

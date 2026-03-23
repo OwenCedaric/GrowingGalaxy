@@ -174,48 +174,71 @@ const {
                 : "light";
         };
 
+    const updateTheme =
+        (
+            theme,
+        ) => {
+            const isDark =
+                theme ===
+                "dark";
+            document.documentElement.classList.toggle(
+                "dark",
+                isDark,
+            );
+            document.documentElement.style.colorScheme =
+                theme;
+
+            // Update theme-color meta tags
+            const themeColor =
+                isDark
+                    ? "#0a0a0a"
+                    : "#ffffff";
+            let metaThemeColor =
+                document.querySelector(
+                    'meta[name="theme-color"]:not([media])',
+                );
+
+            if (
+                !metaThemeColor
+            ) {
+                metaThemeColor =
+                    document.createElement(
+                        "meta",
+                    );
+                metaThemeColor.name =
+                    "theme-color";
+                document.head.appendChild(
+                    metaThemeColor,
+                );
+            }
+            metaThemeColor.content =
+                themeColor;
+
+            if (
+                typeof localStorage !==
+                "undefined"
+            ) {
+                localStorage.setItem(
+                    "theme",
+                    theme,
+                );
+            }
+        };
+
+    // Initialize theme
     const theme =
         getTheme();
-    if (
-        theme ===
-        "dark"
-    ) {
-        document.documentElement.classList.add(
-            "dark",
-        );
-    } else {
-        document.documentElement.classList.remove(
-            "dark",
-        );
-    }
+    updateTheme(
+        theme,
+    );
 
-    if (
-        typeof localStorage !==
-        "undefined"
-    ) {
-        localStorage.setItem(
-            "theme",
-            theme,
-        );
-    }
-
+    // Handle view transitions
     document.addEventListener(
         "astro:after-swap",
         () => {
-            const theme =
-                getTheme();
-            if (
-                theme ===
-                "dark"
-            ) {
-                document.documentElement.classList.add(
-                    "dark",
-                );
-            } else {
-                document.documentElement.classList.remove(
-                    "dark",
-                );
-            }
+            updateTheme(
+                getTheme(),
+            );
         },
     );
 </script>

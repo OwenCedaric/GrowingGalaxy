@@ -27,8 +27,8 @@ export const getStaticPaths =
                 )
             ).sort(
                 (
-                    a,
-                    b,
+                    a: BlogPost,
+                    b: BlogPost,
                 ) =>
                     b.data.pubDate.valueOf() -
                     a.data.pubDate.valueOf(),

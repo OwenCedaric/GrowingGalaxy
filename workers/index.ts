@@ -1,3 +1,6 @@
+/// <reference types="@cloudflare/workers-types" />
+import { MCP_CONFIG } from '../mcp.config';
+
 export interface Env {
   VECTORIZE: VectorizeIndex;
   AI: any;
@@ -8,17 +11,15 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
-    // MCP routes logic
-    if (url.pathname.startsWith('/mcp')) {
+    // MCP 路由分发
+    if (url.pathname.startsWith(MCP_CONFIG.routes.base)) {
       if (request.method === 'OPTIONS') {
         return handleCors(request);
       }
       return (await handleMcpRequest(url, request, env)).clone();
     }
 
-    // Default: Fallback to static assets
-    // The "assets" binding implicitly manages resolving static sites. 
-    // In Workers, returning env.ASSETS.fetch(request) passes the request to the asset router.
+    // 默认回退到静态资源
     return env.ASSETS.fetch(request);
   }
 }
@@ -42,30 +43,28 @@ function corsHeaders() {
 
 async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<Response> {
   const path = url.pathname;
+  const { routes, server, ai, search } = MCP_CONFIG;
 
-  // 1. Handle GET Requests (SSE Handshake + Metadata)
+  // 1. 处理 GET 请求 (SSE 握手与元数据)
   if (request.method === 'GET') {
-    if (path === '/mcp/version') return new Response(JSON.stringify({ version: "1.3" }), { headers: corsHeaders() });
+    if (path === routes.version) {
+        return new Response(JSON.stringify({ version: server.version }), { headers: corsHeaders() });
+    }
     
-    if (path === '/mcp/list_docs') {
-      const res = await env.ASSETS.fetch(new Request(new URL('/mcp/index.json', request.url)));
+    if (path === routes.listDocs) {
+      const res = await env.ASSETS.fetch(new Request(new URL(routes.indexJson, request.url)));
       if (!res.ok) return new Response(JSON.stringify({ error: "Index Error" }), { status: 500, headers: corsHeaders() });
       return new Response(await res.text(), { headers: corsHeaders() });
     }
 
-    // Standard MCP SSE Handshake (Claude Code/Official SDK)
-    if (path === '/mcp') {
+    if (path === routes.base) {
         const { readable, writable } = new TransformStream();
         const writer = writable.getWriter();
         const encoder = new TextEncoder();
         
-        // Return the POST endpoint as an SSE event
-        const endpoint = new URL('/mcp/message', request.url).toString();
+        const endpoint = new URL(routes.message, request.url).toString();
         writer.write(encoder.encode(`event: endpoint\ndata: ${endpoint}\n\n`));
         
-        // Close the stream immediately or keep it open?
-        // Standard MCP over HTTP expects the SSE stream to be the notification channel.
-        // We'll keep it open but effectively empty for now.
         return new Response(readable, { 
             headers: { 
                 'Content-Type': 'text/event-stream',
@@ -77,30 +76,23 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
     }
   }
 
-  // 2. Handle POST Requests (JSON-RPC + Legacy Custom API)
+  // 2. 处理 POST 请求 (JSON-RPC 与遗留 API)
   if (request.method === 'POST') {
     try {
       const body = await request.json() as any;
       const { method, params, id, jsonrpc } = body;
 
-      // Logic: If it has 'method', treat it as a potential MCP JSON-RPC call
       if (method || jsonrpc === "2.0") {
         if (method === 'initialize') {
           return mcpResponse(id, {
-            protocolVersion: "2024-11-05",
+            protocolVersion: server.protocolVersion,
             capabilities: { tools: {}, resources: {} },
-            serverInfo: { name: "growing-galaxy-mcp", version: "1.4.0" }
+            serverInfo: { name: server.name, version: server.version }
           });
         }
         
-        // Handle Notifications (e.g. notifications/initialized) - return 204 No Content
-        if (!id) {
-          return new Response(null, { status: 204, headers: corsHeaders() });
-        }
-
-        if (method === 'notifications/initialized') {
-          return new Response(null, { status: 204, headers: corsHeaders() });
-        }
+        if (!id) return new Response(null, { status: 204, headers: corsHeaders() });
+        if (method === 'notifications/initialized') return new Response(null, { status: 204, headers: corsHeaders() });
 
         if (method === 'tools/list') {
           return mcpResponse(id, {
@@ -110,7 +102,7 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
                 description: "Semantically search the blog and pages.",
                 inputSchema: {
                   type: "object",
-                  properties: { query: { type: "string" }, top_k: { type: "number", default: 5 } },
+                  properties: { query: { type: "string" }, top_k: { type: "number", default: search.defaultTopK } },
                   required: ["query"]
                 }
               },
@@ -126,32 +118,33 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
             ]
           });
         }
+        
         if (method === 'tools/call') {
           const { name, arguments: args } = params || {};
           if (name === 'search' && args?.query) {
-            const aiResp = await env.AI.run('@cf/baai/bge-small-en-v1.5', { text: args.query });
-            const m = await env.VECTORIZE.query(aiResp.data[0], { topK: args.top_k || 5, returnMetadata: 'all' });
-            return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ results: m.matches.map(x => ({ chunk_id: x.id, score: x.score, metadata: x.metadata })) }) }] });
+            const aiResp = await env.AI.run(ai.cloudflareModel, { text: args.query });
+            const m = await env.VECTORIZE.query(aiResp.data[0], { topK: args.top_k || search.defaultTopK, returnMetadata: 'all' });
+            return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ results: m.matches.map((x: any) => ({ chunk_id: x.id, score: x.score, metadata: x.metadata })) }) }] });
           }
           if (name === 'get_context' && args?.chunk_ids) {
             const chunks = await env.VECTORIZE.getByIds(args.chunk_ids);
-            return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ context: chunks.map(m => ({ chunk_id: m.id, text: m.metadata?.text, url: m.metadata?.url, canonical_url: m.metadata?.canonical_url })) }) }] });
+            return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ context: chunks.map((m: any) => ({ chunk_id: m.id, text: m.metadata?.text, url: m.metadata?.url, canonical_url: m.metadata?.canonical_url })) }) }] });
           }
         }
         
-        // If it was a valid method but we don't handle it, return an empty result to keep protocol happy
         return mcpResponse(id, {});
       }
 
-      // Handle Legacy Custom POST API (Custom JSON Body)
-      if (path === '/mcp/search' && body.query) {
-        const aiResp = await env.AI.run('@cf/baai/bge-small-en-v1.5', { text: body.query });
-        const m = await env.VECTORIZE.query(aiResp.data[0], { topK: body.top_k || 5, returnMetadata: 'all' });
-        return new Response(JSON.stringify({ results: m.matches.map(x => ({ chunk_id: x.id, score: x.score, metadata: x.metadata })) }), { headers: corsHeaders() });
+      // 处理遗留自定义 POST API
+      if (path === routes.search && body.query) {
+        const aiResp = await env.AI.run(ai.cloudflareModel, { text: body.query });
+        const m = await env.VECTORIZE.query(aiResp.data[0], { topK: body.top_k || search.defaultTopK, returnMetadata: 'all' });
+        return new Response(JSON.stringify({ results: m.matches.map((x: any) => ({ chunk_id: x.id, score: x.score, metadata: x.metadata })) }), { headers: corsHeaders() });
       }
-      if (path === '/mcp/context' && body.chunk_ids) {
+      
+      if (path === routes.context && body.chunk_ids) {
         const chunks = await env.VECTORIZE.getByIds(body.chunk_ids);
-        return new Response(JSON.stringify({ context: chunks.map(m => ({ chunk_id: m.id, text: m.metadata?.text, url: m.metadata?.url, canonical_url: m.metadata?.canonical_url })) }), { headers: corsHeaders() });
+        return new Response(JSON.stringify({ context: chunks.map((m: any) => ({ chunk_id: m.id, text: m.metadata?.text, url: m.metadata?.url, canonical_url: m.metadata?.canonical_url })) }), { headers: corsHeaders() });
       }
 
       return new Response(JSON.stringify({ error: "Method not found or invalid body", path, method }), { status: 404, headers: corsHeaders() });
@@ -169,4 +162,3 @@ function mcpResponse(id: any, result: any) {
     headers: corsHeaders()
   });
 }
-

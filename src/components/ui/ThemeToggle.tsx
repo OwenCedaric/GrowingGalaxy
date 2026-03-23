@@ -1,36 +1,45 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "@/utils/useTheme";
 
 export default function ThemeToggle() {
-    const [theme, setTheme] = useState<"light" | "dark">("light");
+    const isDark = useTheme();
+    const theme = isDark ? "dark" : "light";
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
-        // Sync with the class set by BaseHead.astro
-        const isDark = document.documentElement.classList.contains("dark");
-        setTheme(isDark ? "dark" : "light");
-
+        
         // Handle Astro view transitions
         const handlePageSwap = () => {
-            const isDark = document.documentElement.classList.contains("dark");
-            setTheme(isDark ? "dark" : "light");
+            // isDark from hook will update automatically because it listens to DOM
         };
 
         document.addEventListener("astro:after-swap", handlePageSwap);
         return () => document.removeEventListener("astro:after-swap", handlePageSwap);
     }, []);
 
+    const updateDOM = (mode: "light" | "dark") => {
+        const isDark = mode === "dark";
+        document.documentElement.classList.toggle("dark", isDark);
+        document.documentElement.style.colorScheme = mode;
+        
+        // Update theme-color meta tags
+        const themeColor = isDark ? "#0a0a0a" : "#ffffff";
+        let metaThemeColor = document.querySelector('meta[name="theme-color"]:not([media])') as HTMLMetaElement | null;
+        
+        if (!metaThemeColor) {
+            metaThemeColor = document.createElement("meta");
+            metaThemeColor.name = "theme-color";
+            document.head.appendChild(metaThemeColor);
+        }
+        metaThemeColor.setAttribute("content", themeColor);
+    };
+
     const toggleTheme = () => {
         const newTheme = theme === "dark" ? "light" : "dark";
-        setTheme(newTheme);
         localStorage.setItem("theme", newTheme);
-
-        if (newTheme === "dark") {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
+        updateDOM(newTheme);
     };
 
     if (!mounted) {
