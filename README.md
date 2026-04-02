@@ -164,7 +164,7 @@ This project natively supports **Model Context Protocol (MCP)**, allowing AI age
 ### 1. Initialization (One-time)
 Use the provided `init.py` to create your Vectorize database via API, or use Wrangler:
 ```bash
-npx wrangler vectorize create growing-galaxy-mcp --dimensions=384 --metric=cosine
+npx wrangler vectorize create growing-galaxy-mcp --dimensions=1024 --metric=cosine
 ```
 
 ### 2. Building & Indexing

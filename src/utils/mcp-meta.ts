@@ -80,7 +80,9 @@ export function supplementMCPMeta(content: string, filePath: string, overrideNam
         }
     }
 
-    const standardCanonical = `${SITE_CONFIG.site}/${namespace}/${basename}`.replace(/\/+/g, '/').replace(':/', '://');
+    // Both blog and pages are served at root /slug
+    const urlNamespace = (namespace === 'blog' || namespace === 'pages') ? '' : namespace;
+    const standardCanonical = `${SITE_CONFIG.site}/${urlNamespace}/${basename}`.replace(/\/+/g, '/').replace(':/', '://');
     const standardRaw = `${SITE_CONFIG.site}/raw/${namespace}/${basename}.md`.replace(/\/+/g, '/').replace(':/', '://');
     
     if (!data.canonical_url || data.canonical_url !== standardCanonical) {

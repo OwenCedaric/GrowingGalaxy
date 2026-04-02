@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-@variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 
 @theme {
@@ -32,6 +32,7 @@
 
 @layer base {
     :root {
+        color-scheme: light dark;
         --background: var(--color-canvas);
         --foreground: var(--color-primary-text);
         --secondary: var(--color-secondary-text);
@@ -40,7 +41,22 @@
         --glass-shadow: var(--color-glass-shadow);
     }
 
-    .dark {
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --background: var(--color-canvas-dark);
+            --foreground: var(--color-primary-text-dark);
+            --secondary: var(--color-secondary-text-dark);
+            --color-secondary-text: var(--color-secondary-text-dark);
+            --color-primary-text: var(--color-primary-text-dark);
+            --color-decoration: var(--color-decoration-dark);
+            --glass-bg: var(--color-glass-bg-dark);
+            --glass-border: var(--color-glass-border-dark);
+            --glass-shadow: var(--color-glass-shadow-dark);
+        }
+    }
+
+    :root.dark {
+        color-scheme: dark;
         --background: var(--color-canvas-dark);
         --foreground: var(--color-primary-text-dark);
         --secondary: var(--color-secondary-text-dark);
@@ -52,11 +68,26 @@
         --glass-shadow: var(--color-glass-shadow-dark);
     }
 
+    :root.light {
+        color-scheme: light;
+        --background: var(--color-canvas);
+        --foreground: var(--color-primary-text);
+        --secondary: var(--color-secondary-text);
+        --glass-bg: var(--color-glass-bg);
+        --glass-border: var(--color-glass-border);
+        --glass-shadow: var(--color-glass-shadow);
+    }
+
     body {
         background-color: var(--background);
         color: var(--foreground);
         @apply font-sans antialiased;
         transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Safari Theme-Switch Repaint Fix */
+    :root.theme-transition-disable * {
+        transition: none !important;
     }
 }
 

@@ -21,12 +21,16 @@ export default function ThemeToggle() {
 
     const updateDOM = (mode: "light" | "dark") => {
         const isDark = mode === "dark";
+
+        // Safari Repaint Fix: Disable transitions briefly
+        document.documentElement.classList.add("theme-transition-disable");
+
         document.documentElement.classList.toggle("dark", isDark);
-        document.documentElement.style.colorScheme = mode;
+        document.documentElement.classList.toggle("light", !isDark);
         
         // Update theme-color meta tags
         const themeColor = isDark ? "#0a0a0a" : "#ffffff";
-        let metaThemeColor = document.querySelector('meta[name="theme-color"]:not([media])') as HTMLMetaElement | null;
+        let metaThemeColor = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
         
         if (!metaThemeColor) {
             metaThemeColor = document.createElement("meta");
@@ -34,6 +38,16 @@ export default function ThemeToggle() {
             document.head.appendChild(metaThemeColor);
         }
         metaThemeColor.setAttribute("content", themeColor);
+
+        // Force repaint
+        if (document.body) {
+            window.getComputedStyle(document.body).backgroundColor;
+        }
+        
+        // Re-enable transitions
+        setTimeout(() => {
+            document.documentElement.classList.remove("theme-transition-disable");
+        }, 0);
     };
 
     const toggleTheme = () => {

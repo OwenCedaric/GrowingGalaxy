@@ -49,8 +49,7 @@ async function main() {
         await fs.access(inputs.blogDir);
         await fs.access(inputs.pagesDir);
     } catch (e) {
-        console.error(`Error: Distribution directories not found. Did you run 'npm run build' first?`);
-        process.exit(1);
+        console.error(`[Warn] Some distribution directories are missing. Proceeding with available files...`);
     }
 
     console.log(`Loading embedding model (${localModel} to match Cloudflare Workers AI)...`);

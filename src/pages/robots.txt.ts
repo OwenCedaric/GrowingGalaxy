@@ -4,9 +4,9 @@ import type { APIRoute } from 'astro';
 const robotsTxt = `
 User-agent: *
 Allow: /
-Disallow: /raw/
 
 Sitemap: ${import.meta.env.SITE}/sitemap-index.xml
+llms-txt: ${import.meta.env.SITE}/llms.txt
 `.trim();
 
 export const GET: APIRoute = () => {

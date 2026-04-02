@@ -43,28 +43,32 @@ const {
 <meta
     name="theme-color"
     content="#ffffff"
-    media="(prefers-color-scheme: light)"
-/>
-<meta
-    name="theme-color"
-    content="#0a0a0a"
-    media="(prefers-color-scheme: dark)"
+    id="theme-color-meta"
 />
 
 {
-    SITE_CONFIG.imageServer && SITE_CONFIG.imageServer.map((server) => (
-        <>
-            <link
-                rel="dns-prefetch"
-                href={server}
-            />
-            <link
-                rel="preconnect"
-                href={server}
-                crossorigin
-            />
-        </>
-    ))
+    SITE_CONFIG.imageServer &&
+        SITE_CONFIG.imageServer.map(
+            (
+                server,
+            ) => (
+                <>
+                    <link
+                        rel="dns-prefetch"
+                        href={
+                            server
+                        }
+                    />
+                    <link
+                        rel="preconnect"
+                        href={
+                            server
+                        }
+                        crossorigin
+                    />
+                </>
+            ),
+        )
 }
 
 <!-- Font Preloads -->
@@ -181,12 +185,18 @@ const {
             const isDark =
                 theme ===
                 "dark";
+
+            // Safari Repaint Fix: Disable transitions briefly
+            document.documentElement.classList.add("theme-transition-disable");
+
             document.documentElement.classList.toggle(
                 "dark",
                 isDark,
             );
-            document.documentElement.style.colorScheme =
-                theme;
+            document.documentElement.classList.toggle(
+                "light",
+                !isDark,
+            );
 
             // Update theme-color meta tags
             const themeColor =
@@ -195,7 +205,7 @@ const {
                     : "#ffffff";
             let metaThemeColor =
                 document.querySelector(
-                    'meta[name="theme-color"]:not([media])',
+                    'meta[name="theme-color"]',
                 );
 
             if (
@@ -223,22 +233,24 @@ const {
                     theme,
                 );
             }
+
+            // Force repaint
+            if (document.body) {
+                window.getComputedStyle(document.body).backgroundColor;
+            }
+            
+            // Re-enable transitions after the paint
+            setTimeout(() => {
+                document.documentElement.classList.remove("theme-transition-disable");
+            }, 0);
         };
 
     // Initialize theme
-    const theme =
-        getTheme();
-    updateTheme(
-        theme,
-    );
+    const theme = getTheme();
+    updateTheme(theme);
 
-    // Handle view transitions
-    document.addEventListener(
-        "astro:after-swap",
-        () => {
-            updateTheme(
-                getTheme(),
-            );
-        },
-    );
+    // Astro View Transitions Support
+    document.addEventListener("astro:after-swap", () => {
+        updateTheme(getTheme());
+    });
 </script>

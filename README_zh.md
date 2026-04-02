@@ -164,7 +164,7 @@ description: "站点摘要描述..."
 ### 1. 数据库初始化 (单次操作)
 你可以使用提供的 `init.py` 脚本通过官方 API 一键开辟数据库，或者直接使用 Wrangler：
 ```bash
-npx wrangler vectorize create growing-galaxy-mcp --dimensions=384 --metric=cosine
+npx wrangler vectorize create growing-galaxy-mcp --dimensions=1024 --metric=cosine
 ```
 
 ### 2. 自动化索引构建

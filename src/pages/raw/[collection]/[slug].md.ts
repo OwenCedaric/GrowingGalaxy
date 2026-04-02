@@ -5,12 +5,11 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getSlug } from '@/utils/slug';
+import { SITE_CONFIG } from '@/config';
 
 export async function getStaticPaths() {
     const blogs = await getCollection('blog');
     const pages = await getCollection('pages');
-
-
 
     const paths = [
         ...blogs.map((entry: CollectionEntry<'blog'>) => ({
@@ -27,14 +26,14 @@ export async function getStaticPaths() {
 }
 
 export async function GET({ props }: APIContext) {
-    const { entry, baseDir } = props;
+    const { entry, baseDir, collection } = props;
+
+    let content;
 
     // Try to find the file
     // entry.id might vary based on loader configuration. 
     // We try exact match first, then extensions.
     const extensions = ['', '.md', '.mdx'];
-    let content;
-
     for (const ext of extensions) {
         try {
             const filePath = path.join(process.cwd(), baseDir, entry.id + ext);
@@ -71,10 +70,17 @@ export async function GET({ props }: APIContext) {
     const { supplementMCPMeta } = await import('@/utils/mcp-meta');
     const supplementedContent = supplementMCPMeta(content, entry.id, props.collection);
 
+    // Calculate canonical URL
+    const site = SITE_CONFIG.site;
+    const id = getSlug(entry);
+    const urlNamespace = (collection === 'blog' || collection === 'pages') ? '' : collection;
+    const canonicalUrl = `${site}/${urlNamespace}/${id}`.replace(/\/+/g, '/').replace(':/', '://');
+
     return new Response('\uFEFF' + supplementedContent, {
         headers: {
             'Content-Type': 'text/markdown; charset=utf-8',
             'X-Robots-Tag': 'noindex, follow',
+            'Link': `<${canonicalUrl}>; rel="canonical"`
         }
     });
 }

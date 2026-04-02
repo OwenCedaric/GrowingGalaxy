@@ -16,7 +16,21 @@ export function useTheme() {
         });
 
         observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-        return () => observer.disconnect();
+
+        // Handle View Transitions swap
+        const handleAfterSwap = () => {
+             setIsDark(document.documentElement.classList.contains('dark'));
+             // Re-bind observer to new element
+             observer.disconnect();
+             observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        };
+
+        document.addEventListener('astro:after-swap', handleAfterSwap);
+
+        return () => {
+            observer.disconnect();
+            document.removeEventListener('astro:after-swap', handleAfterSwap);
+        };
     }, []);
 
     return isDark;
