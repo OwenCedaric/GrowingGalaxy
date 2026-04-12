@@ -1,6 +1,5 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
-import { getSlug } from '@/utils/slug';
 import { SITE_CONFIG } from '@/config';
 
 export async function GET(context) {
@@ -13,7 +12,7 @@ export async function GET(context) {
             title: post.data.title,
             pubDate: post.data.pubDate,
             description: post.data.description,
-            link: `/${getSlug(post)}/`,
+            link: `/blog/${post.id}/`,
         })),
     });
 }

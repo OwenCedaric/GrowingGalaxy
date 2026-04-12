@@ -6,7 +6,6 @@ import type {
     InferGetStaticPropsType,
 } from "astro";
 import { SITE_CONFIG } from "@/config";
-import { getSlug } from "@/utils/slug";
 import Layout from "@/layouts/Layout.astro";
 import TextReveal from "@/components/ui/TextReveal";
 import SpotlightCard from "@/components/ui/SpotlightCard";
@@ -119,7 +118,7 @@ const {
 
                                     <div class="md:col-span-10 space-y-6">
                                         <a
-                                            href={`/${getSlug(post)}`}
+                                            href={`/blog/${post.id}`}
                                             class="block"
                                         >
                                             <h2 class="text-4xl md:text-5xl font-bold tracking-tight hover:text-secondary-text transition-colors">

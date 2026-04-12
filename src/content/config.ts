@@ -13,6 +13,17 @@ const blog = defineCollection({
         tags: z.array(z.string()).optional(),
         readingTime: z.string().optional(), // Now automated, but keeping as optional for override
         depth: z.string(), // e.g. "Beginner", "Intermediate", "Deep Dive" - "Cocktail Strength"
+        copyright: z.object({
+            enabled: z.boolean().optional(),
+            declaration: z.string().optional(),
+            author: z.string().optional(),
+            proof: z.object({
+                enabled: z.boolean().optional(),
+                linkText: z.string().optional(),
+                baseUrl: z.string().optional(),
+                mode: z.enum(['static', 'dynamic']).optional(),
+            }).optional(),
+        }).optional(),
     }),
 });
 

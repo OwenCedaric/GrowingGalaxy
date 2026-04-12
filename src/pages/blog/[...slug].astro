@@ -1,0 +1,379 @@
+---
+import {
+    getCollection,
+    render,
+} from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import { SITE_CONFIG } from "@/config";
+import ArticleAnimate from "@/components/ui/ArticleAnimate";
+import FadeContent from "@/components/ui/FadeContent";
+import ScrollFloat from "@/components/ui/ScrollFloat";
+import GlareHover from "@/components/ui/GlareHover";
+
+export async function getStaticPaths() {
+    const posts =
+        await getCollection(
+            "blog",
+        );
+
+    return posts.map(
+        (
+            post,
+            i,
+        ) => ({
+            params: {
+                slug: post.id,
+            },
+            props: {
+                entry: post,
+                nextPost:
+                    i >
+                    0
+                        ? posts[
+                              i -
+                                  1
+                          ]
+                        : null,
+                prevPost:
+                    i <
+                    posts.length -
+                        1
+                        ? posts[
+                              i +
+                                  1
+                          ]
+                        : null,
+            },
+        }),
+    );
+}
+
+const {
+    entry,
+    nextPost,
+    prevPost,
+} =
+    Astro.props;
+
+const {
+    Content,
+} =
+    await render(
+        entry,
+    );
+
+// Merge copyright settings: Article Frontmatter > Global Config
+const blogCopyright = {
+    enabled: entry.data.copyright?.enabled ?? SITE_CONFIG.articleCopyright?.enabled,
+    declaration: entry.data.copyright?.declaration ?? SITE_CONFIG.articleCopyright?.declaration,
+    author: entry.data.copyright?.author ?? SITE_CONFIG.author ?? SITE_CONFIG.title,
+    proof: {
+        enabled: entry.data.copyright?.proof?.enabled ?? SITE_CONFIG.articleCopyright?.proof?.enabled,
+        linkText: entry.data.copyright?.proof?.linkText ?? SITE_CONFIG.articleCopyright?.proof?.linkText,
+        baseUrl: entry.data.copyright?.proof?.baseUrl ?? SITE_CONFIG.articleCopyright?.proof?.baseUrl,
+        mode: entry.data.copyright?.proof?.mode ?? SITE_CONFIG.articleCopyright?.proof?.mode,
+    }
+};
+---
+
+<Layout
+    title={entry
+        .data
+        .title}
+    description={entry
+        .data
+        .description}
+    rawContentUrl={`/raw/blog/${entry.id}.md`}
+>
+    <article
+        class="max-w-3xl mx-auto pt-12 md:pt-20"
+        data-pagefind-body
+    >
+        {
+            /* Minimal Header */
+        }
+        <header
+            class="mb-20 text-left"
+        >
+            <FadeContent
+                client:load
+                delay={100}
+                duration={600}
+                blur={true}
+            >
+                <div
+                    class="flex items-center justify-start gap-3 text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 mb-8"
+                >
+                    <span
+                        >{
+                            entry
+                                .data
+                                .category
+                        }</span
+                    >
+                    <span
+                        class="text-accent"
+                        >•</span
+                    >
+                    <span
+                        >{
+                            entry
+                                .data
+                                .depth
+                        }</span
+                    >
+                </div>
+            </FadeContent>
+
+            <h1
+                class="text-5xl md:text-7xl font-bold tracking-tighter leading-tight mb-8"
+            >
+                <ScrollFloat
+                    client:load
+                    text={entry
+                        .data
+                        .title}
+                    className="text-5xl md:text-7xl font-bold tracking-tighter leading-tight"
+                    scrollStart="top bottom"
+                    scrollEnd="top center+=200"
+                    stagger={0.02}
+                />
+            </h1>
+
+            <FadeContent
+                client:load
+                delay={300}
+                duration={800}
+                blur={true}
+            >
+                <p
+                    class="text-lg text-secondary-text max-w-2xl leading-relaxed italic opacity-90"
+                >
+                    {
+                        entry
+                            .data
+                            .description
+                    }
+                </p>
+            </FadeContent>
+        </header>
+
+        {
+            /* Hero Image (if exists) */
+        }
+        {
+            entry
+                .data
+                .heroImage && (
+                <FadeContent
+                    client:load
+                    delay={
+                        400
+                    }
+                    duration={
+                        800
+                    }
+                    blur={
+                        true
+                    }
+                    className="mb-20"
+                >
+                    <GlareHover
+                        client:load
+                        borderRadius="2rem"
+                        glareOpacity={
+                            0.25
+                        }
+                        transitionDuration={
+                            800
+                        }
+                    >
+                        <img
+                            src={
+                                entry
+                                    .data
+                                    .heroImage
+                            }
+                            alt={
+                                entry
+                                    .data
+                                    .title
+                            }
+                            loading="eager"
+                            decoding="async"
+                            class="w-full h-auto object-cover"
+                        />
+                    </GlareHover>
+                </FadeContent>
+            )
+        }
+
+        {
+            /* Content */
+        }
+        <ArticleAnimate
+            client:load
+            className="prose prose-xl dark:prose-invert max-w-none prose-p:font-serif prose-p:font-light prose-p:leading-loose prose-p:opacity-90 prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4 prose-blockquote:not-italic prose-blockquote:border-l-2 prose-blockquote:pl-6 prose-blockquote:border-black/20 dark:prose-blockquote:border-white/20"
+        >
+            <Content
+            />
+
+            {
+                /* Tags */
+            }
+            {
+                entry
+                    .data
+                    .tags &&
+                    entry
+                        .data
+                        .tags
+                        .length >
+                        0 && (
+                        <div class="mt-12 flex flex-wrap gap-2 not-prose">
+                            {entry.data.tags.map(
+                                (
+                                    tag: string,
+                                ) => (
+                                    <span class="px-3 py-1 bg-black/5 dark:bg-white/5 rounded-full text-xs font-mono text-secondary-text">
+                                        #
+                                        {
+                                            tag
+                                        }
+                                    </span>
+                                ),
+                            )}
+                        </div>
+                    )
+            }
+
+            {
+                /* Copyright Declaration */
+            }
+            {/* Copyright Declaration */}
+            {blogCopyright.enabled && (
+                <div class="mt-16 p-6 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/10 text-sm leading-relaxed text-secondary-text not-prose">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                        <p class="font-medium text-primary-text">
+                            Copyright Declaration
+                        </p>
+                        {blogCopyright.proof?.enabled && (
+                            <a 
+                                href={blogCopyright.proof.mode === 'dynamic' 
+                                    ? `${blogCopyright.proof.baseUrl}/blog/${entry.id}` 
+                                    : blogCopyright.proof.baseUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-[10px] uppercase tracking-widest font-mono px-3 py-1 border border-black/10 dark:border-white/10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors opacity-60 hover:opacity-100"
+                            >
+                                {blogCopyright.proof.linkText} ↗
+                            </a>
+                        )}
+                    </div>
+                    <p>
+                        &copy;{" "}
+                        {new Date().getFullYear()}{" "}
+                        <span class="font-semibold">
+                            {blogCopyright.author}
+                        </span>
+                        . All Rights Reserved.
+                        <br />
+                        {blogCopyright.declaration}
+                    </p>
+                </div>
+            )}
+        </ArticleAnimate>
+
+        {
+            /* Footer / Signature */
+        }
+        <footer
+            class="mt-16 pt-12 border-t border-black/5 dark:border-white/5 space-y-12"
+        >
+            {
+                /* Navigation Links */
+            }
+            <div
+                class="flex flex-col sm:flex-row justify-between gap-6"
+            >
+                <div
+                    class="flex-1 text-left"
+                >
+                    {
+                        nextPost && (
+                            <a
+                                href={`/blog/${nextPost.id}`}
+                                class="group block"
+                            >
+                                <span class="text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 block mb-2 group-hover:opacity-100 transition-opacity">
+                                    ←
+                                    Next
+                                    Post
+                                </span>
+                                <span class="text-lg font-bold group-hover:underline">
+                                    {
+                                        nextPost
+                                            .data
+                                            .title
+                                    }
+                                </span>
+                            </a>
+                        )
+                    }
+                </div>
+                <div
+                    class="flex-1 text-right"
+                >
+                    {
+                        prevPost && (
+                            <a
+                                href={`/blog/${prevPost.id}`}
+                                class="group block"
+                            >
+                                <span class="text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 block mb-2 group-hover:opacity-100 transition-opacity">
+                                    Previous
+                                    Post
+                                    →
+                                </span>
+                                <span class="text-lg font-bold group-hover:underline">
+                                    {
+                                        prevPost
+                                            .data
+                                            .title
+                                    }
+                                </span>
+                            </a>
+                        )
+                    }
+                </div>
+            </div>
+
+            <div
+                class="flex justify-between items-center opacity-60 dark:opacity-80"
+            >
+                <a
+                    href="/blog"
+                    class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
+                >
+                    Back
+                    to
+                    Blog
+                </a>
+                <span
+                    class="text-xs font-mono"
+                >
+                    {
+                        entry.data.pubDate.toLocaleDateString(
+                            "en-US",
+                            {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                            },
+                        )
+                    }
+                </span>
+            </div>
+        </footer>
+    </article>
+</Layout>

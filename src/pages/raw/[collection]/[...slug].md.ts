@@ -1,10 +1,8 @@
-
 /// <reference types="astro/client" />
 import type { APIContext } from 'astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { getSlug } from '@/utils/slug';
 import { SITE_CONFIG } from '@/config';
 
 export async function getStaticPaths() {
@@ -13,11 +11,11 @@ export async function getStaticPaths() {
 
     const paths = [
         ...blogs.map((entry: CollectionEntry<'blog'>) => ({
-            params: { collection: 'blog', slug: getSlug(entry) },
+            params: { collection: 'blog', slug: entry.id },
             props: { entry, baseDir: 'src/content/blog', collection: 'blog' }
         })),
         ...pages.map((entry: CollectionEntry<'pages'>) => ({
-            params: { collection: 'pages', slug: getSlug(entry) },
+            params: { collection: 'pages', slug: entry.id },
             props: { entry, baseDir: 'src/content/pages', collection: 'pages' }
         }))
     ];
@@ -72,8 +70,8 @@ export async function GET({ props }: APIContext) {
 
     // Calculate canonical URL
     const site = SITE_CONFIG.site;
-    const id = getSlug(entry);
-    const urlNamespace = (collection === 'blog' || collection === 'pages') ? '' : collection;
+    const id = entry.id;
+    const urlNamespace = collection === 'blog' ? 'blog' : '';
     const canonicalUrl = `${site}/${urlNamespace}/${id}`.replace(/\/+/g, '/').replace(':/', '://');
 
     return new Response('\uFEFF' + supplementedContent, {

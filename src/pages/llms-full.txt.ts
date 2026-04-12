@@ -1,7 +1,6 @@
 import type { APIContext } from 'astro';
 import { getCollection } from 'astro:content';
 import { SITE_CONFIG } from '../config';
-import { getSlug } from '@/utils/slug';
 
 export async function GET({ request }: APIContext) {
     const site = SITE_CONFIG.site;
@@ -16,15 +15,15 @@ export async function GET({ request }: APIContext) {
 
 ## Blog Posts
 
-${blogs.map(entry => `- [${entry.data.title}](${site}/${getSlug(entry)}) ([Raw Markdown](${site}/raw/blog/${getSlug(entry)}.md))`).join('\n')}
+${blogs.map(entry => `- [${entry.data.title}](${site}/blog/${entry.id}) ([Raw Markdown](${site}/raw/blog/${entry.id}.md))`).join('\n')}
 
 ## Pages
 
-${pages.map(entry => `- [${entry.data.title}](${site}/${getSlug(entry)}) ([Raw Markdown](${site}/raw/pages/${getSlug(entry)}.md))`).join('\n')}
+${pages.map(entry => `- [${entry.data.title}](${site}/${entry.id}) ([Raw Markdown](${site}/raw/pages/${entry.id}.md))`).join('\n')}
 
 ## Gallery & Photos (Web Only)
 
-${photos.map(entry => `- [${entry.data.name}](${site}/gallery/2025/${getSlug(entry).toLowerCase()})`).join('\n')}
+${photos.map(entry => `- [${entry.data.name}](${site}/gallery/2025/${entry.id.toLowerCase()})`).join('\n')}
 
 ## Blogroll
 

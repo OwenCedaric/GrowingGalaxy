@@ -5,57 +5,15 @@ import {
 } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
-import { getSlug } from "@/utils/slug";
 import { SITE_CONFIG } from "@/config";
 import TextReveal from "@/components/ui/TextReveal";
 import ArticleAnimate from "@/components/ui/ArticleAnimate";
 import FadeContent from "@/components/ui/FadeContent";
-import ScrollFloat from "@/components/ui/ScrollFloat";
-import GlareHover from "@/components/ui/GlareHover";
 
 export async function getStaticPaths() {
-    const posts =
-        await getCollection(
-            "blog",
-        );
     const pages =
         await getCollection(
             "pages",
-        );
-
-    const postPaths =
-        posts.map(
-            (
-                post: CollectionEntry<"blog">,
-                i: number,
-            ) => ({
-                params: {
-                    slug: getSlug(
-                        post,
-                    ),
-                },
-                props: {
-                    entry: post,
-                    type: "blog",
-                    nextPost:
-                        i >
-                        0
-                            ? posts[
-                                  i -
-                                      1
-                              ]
-                            : null,
-                    prevPost:
-                        i <
-                        posts.length -
-                            1
-                            ? posts[
-                                  i +
-                                      1
-                              ]
-                            : null,
-                },
-            }),
         );
 
     const pagePaths =
@@ -64,40 +22,22 @@ export async function getStaticPaths() {
                 page: CollectionEntry<"pages">,
             ) => ({
                 params: {
-                    slug: getSlug(
-                        page,
-                    ),
+                    slug: page.id,
                 },
                 props: {
                     entry: page,
-                    type: "page",
-                    nextPost:
-                        null,
-                    prevPost:
-                        null,
                 },
             }),
         );
 
-    return [
-        ...postPaths,
-        ...pagePaths,
-    ];
+    return pagePaths;
 }
 
 const {
     entry,
-    type,
-    nextPost,
-    prevPost,
 } =
     Astro.props;
 
-const blogPost =
-    type ===
-    "blog"
-        ? (entry as CollectionEntry<"blog">)
-        : null;
 const {
     Content,
 } =
@@ -112,275 +52,53 @@ const {
         .title}
     description={entry
         .data
-        .description ||
-        (type ===
-        "page"
-            ? `${entry.data.title} - ${SITE_CONFIG.title}`
-            : "")}
-    rawContentUrl={`/raw/${type === "blog" ? "blog" : "pages"}/${getSlug(entry)}.md`}
+        .description || `${entry.data.title} - ${SITE_CONFIG.title}`}
+    rawContentUrl={`/raw/pages/${entry.id}.md`}
 >
-    {
-        blogPost ? (
-            <article class="max-w-3xl mx-auto pt-12 md:pt-20" data-pagefind-body>
-                {/* Minimal Header */}
-                <header class="mb-20 text-left">
-                    <FadeContent
-                        client:load
-                        delay={
-                            100
-                        }
-                        duration={
-                            600
-                        }
-                        blur={
-                            true
-                        }
-                    >
-                        <div class="flex items-center justify-start gap-3 text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 mb-8">
-                            <span>{blogPost.data.category}</span>
-                            <span class="text-accent">•</span>
-                            <span>{blogPost.data.depth}</span>
-                        </div>
-                    </FadeContent>
+    <article class="max-w-3xl mx-auto pt-20" data-pagefind-body>
+        <header class="mb-20 text-left">
+            <TextReveal
+                client:load
+                text={
+                    entry
+                        .data
+                        .title
+                }
+                type="char"
+                className="text-6xl md:text-8xl font-bold tracking-tighter leading-tight mb-8"
+            />
 
-                    <h1 class="text-5xl md:text-7xl font-bold tracking-tighter leading-tight mb-8">
-                        <ScrollFloat
-                            client:load
-                            text={
-                                entry
-                                    .data
-                                    .title
-                            }
-                            className="text-5xl md:text-7xl font-bold tracking-tighter leading-tight"
-                            scrollStart="top bottom"
-                            scrollEnd="top center+=200"
-                            stagger={
-                                0.02
-                            }
-                        />
-                    </h1>
-
-                    <FadeContent
-                        client:load
-                        delay={
-                            300
-                        }
-                        duration={
-                            800
-                        }
-                        blur={
-                            true
-                        }
-                    >
-                        <p class="text-lg text-secondary-text max-w-2xl leading-relaxed italic opacity-90">
-                            {
-                                entry
-                                    .data
-                                    .description
-                            }
-                        </p>
-                    </FadeContent>
-                </header>
-
-                {/* Hero Image (if exists) */}
-                {blogPost
-                    .data
-                    .heroImage && (
-                    <FadeContent
-                        client:load
-                        delay={
-                            400
-                        }
-                        duration={
-                            800
-                        }
-                        blur={
-                            true
-                        }
-                        className="mb-20"
-                    >
-                        <GlareHover
-                            client:load
-                            borderRadius="2rem"
-                            glareOpacity={
-                                0.25
-                            }
-                            transitionDuration={
-                                800
-                            }
-                        >
-                            <img
-                                src={
-                                    blogPost
-                                        .data
-                                        .heroImage
-                                }
-                                alt={
-                                    entry
-                                        .data
-                                        .title
-                                }
-                                loading="eager"
-                                decoding="async"
-                                class="w-full h-auto object-cover"
-                            />
-                        </GlareHover>
-                    </FadeContent>
-                )}
-
-                {/* Content */}
-                <ArticleAnimate
+            {entry
+                .data
+                .description && (
+                <FadeContent
                     client:load
-                    className="prose prose-xl dark:prose-invert max-w-none prose-p:font-serif prose-p:font-light prose-p:leading-loose prose-p:opacity-90 prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4 prose-blockquote:not-italic prose-blockquote:border-l-2 prose-blockquote:pl-6 prose-blockquote:border-black/20 dark:prose-blockquote:border-white/20"
+                    delay={
+                        200
+                    }
+                    duration={
+                        700
+                    }
+                    blur={
+                        true
+                    }
                 >
-                    <Content />
-
-                    {/* Tags */}
-                    {blogPost.data.tags && blogPost.data.tags.length > 0 && (
-                        <div class="mt-12 flex flex-wrap gap-2 not-prose">
-                            {blogPost.data.tags.map((tag: string) => (
-                                <span class="px-3 py-1 bg-black/5 dark:bg-white/5 rounded-full text-xs font-mono text-secondary-text">
-                                    #{tag}
-                                </span>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Copyright Declaration */}
-                    <div class="mt-16 p-6 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/10 text-sm leading-relaxed text-secondary-text not-prose">
-                        <p class="font-medium text-primary-text mb-2">
-                            Copyright Declaration
-                        </p>
-                        <p>
-                            &copy;{" "}
-                            {new Date().getFullYear()}{" "}
-                            <span class="font-semibold">
-                                {SITE_CONFIG.title}
-                            </span>
-                            . All Rights Reserved.
-                            <br />
-                            No part of this article may be reproduced, distributed, or transmitted in any form or by any means without the prior written permission of the author.
-                        </p>
-                    </div>
-                </ArticleAnimate>
-
-                {/* Footer / Signature */}
-                <footer class="mt-16 pt-12 border-t border-black/5 dark:border-white/5 space-y-12">
-                    {/* Navigation Links */}
-                    <div class="flex flex-col sm:flex-row justify-between gap-6">
-                        <div class="flex-1 text-left">
-                            {nextPost && (
-                                <a
-                                    href={`/${getSlug(nextPost)}`}
-                                    class="group block"
-                                >
-                                    <span class="text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 block mb-2 group-hover:opacity-100 transition-opacity">
-                                        ←
-                                        Next
-                                        Post
-                                    </span>
-                                    <span class="text-lg font-bold group-hover:underline">
-                                        {
-                                            nextPost
-                                                .data
-                                                .title
-                                        }
-                                    </span>
-                                </a>
-                            )}
-                        </div>
-                        <div class="flex-1 text-right">
-                            {prevPost && (
-                                <a
-                                    href={`/${getSlug(prevPost)}`}
-                                    class="group block"
-                                >
-                                    <span class="text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 block mb-2 group-hover:opacity-100 transition-opacity">
-                                        Previous
-                                        Post
-                                        →
-                                    </span>
-                                    <span class="text-lg font-bold group-hover:underline">
-                                        {
-                                            prevPost
-                                                .data
-                                                .title
-                                        }
-                                    </span>
-                                </a>
-                            )}
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center opacity-60 dark:opacity-80">
-                        <a
-                            href="/blog"
-                            class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
-                        >
-                            Back
-                            to
-                            Blog
-                        </a>
-                        <span class="text-xs font-mono">
-                            {blogPost!.data.pubDate.toLocaleDateString(
-                                "en-US",
-                                {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric",
-                                },
-                            )}
-                        </span>
-                    </div>
-                </footer>
-            </article>
-        ) : (
-            <article class="max-w-3xl mx-auto pt-20" data-pagefind-body>
-                <header class="mb-20 text-left">
-                    <TextReveal
-                        client:load
-                        text={
+                    <p class="text-lg text-secondary-text text-left italic opacity-90">
+                        {
                             entry
                                 .data
-                                .title
+                                .description
                         }
-                        type="char"
-                        className="text-6xl md:text-8xl font-bold tracking-tighter leading-tight mb-8"
-                    />
+                    </p>
+                </FadeContent>
+            )}
+        </header>
 
-                    {entry
-                        .data
-                        .description && (
-                        <FadeContent
-                            client:load
-                            delay={
-                                200
-                            }
-                            duration={
-                                700
-                            }
-                            blur={
-                                true
-                            }
-                        >
-                            <p class="text-lg text-secondary-text text-left italic opacity-90">
-                                {
-                                    entry
-                                        .data
-                                        .description
-                                }
-                            </p>
-                        </FadeContent>
-                    )}
-                </header>
-
-                <ArticleAnimate
-                    client:load
-                    className="prose prose-xl dark:prose-invert max-w-none prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-p:font-serif prose-p:font-light prose-p:leading-loose prose-p:opacity-90 prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4"
-                >
-                    <Content />
-                </ArticleAnimate>
-            </article>
-        )
-    }
+        <ArticleAnimate
+            client:load
+            className="prose prose-xl dark:prose-invert max-w-none prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-p:font-serif prose-p:font-light prose-p:leading-loose prose-p:opacity-90 prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4"
+        >
+            <Content />
+        </ArticleAnimate>
+    </article>
 </Layout>

@@ -31,5 +31,15 @@ export const SITE_CONFIG = {
             { text: "X", href: "https://x.com/OwenCedaric" }
         ],
         copyright: "Growing Galaxy. Designed with intention."
+    },
+    articleCopyright: {
+        enabled: true,
+        declaration: "No part of this article may be reproduced, distributed, or transmitted in any form or by any means without the prior written permission of the author.",
+        proof: {
+            enabled: true,
+            linkText: "Verify Authenticity",
+            baseUrl: "https://proofs.ceda.is",
+            mode: "dynamic" // 'static' uses baseUrl as is, 'dynamic' appends '/blog/[slug]'
+        }
     }
 };
