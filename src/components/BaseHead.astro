@@ -154,103 +154,40 @@ const {
     )}
 />
 
-<script
-    is:inline
->
-    const getTheme =
-        () => {
-            if (
-                typeof localStorage !==
-                    "undefined" &&
-                localStorage.getItem(
-                    "theme",
-                )
-            ) {
-                return localStorage.getItem(
-                    "theme",
-                );
-            }
-            return window.matchMedia(
-                "(prefers-color-scheme: dark)",
-            )
-                .matches
-                ? "dark"
-                : "light";
-        };
+<script is:inline>
+    const getTheme = () => {
+        if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
+            return localStorage.getItem("theme");
+        }
+        return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    };
 
-    const updateTheme =
-        (
-            theme,
-        ) => {
-            const isDark =
-                theme ===
-                "dark";
+    const applyTheme = (theme) => {
+        const isDark = theme === "dark";
+        document.documentElement.classList.toggle("dark", isDark);
 
-            // Safari Repaint Fix: Disable transitions briefly
-            document.documentElement.classList.add("theme-transition-disable");
+        // Update theme-color meta tag
+        const themeColor = isDark ? "#0a0a0a" : "#ffffff";
+        let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (!metaThemeColor) {
+            metaThemeColor = document.createElement("meta");
+            metaThemeColor.name = "theme-color";
+            document.head.appendChild(metaThemeColor);
+        }
+        metaThemeColor.content = themeColor;
 
-            document.documentElement.classList.toggle(
-                "dark",
-                isDark,
-            );
-            document.documentElement.classList.toggle(
-                "light",
-                !isDark,
-            );
-
-            // Update theme-color meta tags
-            const themeColor =
-                isDark
-                    ? "#0a0a0a"
-                    : "#ffffff";
-            let metaThemeColor =
-                document.querySelector(
-                    'meta[name="theme-color"]',
-                );
-
-            if (
-                !metaThemeColor
-            ) {
-                metaThemeColor =
-                    document.createElement(
-                        "meta",
-                    );
-                metaThemeColor.name =
-                    "theme-color";
-                document.head.appendChild(
-                    metaThemeColor,
-                );
-            }
-            metaThemeColor.content =
-                themeColor;
-
-            if (
-                typeof localStorage !==
-                "undefined"
-            ) {
-                localStorage.setItem(
-                    "theme",
-                    theme,
-                );
-            }
-
-            // Force repaint
-            if (document.body) {
-                window.getComputedStyle(document.body).backgroundColor;
-            }
-            
-            // Re-enable transitions after the paint
-            setTimeout(() => {
-                document.documentElement.classList.remove("theme-transition-disable");
-            }, 0);
-        };
+        // Save preference
+        if (typeof localStorage !== "undefined") {
+            localStorage.setItem("theme", theme);
+        }
+    };
 
     // Initialize theme
     const theme = getTheme();
-    updateTheme(theme);
+    applyTheme(theme);
 
     // Astro View Transitions Support
     document.addEventListener("astro:after-swap", () => {
-        updateTheme(getTheme());
+        applyTheme(getTheme());
     });
 </script>

@@ -126,14 +126,14 @@ const blogCopyright = {
             </FadeContent>
 
             <h1
-                class="text-5xl md:text-7xl font-bold tracking-tighter leading-tight mb-8"
+                class="text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-8"
             >
                 <ScrollFloat
                     client:load
                     text={entry
                         .data
                         .title}
-                    className="text-5xl md:text-7xl font-bold tracking-tighter leading-tight"
+                    className="text-3xl md:text-5xl font-bold tracking-tight leading-tight"
                     scrollStart="top bottom"
                     scrollEnd="top center+=200"
                     stagger={0.02}
@@ -147,7 +147,7 @@ const blogCopyright = {
                 blur={true}
             >
                 <p
-                    class="text-lg text-secondary-text max-w-2xl leading-relaxed italic opacity-90"
+                    class="text-base text-primary-text max-w-2xl leading-[1.75]"
                 >
                     {
                         entry
@@ -213,7 +213,7 @@ const blogCopyright = {
         }
         <ArticleAnimate
             client:load
-            className="prose prose-xl dark:prose-invert max-w-none prose-p:font-serif prose-p:font-light prose-p:leading-loose prose-p:opacity-90 prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4 prose-blockquote:not-italic prose-blockquote:border-l-2 prose-blockquote:pl-6 prose-blockquote:border-black/20 dark:prose-blockquote:border-white/20"
+            className="prose dark:prose-invert max-w-none prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4 prose-blockquote:not-italic prose-blockquote:border-l-2 prose-blockquote:pl-6 prose-blockquote:border-black/20 dark:prose-blockquote:border-white/20"
         >
             <Content
             />
@@ -253,8 +253,8 @@ const blogCopyright = {
             {/* Copyright Declaration */}
             {blogCopyright.enabled && (
                 <div class="mt-16 p-6 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/10 text-sm leading-relaxed text-secondary-text not-prose">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                        <p class="font-medium text-primary-text">
+                    <div class="flex justify-between items-center gap-2 mb-4">
+                        <p class="font-medium text-primary-text text-xs sm:text-sm">
                             Copyright Declaration
                         </p>
                         {blogCopyright.proof?.enabled && (
@@ -264,7 +264,7 @@ const blogCopyright = {
                                     : blogCopyright.proof.baseUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="text-[10px] uppercase tracking-widest font-mono px-3 py-1 border border-black/10 dark:border-white/10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors opacity-60 hover:opacity-100"
+                                class="text-[10px] uppercase tracking-widest font-mono px-3 py-1 border border-black/10 dark:border-white/10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors opacity-60 hover:opacity-100 whitespace-nowrap flex-shrink-0"
                             >
                                 {blogCopyright.proof.linkText} ↗
                             </a>

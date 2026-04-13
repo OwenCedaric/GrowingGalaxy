@@ -19,16 +19,15 @@ export default function ThemeToggle() {
         return () => document.removeEventListener("astro:after-swap", handlePageSwap);
     }, []);
 
-    const updateDOM = (mode: "light" | "dark") => {
+    const applyTheme = (mode: "light" | "dark") => {
         const isDark = mode === "dark";
 
         // Safari Repaint Fix: Disable transitions briefly
         document.documentElement.classList.add("theme-transition-disable");
 
         document.documentElement.classList.toggle("dark", isDark);
-        document.documentElement.classList.toggle("light", !isDark);
         
-        // Update theme-color meta tags
+        // Update theme-color meta tag
         const themeColor = isDark ? "#0a0a0a" : "#ffffff";
         let metaThemeColor = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
         
@@ -53,7 +52,7 @@ export default function ThemeToggle() {
     const toggleTheme = () => {
         const newTheme = theme === "dark" ? "light" : "dark";
         localStorage.setItem("theme", newTheme);
-        updateDOM(newTheme);
+        applyTheme(newTheme);
     };
 
     if (!mounted) {
