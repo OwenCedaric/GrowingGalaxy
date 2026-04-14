@@ -8,7 +8,7 @@ const blog = defineCollection({
         description: z.string(),
         pubDate: z.coerce.date(),
         updatedDate: z.coerce.date().optional(),
-        heroImage: z.string().optional(),
+        heroImage: z.string().optional().nullable(),
         category: z.string(), // "Flavor"
         tags: z.array(z.string()).optional(),
         readingTime: z.string().optional(), // Now automated, but keeping as optional for override
