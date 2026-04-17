@@ -29,15 +29,22 @@
     --font-sans: "Inter", "Geist Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
     --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", monospace;
 
-    /* Responsive Heading Scale */
-    --text-h1: 1.75rem;
-    --text-h1--md: 3rem;
-    --text-h2: 1.5rem;
-    --text-h2--md: 2.25rem;
-    --text-h3: 1.25rem;
-    --text-h3--md: 1.5rem;
-    --text-h4: 1.125rem;
-    --text-h4--md: 1.25rem;
+    /* Responsive Fluid Heating Scale (Impeccable Guidelines) */
+    --text-h1: clamp(2rem, 5vw + 1rem, 4rem);
+    --text-h2: clamp(1.5rem, 4vw + 1rem, 3rem);
+    --text-h3: clamp(1.25rem, 3vw + 0.5rem, 2rem);
+    --text-h4: clamp(1.125rem, 2vw + 0.5rem, 1.5rem);
+
+    /* Semantic 4pt Spacing Scale */
+    --space-xs: 0.25rem; /* 4px */
+    --space-sm: 0.5rem;  /* 8px */
+    --space-md: 0.75rem; /* 12px */
+    --space-lg: 1rem;    /* 16px */
+    --space-xl: 1.5rem;  /* 24px */
+    --space-2xl: 2rem;   /* 32px */
+    --space-3xl: 3rem;   /* 48px */
+    --space-4xl: 4rem;   /* 64px */
+    --space-5xl: 6rem;   /* 96px */
 }
 
 @layer base {
@@ -76,17 +83,10 @@
         line-height: 1.3;
     }
 
-    h1 { font-size: var(--text-h1); line-height: 1.2; }
-    h2 { font-size: var(--text-h2); line-height: 1.25; }
-    h3 { font-size: var(--text-h3); }
-    h4 { font-size: var(--text-h4); }
-
-    @media (min-width: 768px) {
-        h1 { font-size: var(--text-h1--md); }
-        h2 { font-size: var(--text-h2--md); }
-        h3 { font-size: var(--text-h3--md); }
-        h4 { font-size: var(--text-h4--md); }
-    }
+    h1 { font-size: var(--text-h1); line-height: 1.1; font-weight: 300; }
+    h2 { font-size: var(--text-h2); line-height: 1.2; font-weight: 300; }
+    h3 { font-size: var(--text-h3); font-weight: 400; }
+    h4 { font-size: var(--text-h4); font-weight: 400; }
 
     .prose {
         --tw-prose-headings: var(--color-primary-text);
@@ -103,24 +103,21 @@
 
     .prose :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
         font-size: var(--text-h1);
-        line-height: 1.2;
+        line-height: 1.1;
+        font-weight: 300;
     }
     .prose :where(h2):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
         font-size: var(--text-h2);
-        line-height: 1.25;
+        line-height: 1.2;
+        font-weight: 300;
     }
     .prose :where(h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
         font-size: var(--text-h3);
+        font-weight: 400;
     }
     .prose :where(h4):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
         font-size: var(--text-h4);
-    }
-
-    @media (min-width: 768px) {
-        .prose :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) { font-size: var(--text-h1--md); }
-        .prose :where(h2):not(:where([class~="not-prose"], [class~="not-prose"] *)) { font-size: var(--text-h2--md); }
-        .prose :where(h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) { font-size: var(--text-h3--md); }
-        .prose :where(h4):not(:where([class~="not-prose"], [class~="not-prose"] *)) { font-size: var(--text-h4--md); }
+        font-weight: 400;
     }
 
     /* Safari Theme-Switch Repaint Fix */

@@ -229,7 +229,7 @@ const Masonry: React.FC<MasonryProps> = ({
                     >
                         {item.content}
                         {colorShiftOnHover && (
-                            <div className="color-overlay absolute inset-0 rounded-[10px] bg-gradient-to-tr from-pink-500/50 to-sky-500/50 opacity-0 pointer-events-none" />
+                            <div className="color-overlay absolute inset-0 rounded-[10px] bg-black/5 dark:bg-white/5 opacity-0 backdrop-blur-[2px] border border-black/5 dark:border-white/5 pointer-events-none transition-all duration-300" />
                         )}
                     </div>
                 </div>

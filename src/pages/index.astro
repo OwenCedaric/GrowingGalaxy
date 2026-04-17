@@ -3,7 +3,6 @@ import Layout from "@/layouts/Layout.astro";
 import { SITE_CONFIG } from "@/config";
 
 import DecryptedText from "@/components/ui/DecryptedText";
-import GradientText from "@/components/ui/GradientText";
 import ShinyText from "@/components/ui/ShinyText";
 import FadeContent from "@/components/ui/FadeContent";
 import GlassGrid from "@/components/ui/GlassGrid.astro";
@@ -64,31 +63,17 @@ import CursorGlow from "@/components/ui/CursorGlow";
         </div>
 
         <!-- Subtitle -->
-        <h2
-            class="hero-subtitle-wrap"
-        >
-            <GradientText
+        <h2 class="hero-subtitle-wrap">
+            <FadeContent
                 client:load
-                colors={[
-                    "#b0b0b0",
-                    "#808080",
-                    "#a0a0a0",
-                    "#c0c0c0",
-                ]}
-                colorsDark={[
-                    "#666666",
-                    "#999999",
-                    "#777777",
-                    "#555555",
-                ]}
-                animationSpeed={8}
+                delay={300}
+                duration={800}
+                blur={true}
             >
-                {
-                    SITE_CONFIG
-                        .homepage
-                        .subtitle
-                }
-            </GradientText>
+                <span class="text-black/60 dark:text-white/60 font-light mix-blend-multiply dark:mix-blend-screen">
+                    {SITE_CONFIG.homepage.subtitle}
+                </span>
+            </FadeContent>
         </h2>
 
         <!-- Description -->
@@ -192,6 +177,8 @@ import CursorGlow from "@/components/ui/CursorGlow";
         flex-direction: column;
         justify-content: center;
         align-items: flex-start;
+        gap: var(--space-xl);
+        padding-top: var(--space-3xl);
     }
 
     /* Eyebrow */
