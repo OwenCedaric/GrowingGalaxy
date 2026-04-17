@@ -11,10 +11,11 @@ import ScrollFloat from "@/components/ui/ScrollFloat";
 import GlareHover from "@/components/ui/GlareHover";
 
 export async function getStaticPaths() {
-    const posts =
-        await getCollection(
-            "blog",
-        );
+    const posts = (await getCollection("blog")).sort(
+        (a, b) =>
+            b.data.pubDate.valueOf() -
+            a.data.pubDate.valueOf(),
+    );
 
     return posts.map(
         (
@@ -63,17 +64,73 @@ const {
     );
 
 // Merge copyright settings: Article Frontmatter > Global Config
-const blogCopyright = {
-    enabled: entry.data.copyright?.enabled ?? SITE_CONFIG.articleCopyright?.enabled,
-    declaration: entry.data.copyright?.declaration ?? SITE_CONFIG.articleCopyright?.declaration,
-    author: entry.data.copyright?.author ?? SITE_CONFIG.author ?? SITE_CONFIG.title,
-    proof: {
-        enabled: entry.data.copyright?.proof?.enabled ?? SITE_CONFIG.articleCopyright?.proof?.enabled,
-        linkText: entry.data.copyright?.proof?.linkText ?? SITE_CONFIG.articleCopyright?.proof?.linkText,
-        baseUrl: entry.data.copyright?.proof?.baseUrl ?? SITE_CONFIG.articleCopyright?.proof?.baseUrl,
-        mode: entry.data.copyright?.proof?.mode ?? SITE_CONFIG.articleCopyright?.proof?.mode,
-    }
-};
+const blogCopyright =
+    {
+        enabled:
+            entry
+                .data
+                .copyright
+                ?.enabled ??
+            SITE_CONFIG
+                .articleCopyright
+                ?.enabled,
+        declaration:
+            entry
+                .data
+                .copyright
+                ?.declaration ??
+            SITE_CONFIG
+                .articleCopyright
+                ?.declaration,
+        author:
+            entry
+                .data
+                .author ??
+            SITE_CONFIG.author ??
+            SITE_CONFIG.title,
+        proof: {
+            enabled:
+                entry
+                    .data
+                    .copyright
+                    ?.proof
+                    ?.enabled ??
+                SITE_CONFIG
+                    .articleCopyright
+                    ?.proof
+                    ?.enabled,
+            linkText:
+                entry
+                    .data
+                    .copyright
+                    ?.proof
+                    ?.linkText ??
+                SITE_CONFIG
+                    .articleCopyright
+                    ?.proof
+                    ?.linkText,
+            baseUrl:
+                entry
+                    .data
+                    .copyright
+                    ?.proof
+                    ?.baseUrl ??
+                SITE_CONFIG
+                    .articleCopyright
+                    ?.proof
+                    ?.baseUrl,
+            mode:
+                entry
+                    .data
+                    .copyright
+                    ?.proof
+                    ?.mode ??
+                SITE_CONFIG
+                    .articleCopyright
+                    ?.proof
+                    ?.mode,
+        },
+    };
 ---
 
 <Layout
@@ -159,56 +216,6 @@ const blogCopyright = {
         </header>
 
         {
-            /* Hero Image (if exists) */
-        }
-        {
-            entry
-                .data
-                .heroImage && (
-                <FadeContent
-                    client:load
-                    delay={
-                        400
-                    }
-                    duration={
-                        800
-                    }
-                    blur={
-                        true
-                    }
-                    className="mb-20"
-                >
-                    <GlareHover
-                        client:load
-                        borderRadius="2rem"
-                        glareOpacity={
-                            0.25
-                        }
-                        transitionDuration={
-                            800
-                        }
-                    >
-                        <img
-                            src={
-                                entry
-                                    .data
-                                    .heroImage
-                            }
-                            alt={
-                                entry
-                                    .data
-                                    .title
-                            }
-                            loading="eager"
-                            decoding="async"
-                            class="w-full h-auto object-cover"
-                        />
-                    </GlareHover>
-                </FadeContent>
-            )
-        }
-
-        {
             /* Content */
         }
         <ArticleAnimate
@@ -250,38 +257,141 @@ const blogCopyright = {
             {
                 /* Copyright Declaration */
             }
-            {/* Copyright Declaration */}
-            {blogCopyright.enabled && (
-                <div class="mt-16 p-6 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/10 text-sm leading-relaxed text-secondary-text not-prose">
-                    <div class="flex justify-between items-center gap-2 mb-4">
-                        <p class="font-medium text-primary-text text-xs sm:text-sm">
-                            Copyright Declaration
-                        </p>
-                        {blogCopyright.proof?.enabled && (
-                            <a 
-                                href={blogCopyright.proof.mode === 'dynamic' 
-                                    ? `${blogCopyright.proof.baseUrl}/blog/${entry.id}` 
-                                    : blogCopyright.proof.baseUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="text-[10px] uppercase tracking-widest font-mono px-3 py-1 border border-black/10 dark:border-white/10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors opacity-60 hover:opacity-100 whitespace-nowrap flex-shrink-0"
-                            >
-                                {blogCopyright.proof.linkText} ↗
-                            </a>
-                        )}
-                    </div>
-                    <p>
-                        &copy;{" "}
-                        {new Date().getFullYear()}{" "}
-                        <span class="font-semibold">
-                            {blogCopyright.author}
-                        </span>
-                        . All Rights Reserved.
-                        <br />
-                        {blogCopyright.declaration}
-                    </p>
-                </div>
-            )}
+            {
+                /* Copyright Declaration */
+            }
+            {
+                blogCopyright.enabled &&
+                    (entry
+                        .data
+                        .copyrightBg ? (
+                        <div class="relative mt-16 rounded-2xl md:rounded-[2rem] overflow-hidden not-prose flex flex-col justify-center group">
+                            <div class="absolute inset-0 z-0 pointer-events-none">
+                                <img
+                                    src={
+                                        entry
+                                            .data
+                                            .copyrightBg
+                                    }
+                                    alt="Copyright Background"
+                                    loading="lazy"
+                                    decoding="async"
+                                    class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                />
+                                <div class="absolute inset-0 bg-black/60 md:bg-black/40" />
+                                <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
+                            </div>
+                            <div class="relative z-10 p-5 md:px-8 md:py-6">
+                                <div class="flex flex-col md:flex-row gap-5 md:gap-10 items-start md:items-center drop-shadow-lg">
+                                    {/* Auto & Action Column */}
+                                    <div class="w-full md:w-5/12 flex flex-row md:flex-col justify-between items-center md:items-start gap-3">
+                                        <div class="flex flex-col gap-1.5">
+                                            <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/70">
+                                                Copyright
+                                                Declaration
+                                            </span>
+                                            <p class="text-sm md:text-base font-sans text-white/90 tracking-wide">
+                                                &copy;{" "}
+                                                {entry.data.pubDate.getFullYear()}{" "}
+                                                <span class="font-medium">
+                                                    {
+                                                        blogCopyright.author
+                                                    }
+                                                </span>
+                                            </p>
+                                        </div>
+                                        {blogCopyright
+                                            .proof
+                                            ?.enabled && (
+                                            <a
+                                                href={
+                                                    blogCopyright
+                                                        .proof
+                                                        .mode ===
+                                                    "dynamic"
+                                                        ? `${blogCopyright.proof.baseUrl}/blog/${entry.id}`
+                                                        : blogCopyright
+                                                              .proof
+                                                              .baseUrl
+                                                }
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="inline-flex self-start items-center text-[10px] uppercase tracking-widest font-mono px-4 py-1.5 border border-white/30 text-white/90 rounded-full hover:bg-white/10 hover:border-white/60 transition-all backdrop-blur-md flex-shrink-0"
+                                            >
+                                                {
+                                                    blogCopyright
+                                                        .proof
+                                                        .linkText
+                                                }{" "}
+                                                ↗
+                                            </a>
+                                        )}
+                                    </div>
+                                    {/* Declaration Column */}
+                                    <div class="w-full md:w-7/12">
+                                        <p class="text-xs md:text-sm leading-relaxed text-white/80 font-light">
+                                            {
+                                                blogCopyright.declaration
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div class="mt-16 p-6 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/10 text-sm leading-relaxed text-secondary-text not-prose">
+                            <div class="flex justify-between items-center gap-2 mb-4">
+                                <p class="font-medium text-primary-text text-xs sm:text-sm">
+                                    Copyright
+                                    Declaration
+                                </p>
+                                {blogCopyright
+                                    .proof
+                                    ?.enabled && (
+                                    <a
+                                        href={
+                                            blogCopyright
+                                                .proof
+                                                .mode ===
+                                            "dynamic"
+                                                ? `${blogCopyright.proof.baseUrl}/blog/${entry.id}`
+                                                : blogCopyright
+                                                      .proof
+                                                      .baseUrl
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="text-[10px] uppercase tracking-widest font-mono px-3 py-1 border border-black/20 dark:border-white/20 text-primary-text rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors whitespace-nowrap flex-shrink-0"
+                                    >
+                                        {
+                                            blogCopyright
+                                                .proof
+                                                .linkText
+                                        }{" "}
+                                        ↗
+                                    </a>
+                                )}
+                            </div>
+                            <p>
+                                &copy;{" "}
+                                {entry.data.pubDate.getFullYear()}{" "}
+                                <span class="font-semibold">
+                                    {
+                                        blogCopyright.author
+                                    }
+                                </span>
+                                .
+                                All
+                                Rights
+                                Reserved.
+                                <br />
+                                {
+                                    blogCopyright.declaration
+                                }
+                            </p>
+                        </div>
+                    ))
+            }
         </ArticleAnimate>
 
         {
