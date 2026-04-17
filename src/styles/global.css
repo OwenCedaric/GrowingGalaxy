@@ -120,6 +120,12 @@
         font-weight: 400;
     }
 
+    /* Fix transparent images (like diagrams) in dark mode */
+    .dark .prose img {
+        background-color: var(--color-canvas);
+        border-radius: 0.5rem;
+    }
+
     /* Safari Theme-Switch Repaint Fix */
     :root.theme-transition-disable * {
         transition: none !important;
