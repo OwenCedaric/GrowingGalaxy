@@ -121,142 +121,146 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
 </style>
 
 <script define:vars={{ config: harmonicSystem }}>
-    let timePhase = 0;
-    
-    // Local constants previously in config
-    const ampPrimary = 75;
-    const ampSecondary = 35;
-    const resolution = 400;
+    function init() {
+        const svgSection = document.getElementById("parametric-svg");
+        if (!svgSection) return;
 
-    // PRNG seeded by config.seed
-    let currentSeed = Number(config.seed) || 1234;
-
-    function seededRandom() {
-        var x = Math.sin(currentSeed++) * 10000;
-        return x - Math.floor(x);
-    }
-
-    // Generate strands based on the seed deterministically
-    const strands = [];
-    for(let i=0; i<3; i++) {
-        const pX = Math.floor(seededRandom() * 5) + 1;
-        const pY = Math.floor(seededRandom() * 5) + 1;
-        const sX = Math.floor(seededRandom() * 5) + 1;
-        const sY = Math.floor(seededRandom() * 5) + 1;
-        const offset = seededRandom() * Math.PI * 2;
+        let timePhase = 0;
         
-        strands.push({
-            id: `strand-${i+1}`,
-            pX, pY, sX, sY, offset
-        });
-    }
+        // Local constants previously in config
+        const ampPrimary = 75;
+        const ampSecondary = 35;
+        const resolution = 400;
 
-    const labelPhase = document.getElementById("label-phase");
+        // PRNG seeded by config.seed
+        let currentSeed = Number(config.seed) || 1234;
 
-    // 生成复合谐波路径
-    function generateComplexPath(
-        strand,
-        phaseOffset,
-    ) {
-        let pathString = "";
-        for (
-            let i = 0;
-            i <= resolution;
-            i++
+        function seededRandom() {
+            var x = Math.sin(currentSeed++) * 10000;
+            return x - Math.floor(x);
+        }
+
+        // Generate strands based on the seed deterministically
+        const strands = [];
+        for(let i=0; i<3; i++) {
+            const pX = Math.floor(seededRandom() * 5) + 1;
+            const pY = Math.floor(seededRandom() * 5) + 1;
+            const sX = Math.floor(seededRandom() * 5) + 1;
+            const sY = Math.floor(seededRandom() * 5) + 1;
+            const offset = seededRandom() * Math.PI * 2;
+            
+            strands.push({
+                id: `strand-${i+1}`,
+                pX, pY, sX, sY, offset
+            });
+        }
+
+        const labelPhase = document.getElementById("label-phase");
+
+        // 生成复合谐波路径
+        function generateComplexPath(
+            strand,
+            phaseOffset,
         ) {
-            const theta =
-                (i / resolution) * Math.PI * 2;
+            let pathString = "";
+            for (
+                let i = 0;
+                i <= resolution;
+                i++
+            ) {
+                const theta =
+                    (i / resolution) * Math.PI * 2;
 
-            const x =
-                ampPrimary *
-                    Math.sin(
-                        strand.pX *
-                            theta +
-                            phaseOffset,
-                    ) +
-                ampSecondary *
-                    Math.cos(
-                        strand.sX *
-                            theta -
-                            phaseOffset *
-                                0.5,
-                    );
+                const x =
+                    ampPrimary *
+                        Math.sin(
+                            strand.pX *
+                                theta +
+                                phaseOffset,
+                        ) +
+                    ampSecondary *
+                        Math.cos(
+                            strand.sX *
+                                theta -
+                                phaseOffset *
+                                    0.5,
+                        );
 
-            const y =
-                ampPrimary *
-                    Math.cos(
-                        strand.pY *
-                            theta,
-                    ) +
-                ampSecondary *
-                    Math.sin(
-                        strand.sY *
-                            theta +
-                            phaseOffset *
-                                0.8,
-                    );
+                const y =
+                    ampPrimary *
+                        Math.cos(
+                            strand.pY *
+                                theta,
+                        ) +
+                    ampSecondary *
+                        Math.sin(
+                            strand.sY *
+                                theta +
+                                phaseOffset *
+                                    0.8,
+                        );
 
-            if (i === 0) {
-                pathString += `M ${x.toFixed(2)} ${y.toFixed(2)} `;
-            } else {
-                pathString += `L ${x.toFixed(2)} ${y.toFixed(2)} `;
+                if (i === 0) {
+                    pathString += `M ${x.toFixed(2)} ${y.toFixed(2)} `;
+                } else {
+                    pathString += `L ${x.toFixed(2)} ${y.toFixed(2)} `;
+                }
             }
+            return pathString + "Z";
         }
-        return pathString + "Z";
-    }
 
-    // 动画渲染循环
-    let animationFrameId;
-    function animateSystem() {
-        timePhase += config.speed;
+        // 动画渲染循环
+        let animationFrameId;
+        function animateSystem() {
+            timePhase += config.speed;
 
-        strands.forEach((strand) => {
-            const element =
-                document.getElementById(
-                    strand.id,
-                );
-            if (element) {
-                const newPath =
-                    generateComplexPath(
-                        strand,
-                        timePhase +
-                            strand.offset,
+            strands.forEach((strand) => {
+                const element =
+                    document.getElementById(
+                        strand.id,
                     );
-                element.setAttribute(
-                    "d",
-                    newPath,
-                );
+                if (element) {
+                    const newPath =
+                        generateComplexPath(
+                            strand,
+                            timePhase +
+                                strand.offset,
+                        );
+                    element.setAttribute(
+                        "d",
+                        newPath,
+                    );
+                }
+            });
+
+            if (labelPhase) {
+                labelPhase.textContent = `Δ_PHASE: ${timePhase.toFixed(2)}`;
             }
+            
+            animationFrameId = requestAnimationFrame(
+                animateSystem,
+            );
+        }
+
+        // 启动机制
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (!animationFrameId) {
+                        animateSystem();
+                    }
+                } else {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = null;
+                    }
+                }
+            });
         });
-
-        if (labelPhase) {
-            labelPhase.textContent = `Δ_PHASE: ${timePhase.toFixed(2)}`;
-        }
         
-        animationFrameId = requestAnimationFrame(
-            animateSystem,
-        );
-    }
-
-    // 启动机制
-    // Consider adding IntersectionObserver to pause when not in view
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                if (!animationFrameId) {
-                    animateSystem();
-                }
-            } else {
-                if (animationFrameId) {
-                    cancelAnimationFrame(animationFrameId);
-                    animationFrameId = null;
-                }
-            }
-        });
-    });
-    
-    const svgSection = document.getElementById("parametric-svg");
-    if(svgSection) {
         observer.observe(svgSection);
     }
+
+    // Initialize on first load and subsequent navigations
+    document.addEventListener('astro:page-load', init);
 </script>
