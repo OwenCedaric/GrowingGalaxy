@@ -224,8 +224,6 @@
         border-radius: var(--gh-br);
         overflow: hidden;
         position: relative;
-        display: grid;
-        place-items: center;
         isolation: isolate;
     }
 
@@ -237,22 +235,26 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(var(--gh-angle),
-                hsla(0, 0%, 0%, 0) 60%,
-                var(--gh-rgba) 70%,
-                hsla(0, 0%, 0%, 0),
-                hsla(0, 0%, 0%, 0) 100%);
-        transition: var(--gh-duration) ease;
-        background-size: var(--gh-size) var(--gh-size), 100% 100%;
-        background-repeat: no-repeat;
-        background-position: -100% -100%, 0 0;
-        z-index: 2;
+        background: linear-gradient(
+            var(--gh-angle, 135deg),
+            transparent 0%,
+            transparent 35%,
+            var(--gh-rgba, rgba(255, 255, 255, 0.4)) 50%,
+            transparent 65%,
+            transparent 100%
+        );
+        background-size: 300% 300%;
+        background-position: 0% 0%;
+        transition: var(--gh-duration, 0.6s) ease;
+        z-index: 10;
         pointer-events: none;
+        opacity: 0;
     }
 
     @media (hover: hover) {
         .glare-hover:hover::before {
-            background-position: 100% 100%, 0 0;
+            opacity: 1;
+            background-position: 100% 100%;
         }
     }
 

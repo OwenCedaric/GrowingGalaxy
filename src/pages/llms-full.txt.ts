@@ -1,8 +1,7 @@
-import type { APIContext } from 'astro';
 import { getCollection } from 'astro:content';
-import { SITE_CONFIG } from '../config';
+import { SITE_CONFIG } from '@/config';
 
-export async function GET({ request }: APIContext) {
+export async function GET() {
     const site = SITE_CONFIG.site;
     const blogs = await getCollection('blog');
     const pages = await getCollection('pages');

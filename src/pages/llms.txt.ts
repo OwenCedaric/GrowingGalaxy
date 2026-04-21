@@ -1,7 +1,6 @@
-import type { APIContext } from 'astro';
-import { SITE_CONFIG } from '../config';
+import { SITE_CONFIG } from '@/config';
 
-export async function GET({ request }: APIContext) {
+export async function GET() {
     const site = SITE_CONFIG.site;
     const title = SITE_CONFIG.title;
     const description = SITE_CONFIG.description;

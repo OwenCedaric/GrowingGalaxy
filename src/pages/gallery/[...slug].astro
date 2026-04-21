@@ -10,7 +10,6 @@ import {
     User,
     MapPin,
     Tag,
-    ArrowLeft,
 } from "lucide-react";
 
 export async function getStaticPaths() {
@@ -182,10 +181,20 @@ const formattedDate =
             >
                 {
                     photo.name
-                        .split("\n")
-                        .map((line) => (
-                            <div>{line}</div>
-                        ))
+                        .split(
+                            "\n",
+                        )
+                        .map(
+                            (
+                                line,
+                            ) => (
+                                <div>
+                                    {
+                                        line
+                                    }
+                                </div>
+                            ),
+                        )
                 }
             </h1>
 
@@ -195,34 +204,50 @@ const formattedDate =
                 <div
                     class="flex flex-col md:flex-row md:flex-wrap md:items-center gap-4 md:gap-8 text-sm text-zinc-500 dark:text-zinc-400 tracking-wider font-sans font-light"
                 >
-                    <div class="flex items-center uppercase text-xs font-medium tracking-[0.2em]">
-                        <User className="w-3.5 h-3.5 mr-2 shrink-0 stroke-[2]" />
-                        {photo.author}
+                    <div
+                        class="flex items-center uppercase text-xs font-medium tracking-[0.2em]"
+                    >
+                        <User
+                            className="w-3.5 h-3.5 mr-2 shrink-0 stroke-[2]"
+                        />
+                        {
+                            photo.author
+                        }
                     </div>
                     {
                         photo.location && (
                             <div class="flex items-center">
                                 <MapPin className="w-3.5 h-3.5 mr-2 shrink-0 stroke-[1.5]" />
-                                {photo.location}
+                                {
+                                    photo.location
+                                }
                             </div>
                         )
                     }
                     {
-                        photo.tag && photo.tag.length > 0 && (
-                            <div class="flex items-center flex-wrap gap-2">
-                                <Tag className="w-3.5 h-3.5 mr-2 shrink-0 stroke-[1.5] hidden md:block" />
-                                <div class="flex items-center md:hidden w-3.5 h-3.5 mr-2 shrink-0">
-                                    <Tag className="w-3.5 h-3.5 stroke-[1.5]" />
+                        photo.tag &&
+                            photo
+                                .tag
+                                .length >
+                                0 && (
+                                <div class="flex items-center flex-wrap gap-2">
+                                    <Tag className="w-3.5 h-3.5 mr-2 shrink-0 stroke-[1.5] hidden md:block" />
+                                    <div class="flex items-center md:hidden w-3.5 h-3.5 mr-2 shrink-0">
+                                        <Tag className="w-3.5 h-3.5 stroke-[1.5]" />
+                                    </div>
+                                    <span class="leading-relaxed">
+                                        {photo.tag.join(
+                                            " · ",
+                                        )}
+                                    </span>
                                 </div>
-                                <span class="leading-relaxed">
-                                    {photo.tag.join(" · ")}
-                                </span>
-                            </div>
-                        )
+                            )
                     }
                 </div>
 
-                <div class="shrink-0 flex flex-col md:items-end">
+                <div
+                    class="shrink-0 flex flex-col md:items-end"
+                >
                     <TimeRewindAnimation
                         client:visible
                         targetDate={photo.date}
@@ -236,127 +261,298 @@ const formattedDate =
             class="w-full mx-auto flex flex-col gap-24 md:gap-40"
         >
             {
-                bodyImages.map((img, index) => {
-                    const total = String(bodyImages.length).padStart(2, "0");
-                    const num = String(index + 1).padStart(2, "0");
-                    const hasText = !!img.description;
-                    
-                    let layoutType = 'hero';
-                    if (index === 0) {
-                        layoutType = 'hero';
-                    } else if (!hasText) {
-                        layoutType = 'artwork';
-                    } else {
-                        const beat = index % 4;
-                        if (beat === 1) layoutType = 'standard';
-                        else if (beat === 2) layoutType = 'cinematic';
-                        else if (beat === 3) layoutType = 'alternate';
-                        else layoutType = 'editorial'; 
-                    }
+                bodyImages.map(
+                    (
+                        img,
+                        index,
+                    ) => {
+                        const total =
+                            String(
+                                bodyImages.length,
+                            ).padStart(
+                                2,
+                                "0",
+                            );
+                        const num =
+                            String(
+                                index +
+                                    1,
+                            ).padStart(
+                                2,
+                                "0",
+                            );
+                        const hasText =
+                            !!img.description;
 
-                    const isEditorialText = layoutType === 'editorial' || layoutType === 'hero';
+                        let layoutType =
+                            "hero";
+                        if (
+                            index ===
+                            0
+                        ) {
+                            layoutType =
+                                "hero";
+                        } else if (
+                            !hasText
+                        ) {
+                            layoutType =
+                                "artwork";
+                        } else {
+                            const beat =
+                                index %
+                                4;
+                            if (
+                                beat ===
+                                1
+                            )
+                                layoutType =
+                                    "standard";
+                            else if (
+                                beat ===
+                                2
+                            )
+                                layoutType =
+                                    "cinematic";
+                            else if (
+                                beat ===
+                                3
+                            )
+                                layoutType =
+                                    "alternate";
+                            else
+                                layoutType =
+                                    "editorial";
+                        }
 
-                    return (
-                        <FadeContent
-                            client:visible
-                            delay={index * 150}
-                            duration={1000}
-                            blur={true}
-                            className={`group w-full ${layoutType === 'editorial' ? 'my-24 md:my-40' : ''}`}
-                        >
-                            <div class={`relative w-full flex flex-col ${
-                                layoutType === 'hero' ? 'items-center gap-6 md:gap-10' :
-                                layoutType === 'artwork' ? 'items-center gap-6 md:gap-10' :
-                                layoutType === 'cinematic' ? 'flex-col items-center gap-8 md:gap-12' :
-                                layoutType === 'alternate' ? 'md:flex-row-reverse items-center justify-between gap-12 md:gap-20' :
-                                layoutType === 'editorial' ? 'md:flex-row items-center justify-between gap-12 md:gap-24' :
-                                'md:flex-row items-center justify-between gap-12 md:gap-20' 
-                            }`}>
-                                {/* Sleek Magazine Numbering Plate */}
-                                {(layoutType === 'cinematic' || layoutType === 'hero' || layoutType === 'artwork') && (
-                                    <div class="flex items-center gap-4 text-xs uppercase tracking-[0.2em] font-sans font-medium text-zinc-400 dark:text-zinc-500 mb-2">
-                                        <span class="w-8 h-[1px] bg-zinc-300 dark:bg-zinc-700"></span>
-                                        N° {num} &mdash; {total}
-                                    </div>
-                                )}
-                                
-                                {/* Image Container */}
-                                <div class={`relative shrink-0 flex flex-col items-center justify-center ${
-                                    layoutType === 'hero' ? 'w-full' :
-                                    layoutType === 'artwork' ? 'w-full md:w-[85%]' :
-                                    layoutType === 'cinematic' ? 'w-full md:w-[90%]' :
-                                    layoutType === 'editorial' ? 'w-full md:w-[45%]' :
-                                    'w-full md:w-[50%]' 
-                                }`}>
-                                    {(layoutType === 'standard' || layoutType === 'alternate' || layoutType === 'editorial') && (
-                                        <div class={`absolute -top-10 md:-top-12 text-xs uppercase tracking-[0.2em] font-sans font-medium text-zinc-400 dark:text-zinc-500 ${
-                                            layoutType === 'alternate' ? 'right-0' : 'left-0'
-                                        }`}>
-                                            N° {num}
+                        const isEditorialText =
+                            layoutType ===
+                                "editorial" ||
+                            layoutType ===
+                                "hero";
+
+                        return (
+                            <FadeContent
+                                client:visible
+                                delay={
+                                    index *
+                                    150
+                                }
+                                duration={
+                                    1000
+                                }
+                                blur={
+                                    true
+                                }
+                                className={`group w-full ${layoutType === "editorial" ? "my-24 md:my-40" : ""}`}
+                            >
+                                <div
+                                    class={`relative w-full flex flex-col ${
+                                        layoutType ===
+                                        "hero"
+                                            ? "items-center gap-6 md:gap-10"
+                                            : layoutType ===
+                                                "artwork"
+                                              ? "items-center gap-6 md:gap-10"
+                                              : layoutType ===
+                                                  "cinematic"
+                                                ? "flex-col items-center gap-8 md:gap-12"
+                                                : layoutType ===
+                                                    "alternate"
+                                                  ? "md:flex-row-reverse items-center justify-between gap-12 md:gap-20"
+                                                  : layoutType ===
+                                                      "editorial"
+                                                    ? "md:flex-row items-center justify-between gap-12 md:gap-24"
+                                                    : "md:flex-row items-center justify-between gap-12 md:gap-20"
+                                    }`}
+                                >
+                                    {/* Sleek Magazine Numbering Plate */}
+                                    {(layoutType ===
+                                        "cinematic" ||
+                                        layoutType ===
+                                            "hero" ||
+                                        layoutType ===
+                                            "artwork") && (
+                                        <div class="flex items-center gap-4 text-xs uppercase tracking-[0.2em] font-sans font-medium text-zinc-400 dark:text-zinc-500 mb-2">
+                                            <span class="w-8 h-[1px] bg-zinc-300 dark:bg-zinc-700" />
+                                            N°{" "}
+                                            {
+                                                num
+                                            }{" "}
+                                            &mdash;{" "}
+                                            {
+                                                total
+                                            }
                                         </div>
                                     )}
-                                    
-                                    <TiltedCard
-                                        client:load
-                                        imageSrc={img.url}
-                                        altText={img.alt || "Gallery Photo"}
-                                        captionText=""
-                                        containerHeight="auto"
-                                        containerWidth="100%"
-                                        imageHeight="auto"
-                                        imageWidth="auto"
-                                        imageClassName={`w-auto h-auto object-contain shadow-2xl shadow-black/10 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/10 ${
-                                            layoutType === 'editorial' ? 'max-h-[70vh] rounded-t-[3rem] rounded-b-2xl' : 
-                                            layoutType === 'cinematic' ? 'max-h-[85vh] rounded-md md:rounded-xl' :
-                                            layoutType === 'alternate' ? 'max-h-[85vh] rounded-tr-[3rem] rounded-bl-[3rem] rounded-tl-xl rounded-br-xl' :
-                                            layoutType === 'artwork' ? 'max-h-[85vh] rounded-md md:rounded-xl' :
-                                            layoutType === 'hero' ? 'max-h-[85vh] rounded-none sm:rounded-2xl' :
-                                            'max-h-[85vh] rounded-2xl' 
+
+                                    {/* Image Container */}
+                                    <div
+                                        class={`relative shrink-0 flex flex-col items-center justify-center ${
+                                            layoutType ===
+                                            "hero"
+                                                ? "w-full"
+                                                : layoutType ===
+                                                    "artwork"
+                                                  ? "w-full md:w-[85%]"
+                                                  : layoutType ===
+                                                      "cinematic"
+                                                    ? "w-full md:w-[90%]"
+                                                    : layoutType ===
+                                                        "editorial"
+                                                      ? "w-full md:w-[45%]"
+                                                      : "w-full md:w-[50%]"
                                         }`}
-                                        rotateAmplitude={layoutType === 'hero' || layoutType === 'cinematic' ? 3 : 5}
-                                        scaleOnHover={1.01}
-                                        showMobileWarning={false}
-                                        showTooltip={false}
-                                        displayOverlayContent={false}
-                                        objectFit="contain"
-                                    />
-                                </div>
-                                
-                                {/* Text Container */}
-                                {hasText && (
-                                    <div class={`flex flex-col ${
-                                        layoutType === 'hero' ? 'w-full items-center mt-6 md:mt-10' : 
-                                        layoutType === 'cinematic' ? 'w-full items-center mt-6 md:mt-10' :
-                                        layoutType === 'editorial' ? 'flex-1 items-start justify-center md:pr-12' :
-                                        layoutType === 'alternate' ? 'flex-1 items-start justify-center md:pr-12' :
-                                        'flex-1 items-start justify-center md:pl-12' 
-                                    }`}>
-                                        <div class={`w-full text-left ${
-                                            (layoutType === 'hero' || layoutType === 'cinematic') 
-                                                ? 'max-w-2xl flex flex-col gap-6' 
-                                                : 'flex flex-col gap-6'
-                                        }`}>
-                                            {img.description?.split("\n")
-                                                .map(p => p.trim())
-                                                .filter(Boolean)
-                                                .map((paragraph, pIdx) => (
-                                                    <p class={`tracking-wide break-words inline-block w-full ${
-                                                        isEditorialText && pIdx === 0
-                                                            ? 'text-3xl md:text-5xl font-serif font-medium italic leading-[1.2] text-zinc-900 dark:text-zinc-100 mb-4'
-                                                            : layoutType === 'hero'
-                                                            ? 'text-lg md:text-xl font-sans font-light leading-relaxed text-zinc-600 dark:text-zinc-300'
-                                                            : 'text-base md:text-lg font-sans font-light leading-relaxed text-zinc-500 dark:text-zinc-400'
-                                                    }`}>
-                                                        {paragraph}
-                                                    </p>
-                                                ))}
-                                        </div>
+                                    >
+                                        {(layoutType ===
+                                            "standard" ||
+                                            layoutType ===
+                                                "alternate" ||
+                                            layoutType ===
+                                                "editorial") && (
+                                            <div
+                                                class={`absolute -top-10 md:-top-12 text-xs uppercase tracking-[0.2em] font-sans font-medium text-zinc-400 dark:text-zinc-500 ${
+                                                    layoutType ===
+                                                    "alternate"
+                                                        ? "right-0"
+                                                        : "left-0"
+                                                }`}
+                                            >
+                                                N°{" "}
+                                                {
+                                                    num
+                                                }
+                                            </div>
+                                        )}
+
+                                        <TiltedCard
+                                            client:load
+                                            imageSrc={
+                                                img.url
+                                            }
+                                            altText={
+                                                img.alt ||
+                                                "Gallery Photo"
+                                            }
+                                            captionText=""
+                                            containerHeight="auto"
+                                            containerWidth="100%"
+                                            imageHeight="auto"
+                                            imageWidth="auto"
+                                            imageClassName={`w-auto h-auto object-contain shadow-2xl shadow-black/10 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/10 ${
+                                                layoutType ===
+                                                "editorial"
+                                                    ? "max-h-[70vh] rounded-t-[3rem] rounded-b-2xl"
+                                                    : layoutType ===
+                                                        "cinematic"
+                                                      ? "max-h-[85vh] rounded-md md:rounded-xl"
+                                                      : layoutType ===
+                                                          "alternate"
+                                                        ? "max-h-[85vh] rounded-tr-[3rem] rounded-bl-[3rem] rounded-tl-xl rounded-br-xl"
+                                                        : layoutType ===
+                                                            "artwork"
+                                                          ? "max-h-[85vh] rounded-md md:rounded-xl"
+                                                          : layoutType ===
+                                                              "hero"
+                                                            ? "max-h-[85vh] rounded-none sm:rounded-2xl"
+                                                            : "max-h-[85vh] rounded-2xl"
+                                            }`}
+                                            rotateAmplitude={
+                                                layoutType ===
+                                                    "hero" ||
+                                                layoutType ===
+                                                    "cinematic"
+                                                    ? 3
+                                                    : 5
+                                            }
+                                            scaleOnHover={
+                                                1.01
+                                            }
+                                            showMobileWarning={
+                                                false
+                                            }
+                                            showTooltip={
+                                                false
+                                            }
+                                            displayOverlayContent={
+                                                false
+                                            }
+                                            objectFit="contain"
+                                        />
                                     </div>
-                                )}
-                            </div>
-                        </FadeContent>
-                    );
-                })
+
+                                    {/* Text Container */}
+                                    {hasText && (
+                                        <div
+                                            class={`flex flex-col ${
+                                                layoutType ===
+                                                "hero"
+                                                    ? "w-full items-center mt-6 md:mt-10"
+                                                    : layoutType ===
+                                                        "cinematic"
+                                                      ? "w-full items-center mt-6 md:mt-10"
+                                                      : layoutType ===
+                                                          "editorial"
+                                                        ? "flex-1 items-start justify-center md:pr-12"
+                                                        : layoutType ===
+                                                            "alternate"
+                                                          ? "flex-1 items-start justify-center md:pr-12"
+                                                          : "flex-1 items-start justify-center md:pl-12"
+                                            }`}
+                                        >
+                                            <div
+                                                class={`w-full text-left ${
+                                                    layoutType ===
+                                                        "hero" ||
+                                                    layoutType ===
+                                                        "cinematic"
+                                                        ? "max-w-2xl flex flex-col gap-6"
+                                                        : "flex flex-col gap-6"
+                                                }`}
+                                            >
+                                                {img.description
+                                                    ?.split(
+                                                        "\n",
+                                                    )
+                                                    .map(
+                                                        (
+                                                            p,
+                                                        ) =>
+                                                            p.trim(),
+                                                    )
+                                                    .filter(
+                                                        Boolean,
+                                                    )
+                                                    .map(
+                                                        (
+                                                            paragraph,
+                                                            pIdx,
+                                                        ) => (
+                                                            <p
+                                                                class={`tracking-wide break-words inline-block w-full ${
+                                                                    isEditorialText &&
+                                                                    pIdx ===
+                                                                        0
+                                                                        ? "text-3xl md:text-5xl font-serif font-medium italic leading-[1.2] text-zinc-900 dark:text-zinc-100 mb-4"
+                                                                        : layoutType ===
+                                                                            "hero"
+                                                                          ? "text-lg md:text-xl font-sans font-light leading-relaxed text-zinc-600 dark:text-zinc-300"
+                                                                          : "text-base md:text-lg font-sans font-light leading-relaxed text-zinc-500 dark:text-zinc-400"
+                                                                }`}
+                                                            >
+                                                                {
+                                                                    paragraph
+                                                                }
+                                                            </p>
+                                                        ),
+                                                    )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </FadeContent>
+                        );
+                    },
+                )
             }
         </section>
 

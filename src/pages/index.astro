@@ -5,8 +5,7 @@ import { SITE_CONFIG } from "@/config";
 import DecryptedText from "@/components/ui/DecryptedText";
 import ShinyText from "@/components/ui/ShinyText";
 import FadeContent from "@/components/ui/FadeContent";
-import GlassGrid from "@/components/ui/GlassGrid.astro";
-import PaperPlanes from "@/components/ui/PaperPlanes.astro";
+import HarmonicSystem from "@/components/ui/HarmonicSystem.astro";
 import CursorGlow from "@/components/ui/CursorGlow";
 ---
 
@@ -23,64 +22,65 @@ import CursorGlow from "@/components/ui/CursorGlow";
     <section
         class="hero-section"
     >
-        <!-- Eyebrow -->
-        <FadeContent
-            client:load
-            delay={100}
-            duration={800}
-            blur={true}
-        >
-            <div
-                class="hero-eyebrow"
-            >
-                <span
-                    class="eyebrow-line"
-                >
-                </span>
-                <span
-                    >Digital
-                    Narratives</span
-                >
-            </div>
-        </FadeContent>
-
-        <!-- Main Title -->
-        <div
-            class="hero-title-wrap"
-        >
-            <DecryptedText
-                client:load
-                text={SITE_CONFIG
-                    .homepage
-                    .title}
-                speed={40}
-                maxIterations={20}
-                sequential={true}
-                revealDirection="start"
-                animateOn="view"
-                parentClassName="hero-title"
-            />
-        </div>
-
-        <!-- Subtitle -->
-        <h2 class="hero-subtitle-wrap">
+        <div class="hero-content w-full md:w-[65%] lg:w-[60%] flex flex-col justify-center z-10 transition-all duration-500 relative">
+            <!-- Eyebrow -->
             <FadeContent
                 client:load
-                delay={300}
+                delay={100}
                 duration={800}
                 blur={true}
             >
-                <span class="text-black/60 dark:text-white/60 font-light mix-blend-multiply dark:mix-blend-screen">
-                    {SITE_CONFIG.homepage.subtitle}
-                </span>
+                <div
+                    class="hero-eyebrow"
+                >
+                    <span
+                        class="eyebrow-line"
+                    >
+                    </span>
+                    <span
+                        >Digital
+                        Narratives</span
+                    >
+                </div>
             </FadeContent>
-        </h2>
 
-        <!-- Description -->
-        <div
-            class="hero-desc"
-        >
-            {
+            <!-- Main Title -->
+            <div
+                class="hero-title-wrap"
+            >
+                <DecryptedText
+                    client:load
+                    text={SITE_CONFIG
+                        .homepage
+                        .title}
+                    speed={40}
+                    maxIterations={20}
+                    sequential={true}
+                    revealDirection="start"
+                    animateOn="view"
+                    parentClassName="hero-title"
+                />
+            </div>
+
+            <!-- Subtitle -->
+            <h2 class="hero-subtitle-wrap">
+                <FadeContent
+                    client:load
+                    delay={300}
+                    duration={800}
+                    blur={true}
+                >
+                    <span class="text-black/60 dark:text-white/60 font-light mix-blend-multiply dark:mix-blend-screen">
+                        {SITE_CONFIG.homepage.subtitle}
+                    </span>
+                </FadeContent>
+            </h2>
+
+            <!-- Description -->
+            <div
+                class="hero-desc"
+            >
+                {
                 SITE_CONFIG.homepage.description.map(
                     (
                         paragraph,
@@ -154,14 +154,10 @@ import CursorGlow from "@/components/ui/CursorGlow";
                 }
             </div>
         </FadeContent>
+        </div>
 
-        <!-- Paper Planes Decoration (Desktop) -->
-        <PaperPlanes
-        />
-
-        <!-- Glass Grid Decoration (Desktop) -->
-        <GlassGrid
-        />
+        <!-- Harmonic System Decoration (Desktop Right Side) -->
+        <HarmonicSystem />
     </section>
 </Layout>
 
@@ -175,10 +171,24 @@ import CursorGlow from "@/components/ui/CursorGlow";
         min-height: 80vh;
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
+        align-items: stretch;
         gap: var(--space-xl);
         padding-top: var(--space-3xl);
+    }
+    
+    @media (min-width: 768px) {
+        .hero-section {
+            flex-direction: row;
+            padding-top: 0; 
+            padding-left: var(--space-xl);
+            padding-right: 0;
+            gap: 0;
+            margin: -3rem -1.5rem -3rem -1.5rem; /* negate Layout padding roughly */
+        }
+        
+        .hero-content {
+            padding: var(--space-2xl) var(--space-3xl) var(--space-2xl) 0;
+        }
     }
 
     /* Eyebrow */

@@ -8,14 +8,22 @@ import { SITE_CONFIG } from "@/config";
 import ArticleAnimate from "@/components/ui/ArticleAnimate";
 import FadeContent from "@/components/ui/FadeContent";
 import ScrollFloat from "@/components/ui/ScrollFloat";
-import GlareHover from "@/components/ui/GlareHover";
+import MDXImage from "@/components/blog/MDXImage.astro";
 
 export async function getStaticPaths() {
-    const posts = (await getCollection("blog")).sort(
-        (a, b) =>
-            b.data.pubDate.valueOf() -
-            a.data.pubDate.valueOf(),
-    );
+    const posts =
+        (
+            await getCollection(
+                "blog",
+            )
+        ).sort(
+            (
+                a,
+                b,
+            ) =>
+                b.data.pubDate.valueOf() -
+                a.data.pubDate.valueOf(),
+        );
 
     return posts.map(
         (
@@ -223,6 +231,9 @@ const blogCopyright =
             className="prose dark:prose-invert max-w-none prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4 prose-blockquote:not-italic prose-blockquote:border-l-2 prose-blockquote:pl-6 prose-blockquote:border-black/20 dark:prose-blockquote:border-white/20"
         >
             <Content
+                components={{
+                    img: MDXImage,
+                }}
             />
 
             {
@@ -266,7 +277,7 @@ const blogCopyright =
                         .data
                         .copyrightBg ? (
                         <div class="relative mt-16 rounded-2xl md:rounded-[2rem] overflow-hidden not-prose flex flex-col justify-center group">
-                            <div class="absolute inset-0 z-0 pointer-events-none">
+                            <div class="absolute inset-0 z-0">
                                 <img
                                     src={
                                         entry
@@ -278,8 +289,8 @@ const blogCopyright =
                                     decoding="async"
                                     class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                                 />
-                                <div class="absolute inset-0 bg-black/60 md:bg-black/40" />
-                                <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
+                                <div class="absolute inset-0 bg-black/60 md:bg-black/40 pointer-events-none" />
+                                <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent pointer-events-none" />
                             </div>
                             <div class="relative z-10 p-5 md:px-8 md:py-6">
                                 <div class="flex flex-col md:flex-row gap-5 md:gap-10 items-start md:items-center drop-shadow-lg">

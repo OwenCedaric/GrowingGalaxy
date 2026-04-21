@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/utils/useTheme";
 
@@ -9,7 +9,7 @@ export default function ThemeToggle() {
 
     useEffect(() => {
         setMounted(true);
-        
+
         // Handle Astro view transitions
         const handlePageSwap = () => {
             // isDark from hook will update automatically because it listens to DOM
@@ -26,11 +26,11 @@ export default function ThemeToggle() {
         document.documentElement.classList.add("theme-transition-disable");
 
         document.documentElement.classList.toggle("dark", isDark);
-        
+
         // Update theme-color meta tag
         const themeColor = isDark ? "#0a0a0a" : "#ffffff";
         let metaThemeColor = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
-        
+
         if (!metaThemeColor) {
             metaThemeColor = document.createElement("meta");
             metaThemeColor.name = "theme-color";
@@ -42,7 +42,7 @@ export default function ThemeToggle() {
         if (document.body) {
             window.getComputedStyle(document.body).backgroundColor;
         }
-        
+
         // Re-enable transitions
         setTimeout(() => {
             document.documentElement.classList.remove("theme-transition-disable");

@@ -21,7 +21,11 @@ export const SITE_CONFIG = {
         links: [
             { text: "Read the blog", href: "/blog" },
             { text: "View the gallery", href: "/gallery" }
-        ]
+        ],
+        harmonicSystem: {
+            seed: 2026,
+            speed: 0.0042
+        }
     },
     footer: {
         social: [

@@ -2,10 +2,24 @@
 import Layout from "@/layouts/Layout.astro";
 import SearchResults from "@/components/ui/SearchResults";
 import { SITE_CONFIG } from "@/config";
+import TextReveal from "@/components/ui/TextReveal";
 ---
 
 <Layout title="Search Results" description=`Search the ${SITE_CONFIG.title} archive`>
-    <div class="max-w-3xl mx-auto w-full pt-4 md:pt-12">
+    <div class="max-w-4xl mx-auto w-full pt-20 px-6">
+        <div class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center">
+            <TextReveal
+                client:load
+                text="Search"
+                type="char"
+                className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
+                style={{
+                    writingMode: "vertical-rl",
+                    textOrientation: "mixed",
+                }}
+            />
+        </div>
+
         <SearchResults client:load />
     </div>
 </Layout>

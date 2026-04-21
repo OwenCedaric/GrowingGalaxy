@@ -1,0 +1,262 @@
+---
+import { SITE_CONFIG } from "@/config";
+
+const { harmonicSystem } = SITE_CONFIG.homepage;
+---
+
+<section
+    class="hidden md:flex absolute right-0 top-0 h-full w-[45%] lg:w-[50%] bg-grid flex-col justify-center items-center z-0 transition-all duration-500 slanted-bg"
+>
+    <div
+        class="relative w-full max-w-[340px] aspect-square flex items-center justify-center group"
+    >
+        <svg
+            id="parametric-svg"
+            class="w-full h-full text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-700"
+            viewBox="-120 -120 240 240"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path
+                id="strand-1"
+                d=""
+                stroke="currentColor"
+                stroke-width="0.35"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+            </path>
+            <path
+                id="strand-2"
+                d=""
+                stroke="currentColor"
+                stroke-width="0.35"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-opacity="0.6"
+            >
+            </path>
+            <path
+                id="strand-3"
+                d=""
+                stroke="currentColor"
+                stroke-width="0.35"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-opacity="0.2"
+            >
+            </path>
+        </svg>
+
+        <div
+            class="absolute bottom-[-40px] font-mono text-[9px] text-zinc-400 dark:text-zinc-500 tracking-widest uppercase"
+        >
+            <span id="label-phase">Δ_PHASE: 0.00</span>
+        </div>
+    </div>
+</section>
+
+<style>
+    .slanted-bg {
+        clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+        padding-left: 10%; /* offset center visually due to slant */
+    }
+
+    /* 保留底层微小网格 */
+    .bg-grid {
+        background-size: 32px
+            32px;
+        background-image: linear-gradient(
+                to right,
+                rgba(
+                        0,
+                        0,
+                        0,
+                        0.03
+                    )
+                    1px,
+                transparent
+                    1px
+            ),
+            linear-gradient(
+                to bottom,
+                rgba(
+                        0,
+                        0,
+                        0,
+                        0.03
+                    )
+                    1px,
+                transparent
+                    1px
+            );
+    }
+    
+    :global(.dark) .bg-grid {
+        background-image: linear-gradient(
+                to right,
+                rgba(
+                        255,
+                        255,
+                        255,
+                        0.03
+                    )
+                    1px,
+                transparent
+                    1px
+            ),
+            linear-gradient(
+                to bottom,
+                rgba(
+                        255,
+                        255,
+                        255,
+                        0.03
+                    )
+                    1px,
+                transparent
+                    1px
+            );
+    }
+</style>
+
+<script define:vars={{ config: harmonicSystem }}>
+    let timePhase = 0;
+    
+    // Local constants previously in config
+    const ampPrimary = 75;
+    const ampSecondary = 35;
+    const resolution = 400;
+
+    // PRNG seeded by config.seed
+    let currentSeed = Number(config.seed) || 1234;
+
+    function seededRandom() {
+        var x = Math.sin(currentSeed++) * 10000;
+        return x - Math.floor(x);
+    }
+
+    // Generate strands based on the seed deterministically
+    const strands = [];
+    for(let i=0; i<3; i++) {
+        const pX = Math.floor(seededRandom() * 5) + 1;
+        const pY = Math.floor(seededRandom() * 5) + 1;
+        const sX = Math.floor(seededRandom() * 5) + 1;
+        const sY = Math.floor(seededRandom() * 5) + 1;
+        const offset = seededRandom() * Math.PI * 2;
+        
+        strands.push({
+            id: `strand-${i+1}`,
+            pX, pY, sX, sY, offset
+        });
+    }
+
+    const labelPhase = document.getElementById("label-phase");
+
+    // 生成复合谐波路径
+    function generateComplexPath(
+        strand,
+        phaseOffset,
+    ) {
+        let pathString = "";
+        for (
+            let i = 0;
+            i <= resolution;
+            i++
+        ) {
+            const theta =
+                (i / resolution) * Math.PI * 2;
+
+            const x =
+                ampPrimary *
+                    Math.sin(
+                        strand.pX *
+                            theta +
+                            phaseOffset,
+                    ) +
+                ampSecondary *
+                    Math.cos(
+                        strand.sX *
+                            theta -
+                            phaseOffset *
+                                0.5,
+                    );
+
+            const y =
+                ampPrimary *
+                    Math.cos(
+                        strand.pY *
+                            theta,
+                    ) +
+                ampSecondary *
+                    Math.sin(
+                        strand.sY *
+                            theta +
+                            phaseOffset *
+                                0.8,
+                    );
+
+            if (i === 0) {
+                pathString += `M ${x.toFixed(2)} ${y.toFixed(2)} `;
+            } else {
+                pathString += `L ${x.toFixed(2)} ${y.toFixed(2)} `;
+            }
+        }
+        return pathString + "Z";
+    }
+
+    // 动画渲染循环
+    let animationFrameId;
+    function animateSystem() {
+        timePhase += config.speed;
+
+        strands.forEach((strand) => {
+            const element =
+                document.getElementById(
+                    strand.id,
+                );
+            if (element) {
+                const newPath =
+                    generateComplexPath(
+                        strand,
+                        timePhase +
+                            strand.offset,
+                    );
+                element.setAttribute(
+                    "d",
+                    newPath,
+                );
+            }
+        });
+
+        if (labelPhase) {
+            labelPhase.textContent = `Δ_PHASE: ${timePhase.toFixed(2)}`;
+        }
+        
+        animationFrameId = requestAnimationFrame(
+            animateSystem,
+        );
+    }
+
+    // 启动机制
+    // Consider adding IntersectionObserver to pause when not in view
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                if (!animationFrameId) {
+                    animateSystem();
+                }
+            } else {
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
+                }
+            }
+        });
+    });
+    
+    const svgSection = document.getElementById("parametric-svg");
+    if(svgSection) {
+        observer.observe(svgSection);
+    }
+</script>
