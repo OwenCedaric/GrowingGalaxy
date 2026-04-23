@@ -11,58 +11,40 @@ import ScrollFloat from "@/components/ui/ScrollFloat";
 import MDXImage from "@/components/blog/MDXImage.astro";
 
 export async function getStaticPaths() {
-    const posts =
-        (
-            await getCollection(
-                "blog",
-            )
-        ).sort(
-            (
-                a,
-                b,
-            ) =>
-                b.data.pubDate.valueOf() -
-                a.data.pubDate.valueOf(),
-        );
+    const posts = (await getCollection("blog")).sort(
+        (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+    );
 
-    return posts.map(
-        (
-            post,
-            i,
-        ) => ({
+    const fs = await import('node:fs/promises');
+    const path = await import('node:path');
+
+    return await Promise.all(posts.map(async (post, i) => {
+        let extension = '.md';
+        try {
+            await fs.access(path.join(process.cwd(), 'src/content/blog', post.id + '.mdx'));
+            extension = '.mdx';
+        } catch (e) {}
+
+        return {
             params: {
                 slug: post.id,
             },
             props: {
                 entry: post,
-                nextPost:
-                    i >
-                    0
-                        ? posts[
-                              i -
-                                  1
-                          ]
-                        : null,
-                prevPost:
-                    i <
-                    posts.length -
-                        1
-                        ? posts[
-                              i +
-                                  1
-                          ]
-                        : null,
+                extension,
+                nextPost: i > 0 ? posts[i - 1] : null,
+                prevPost: i < posts.length - 1 ? posts[i + 1] : null,
             },
-        }),
-    );
+        };
+    }));
 }
 
 const {
     entry,
+    extension,
     nextPost,
     prevPost,
-} =
-    Astro.props;
+} = Astro.props;
 
 const {
     Content,
@@ -148,7 +130,7 @@ const blogCopyright =
     description={entry
         .data
         .description}
-    rawContentUrl={`/raw/blog/${entry.id}.md`}
+    rawContentUrl={`/raw/blog/${entry.id}${extension}`}
 >
     <article
         class="max-w-3xl mx-auto pt-12 md:pt-20"

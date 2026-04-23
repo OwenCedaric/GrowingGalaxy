@@ -21,6 +21,8 @@ pnpm-debug.log*
 public/pagefind/
 public/mcp/
 vectors.ndjson
+state/
+deletions.json
 
 # macOS-specific files
 .DS_Store

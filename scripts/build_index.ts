@@ -1,4 +1,5 @@
 import * as fs from 'node:fs/promises';
+import * as fsSync from 'node:fs';
 import * as path from 'node:path';
 import crypto from 'node:crypto';
 import matter from 'gray-matter';
@@ -9,7 +10,7 @@ import { MCP_CONFIG } from '../mcp.config';
 env.localModelPath = MCP_CONFIG.ai.localModelPath;
 env.allowRemoteModels = true;
 
-const { size: CHUNK_SIZE, overlap: OVERLAP } = MCP_CONFIG.chunking;
+const { size: CHUNK_SIZE } = MCP_CONFIG.chunking;
 const { localModel, dtype, pooling, normalize, dimensions } = MCP_CONFIG.ai;
 const { inputs, outputs, namespaces } = MCP_CONFIG.build;
 
@@ -35,48 +36,67 @@ async function walkDir(dir: string, fileList: string[] = []) {
     return fileList;
 }
 
-function structuralChunkText(text: string, title: string, size: number) {
+function structuralChunkText(text: string, title: string, targetSize: number) {
     const chunks: string[] = [];
-    const lines = text.split('\n');
-    let currentChunk = '';
-    let currentChapter = '';
-    let inCodeBlock = false;
+    const sections = text.split(/(?=^#{1,3}\s+)/m); // Split by h1, h2, h3 headers
 
-    const commitChunk = () => {
-        if (currentChunk.trim().length === 0) return;
-        const prefix = `Context: [${title}] > [${currentChapter || 'Intro'}]\n\n`;
-        const fullText = prefix + currentChunk.trim();
+    for (const section of sections) {
+        if (!section.trim()) continue;
+
+        // Extract current header if exists
+        const headerMatch = section.match(/^#{1,3}\s+(.+)$/m);
+        const currentHeader = headerMatch ? headerMatch[1] : 'Intro';
         
-        let i = 0;
-        while (i < fullText.length) {
-            chunks.push(fullText.slice(i, i + size));
-            i += size; // 结构化分片暂不强制overlap，保证纯净
+        const paragraphs = section.split(/\n{2,}/);
+        let currentChunkText = '';
+
+        const commit = (content: string) => {
+            if (!content.trim()) return;
+            const prefix = `Context: [${title}] > [${currentHeader}]\n\n`;
+            chunks.push(prefix + content.trim());
+        };
+
+        for (const paragraph of paragraphs) {
+            const cleanPara = paragraph.trim();
+            if (!cleanPara) continue;
+
+            // If adding this paragraph exceeds target size, commit current chunk
+            if (currentChunkText.length + cleanPara.length > targetSize && currentChunkText.length > 0) {
+                commit(currentChunkText);
+                currentChunkText = '';
+            }
+
+            // If a single paragraph is already larger than targetSize, we might still need to split it
+            // but we try to do it at sentence boundaries
+            if (cleanPara.length > targetSize) {
+                if (currentChunkText.length > 0) {
+                    commit(currentChunkText);
+                    currentChunkText = '';
+                }
+                
+                // Split large paragraph into sentences (basic regex for . ! ? and Chinese equivalents)
+                const sentences = cleanPara.split(/([。！？.!?])\s*/);
+                let sentenceBuffer = '';
+                
+                for (let i = 0; i < sentences.length; i += 2) {
+                    const sentence = sentences[i] + (sentences[i+1] || '');
+                    if (sentenceBuffer.length + sentence.length > targetSize && sentenceBuffer.length > 0) {
+                        commit(sentenceBuffer);
+                        sentenceBuffer = '';
+                    }
+                    sentenceBuffer += sentence;
+                }
+                if (sentenceBuffer) currentChunkText = sentenceBuffer;
+            } else {
+                currentChunkText += (currentChunkText ? '\n\n' : '') + cleanPara;
+            }
         }
-        currentChunk = '';
-    };
 
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-
-        if (line.trim().startsWith('```')) {
-            inCodeBlock = !inCodeBlock;
-        }
-
-        const isHeader = !inCodeBlock && /^#{2,3}\s+(.+)$/.test(line.trim());
-
-        if (isHeader) {
-            commitChunk();
-            const match = line.trim().match(/^#{2,3}\s+(.+)$/);
-            currentChapter = match ? match[1] : '';
-        }
-
-        currentChunk += line + '\n';
-
-        if (currentChunk.length >= size * 2 && !inCodeBlock) {
-             commitChunk();
+        if (currentChunkText) {
+            commit(currentChunkText);
         }
     }
-    commitChunk();
+
     return chunks;
 }
 
@@ -149,6 +169,7 @@ async function main() {
             
         const baseDir = namespace === namespaces.blog ? blogDir : pagesDir;
         // 使用相对路径保留子目录结构，并统一转换为正斜杠
+        const extension = path.extname(file);
         const filename = path.relative(baseDir, file)
             .replace(/\.(md|mdx)$/, '')
             .split(path.sep)
@@ -162,8 +183,9 @@ async function main() {
 
         const currentHash = hashText(rawContent);
 
-        const url = `/raw/${namespace}/${filename}.md`;
-        const canonical_url = `/${namespace}/${filename}`;
+        const url = `/raw/${namespace}/${filename}${extension}`;
+        const urlNamespace = namespace === namespaces.blog ? namespaces.blog : '';
+        const canonical_url = `/${urlNamespace}/${filename}`.replace(/\/+/g, '/');
         
         indexJson.push({
             id,
@@ -187,7 +209,8 @@ async function main() {
         }
 
         const modelExtractor = await getExtractor();
-        const textChunks = structuralChunkText(parsed.content || '', parsed.data.title || filename, CHUNK_SIZE);
+        const effectiveChunkSize = parsed.data.ai?.chunk_size || CHUNK_SIZE;
+        const textChunks = structuralChunkText(parsed.content || '', parsed.data.title || filename, effectiveChunkSize);
         const newChunkIds: string[] = [];
 
         for (let i = 0; i < textChunks.length; i++) {
@@ -199,14 +222,14 @@ async function main() {
             const output = await modelExtractor(text, { pooling, normalize });
             const vector = Array.from(output.data);
 
-            const chunkData = { id: chunkId, doc_id: id, text, tokens: text.length, url, namespace };
+            const chunkData = { id: chunkId, doc_id: id, text, tokens: text.length, url, canonical_url, namespace };
             chunksJson.push(chunkData);
 
             // Vectorize 强制要求 metadata 总大小不超过限制，保证 text 长度安全
             vectorsNdjson.push(JSON.stringify({
                 id: chunkId,
                 values: vector,
-                metadata: { doc_id: id, url, canonical_url, namespace, text: text.slice(0, 8000) }
+                metadata: { doc_id: id, url, canonical_url, namespace, text: text }
             }));
         }
         
@@ -223,11 +246,45 @@ async function main() {
         }
     }
 
-    // 写入 MCP 资源与向量库同步状态
+    // Load existing chunks to maintain a complete database for the worker
+    let allChunks: any[] = [];
+    try {
+        const existingData = await fs.readFile(path.join(mcpDir, outputs.chunksFile), 'utf-8');
+        allChunks = JSON.parse(existingData);
+    } catch (e) {}
+
+    // Helper to write assets to multiple locations
+    const writeAsset = async (filename: string, content: string) => {
+        await fs.writeFile(path.join(mcpDir, filename), content);
+        const distMcpDir = path.join(process.cwd(), 'dist', 'mcp');
+        try {
+            await fs.mkdir(distMcpDir, { recursive: true });
+            await fs.writeFile(path.join(distMcpDir, filename), content);
+            console.log(`Synced ${filename} to dist/mcp`);
+        } catch (e) {}
+    };
+
+    // Filter out chunks from files that were updated or deleted
+    // Logic: Keep existing chunks if their doc_id is in newManifest and the file hasn't changed.
+    const finalChunks = [
+        ...allChunks.filter(c => {
+            const entry = newManifest[c.doc_id];
+            if (!entry) return false;
+            // find the file for this doc_id
+            const file = allFiles.find(f => f.includes(c.doc_id));
+            if (!file) return false;
+            return hashText(fsSync.readFileSync(file, 'utf-8')) === entry.hash;
+        }),
+        ...chunksJson
+    ];
+
+    // Remove duplicates by ID
+    const uniqueChunks = Array.from(new Map(finalChunks.map(c => [c.id, c])).values());
+
     if (indexJson.length > 0)
-        await fs.writeFile(path.join(mcpDir, outputs.indexFile), JSON.stringify(indexJson, null, 2));
-    if (chunksJson.length > 0)
-        await fs.writeFile(path.join(mcpDir, outputs.chunksFile), JSON.stringify(chunksJson, null, 2));
+        await writeAsset(outputs.indexFile, JSON.stringify(indexJson, null, 2));
+    if (uniqueChunks.length > 0)
+        await writeAsset(outputs.chunksFile, JSON.stringify(uniqueChunks, null, 2));
     
     // 如果没有增量数据，空写可能破坏 ndjson
     if (vectorsNdjson.length > 0) {
@@ -241,9 +298,13 @@ async function main() {
     await fs.writeFile(manifestPath, JSON.stringify(newManifest, null, 2));
     await fs.writeFile(path.join(process.cwd(), 'deletions.json'), JSON.stringify(idsToDelete));
 
-    console.log(`Generated ${chunksJson.length} NEW chunks.`);
-    console.log(`Found ${idsToDelete.length} chunks to DELETE.`);
-    console.log(`Success: MCP index build complete (Dimensions: ${dimensions}).`);
+    console.log(`\n✨ MCP Index Build Complete`);
+    console.log(`--------------------------------`);
+    console.log(`- New Chunks: ${chunksJson.length}`);
+    console.log(`- Deleted Chunks: ${idsToDelete.length}`);
+    console.log(`- Dimensions: ${dimensions}`);
+    console.log(`- Assets generated in: ${outputs.mcpDir} and dist/mcp`);
+    console.log(`--------------------------------\n`);
 }
 
 main().catch(console.error);

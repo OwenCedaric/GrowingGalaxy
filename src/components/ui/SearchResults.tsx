@@ -33,9 +33,9 @@ export default function SearchResults() {
     const [keywordResults, setKeywordResults] = useState<PagefindResult[]>([]);
     const [isKeywordLoading, setIsKeywordLoading] = useState(false);
 
-    // AI Search State
     const [aiResults, setAiResults] = useState<McpResult[]>([]);
     const [isAiLoading, setIsAiLoading] = useState(false);
+    const [hasSearchedAi, setHasSearchedAi] = useState(false);
 
     // Initial Search Effect
     useEffect(() => {
@@ -46,6 +46,12 @@ export default function SearchResults() {
             performKeywordSearch(q);
         }
     }, []);
+
+    // Reset AI search state when query changes
+    useEffect(() => {
+        setHasSearchedAi(false);
+        setAiResults([]);
+    }, [query]);
 
     // Perform Keyword Search (Pagefind)
     const performKeywordSearch = async (q: string) => {
@@ -73,6 +79,7 @@ export default function SearchResults() {
     const performAiSearch = useCallback(async (q: string) => {
         if (!q.trim()) return;
         setIsAiLoading(true);
+        setHasSearchedAi(true);
         try {
             const response = await fetch("/mcp/search", {
                 method: "POST",
@@ -92,10 +99,10 @@ export default function SearchResults() {
 
     // Handle Tab Switch
     useEffect(() => {
-        if (activeTab === "ai" && aiResults.length === 0 && query.trim()) {
+        if (activeTab === "ai" && !hasSearchedAi && !isAiLoading && query.trim()) {
             performAiSearch(query);
         }
-    }, [activeTab, query, aiResults.length, performAiSearch]);
+    }, [activeTab, query, hasSearchedAi, isAiLoading, performAiSearch]);
 
     // Helper to determine the category based on URL
     const getCategoryFromUrl = (url: string) => {
@@ -199,14 +206,14 @@ export default function SearchResults() {
                                         <SpotlightCard className="p-6 md:p-12 border border-black/5 dark:border-white/10 border-l-2 border-l-accent/20">
                                             <article className="flex flex-col gap-6 group relative z-10 w-full">
                                                 <div className="space-y-4">
-                                                    <a href={r.metadata.canonical_url} className="block group/link after:absolute after:inset-0 after:z-20 after:cursor-pointer">
+                                                    <a href={r.metadata?.canonical_url || "#"} className="block group/link after:absolute after:inset-0 after:z-20 after:cursor-pointer">
                                                         <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-primary-text group-hover/link:text-secondary-text transition-colors leading-tight">
                                                             <ScrollFloat
                                                                 text="Fragment from Content"
                                                                 className="text-xl md:text-2xl font-serif italic mb-2 block opacity-40 dark:opacity-60"
                                                                 stagger={0.03}
                                                             />
-                                                            <span>{r.metadata.doc_id.replace(/-/g, ' ')}</span>
+                                                            <span>{r.metadata?.doc_id?.replace(/-/g, ' ') || "Untitled Fragment"}</span>
                                                         </h2>
                                                     </a>
                                                     <div className="flex items-center gap-4">
@@ -220,7 +227,7 @@ export default function SearchResults() {
                                                     </div>
                                                 </div>
                                                 <div className="text-sm md:text-base text-primary-text/80 dark:text-primary-text/90 leading-relaxed font-light italic border-l border-black/10 dark:border-white/10 pl-6">
-                                                    "{r.metadata.text.slice(0, 400)}..."
+                                                    "{r.metadata?.text?.slice(0, 400) || "No preview available"}..."
                                                 </div>
                                             </article>
                                         </SpotlightCard>

@@ -11,32 +11,33 @@ import ArticleAnimate from "@/components/ui/ArticleAnimate";
 import FadeContent from "@/components/ui/FadeContent";
 
 export async function getStaticPaths() {
-    const pages =
-        await getCollection(
-            "pages",
-        );
+    const pages = await getCollection("pages");
+    const fs = await import('node:fs/promises');
+    const path = await import('node:path');
 
-    const pagePaths =
-        pages.map(
-            (
-                page: CollectionEntry<"pages">,
-            ) => ({
-                params: {
-                    slug: page.id,
-                },
-                props: {
-                    entry: page,
-                },
-            }),
-        );
+    return await Promise.all(pages.map(async (page: CollectionEntry<"pages">) => {
+        let extension = '.md';
+        try {
+            await fs.access(path.join(process.cwd(), 'src/content/pages', page.id + '.mdx'));
+            extension = '.mdx';
+        } catch (e) {}
 
-    return pagePaths;
+        return {
+            params: {
+                slug: page.id,
+            },
+            props: {
+                entry: page,
+                extension,
+            },
+        };
+    }));
 }
 
 const {
     entry,
-} =
-    Astro.props;
+    extension,
+} = Astro.props;
 
 const {
     Content,
@@ -53,7 +54,7 @@ const {
     description={entry
         .data
         .description || `${entry.data.title} - ${SITE_CONFIG.title}`}
-    rawContentUrl={`/raw/pages/${entry.id}.md`}
+    rawContentUrl={`/raw/pages/${entry.id}${extension}`}
 >
     <article class="max-w-3xl mx-auto pt-20" data-pagefind-body>
         <header class="mb-20 text-left">

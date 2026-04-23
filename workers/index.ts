@@ -122,13 +122,32 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
         if (method === 'tools/call') {
           const { name, arguments: args } = params || {};
           if (name === 'search' && args?.query) {
-            const aiResp = await env.AI.run(ai.cloudflareModel, { text: args.query });
-            const m = await env.VECTORIZE.query(aiResp.data[0], { topK: args.top_k || search.defaultTopK, returnMetadata: 'all' });
-            return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ results: m.matches.map((x: any) => ({ chunk_id: x.id, score: x.score, metadata: x.metadata })) }) }] });
+            const aiResp = await runAiWithRetry(env, ai.cloudflareModel, { text: args.query });
+            if (!aiResp?.data) {
+              return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ results: [], error: aiResp?.error || "Embedding failed" }) }] });
+            }
+            
+            const vector = Array.isArray(aiResp.data[0]) ? aiResp.data[0] : aiResp.data;
+            if (!Array.isArray(vector)) {
+              return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ results: [], error: "Invalid vector format" }) }] });
+            }
+
+            const m = await env.VECTORIZE.query(vector, { topK: args.top_k || search.defaultTopK, returnMetadata: true });
+            const results = (m.matches || []).map((x: any) => ({
+              chunk_id: x.id,
+              score: x.score,
+              metadata: x.metadata || {}
+            }));
+            return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ results }) }] });
           }
           if (name === 'get_context' && args?.chunk_ids) {
-            const chunks = await env.VECTORIZE.getByIds(args.chunk_ids);
-            return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ context: chunks.map((m: any) => ({ chunk_id: m.id, text: m.metadata?.text, url: m.metadata?.url, canonical_url: m.metadata?.canonical_url })) }) }] });
+            const res = await env.ASSETS.fetch(new Request(new URL(routes.chunksJson, request.url)));
+            if (!res.ok) return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ error: "Chunks Error" }) }] });
+            const allChunks = await res.json() as any[];
+            const context = allChunks
+              .filter(c => args.chunk_ids.includes(c.id))
+              .map(c => ({ chunk_id: c.id, text: c.text, url: c.url, canonical_url: c.canonical_url }));
+            return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ context }) }] });
           }
         }
         
@@ -137,14 +156,33 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
 
       // 处理遗留自定义 POST API
       if (path === routes.search && body.query) {
-        const aiResp = await env.AI.run(ai.cloudflareModel, { text: body.query });
-        const m = await env.VECTORIZE.query(aiResp.data[0], { topK: body.top_k || search.defaultTopK, returnMetadata: 'all' });
-        return new Response(JSON.stringify({ results: m.matches.map((x: any) => ({ chunk_id: x.id, score: x.score, metadata: x.metadata })) }), { headers: corsHeaders() });
+        const aiResp = await runAiWithRetry(env, ai.cloudflareModel, { text: body.query });
+        if (!aiResp?.data) {
+          return new Response(JSON.stringify({ results: [], error: aiResp?.error || "Embedding failed" }), { headers: corsHeaders() });
+        }
+
+        const vector = Array.isArray(aiResp.data[0]) ? aiResp.data[0] : aiResp.data;
+        if (!Array.isArray(vector)) {
+          return new Response(JSON.stringify({ results: [], error: "Invalid vector format" }), { headers: corsHeaders() });
+        }
+
+        const m = await env.VECTORIZE.query(vector, { topK: body.top_k || search.defaultTopK, returnMetadata: true });
+        const results = (m.matches || []).map((x: any) => ({
+          chunk_id: x.id,
+          score: x.score,
+          metadata: x.metadata || {}
+        }));
+        return new Response(JSON.stringify({ results }), { headers: corsHeaders() });
       }
       
       if (path === routes.context && body.chunk_ids) {
-        const chunks = await env.VECTORIZE.getByIds(body.chunk_ids);
-        return new Response(JSON.stringify({ context: chunks.map((m: any) => ({ chunk_id: m.id, text: m.metadata?.text, url: m.metadata?.url, canonical_url: m.metadata?.canonical_url })) }), { headers: corsHeaders() });
+        const res = await env.ASSETS.fetch(new Request(new URL(routes.chunksJson, request.url)));
+        if (!res.ok) return new Response(JSON.stringify({ error: "Chunks Error" }), { status: 500, headers: corsHeaders() });
+        const allChunks = await res.json() as any[];
+        const context = allChunks
+          .filter(c => body.chunk_ids.includes(c.id))
+          .map(c => ({ chunk_id: c.id, text: c.text, url: c.url, canonical_url: c.canonical_url }));
+        return new Response(JSON.stringify({ context }), { headers: corsHeaders() });
       }
 
       return new Response(JSON.stringify({ error: "Method not found or invalid body", path, method }), { status: 404, headers: corsHeaders() });
@@ -161,4 +199,27 @@ function mcpResponse(id: any, result: any) {
   return new Response(JSON.stringify({ jsonrpc: "2.0", id, result }), {
     headers: corsHeaders()
   });
+}
+
+/**
+ * Run Workers AI with a simple retry mechanism to handle capacity errors
+ */
+async function runAiWithRetry(env: Env, model: string, input: any, retries = 2): Promise<any> {
+  let lastError: any = null;
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const resp = await env.AI.run(model, input);
+      if (resp && (resp.data || Array.isArray(resp))) return resp;
+      throw new Error(JSON.stringify(resp));
+    } catch (e: any) {
+      lastError = e;
+      // If it's a capacity error, wait a bit and retry
+      if (e.message?.includes('capacity') || e.message?.includes('429')) {
+        await new Promise(resolve => setTimeout(resolve, 500 * (i + 1)));
+        continue;
+      }
+      break; 
+    }
+  }
+  return { error: lastError?.message || "AI service unavailable" };
 }

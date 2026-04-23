@@ -53,7 +53,9 @@ async function main() {
         let updated = false;
         
         const namespace = filePath.includes('/blog/') || filePath.includes('\\blog\\') ? 'blog' : 'pages';
-        const basename = path.basename(filePath, path.extname(filePath)).replace(' copy', '');
+        const baseDir = namespace === 'blog' ? blogDir : pagesDir;
+        const slug = path.relative(baseDir, filePath).replace(/\.(md|mdx)$/, '').replace(' copy', '').split(path.sep).join('/');
+        const basename = path.basename(slug);
         
         // Remove emojis from Title and Description
         if (parsed.data.title) {
@@ -71,44 +73,27 @@ async function main() {
             }
         }
 
-        // MCP Meta updates
-        if (!parsed.data.id || parsed.data.id.includes(' copy')) {
-            parsed.data.id = basename;
+        // Clean up redundant fields from source files
+        if (parsed.data.ai) {
+            delete parsed.data.ai;
             updated = true;
         }
-        
-        if (!parsed.data.ai) {
-            parsed.data.ai = {};
-        }
-
-        if (parsed.data.ai.searchable === undefined) {
-            parsed.data.ai.searchable = true;
+        if (parsed.data.mcp) {
+            delete parsed.data.mcp;
             updated = true;
         }
-        
-        if (!parsed.data.ai.summary && parsed.data.description) {
-            parsed.data.ai.summary = parsed.data.description;
+        if (parsed.data.canonical_url) {
+            delete parsed.data.canonical_url;
             updated = true;
         }
-
-        if (!parsed.data.ai.namespace) {
-            parsed.data.ai.namespace = namespace;
+        if (parsed.data.raw_url) {
+            delete parsed.data.raw_url;
             updated = true;
         }
 
-        if (!parsed.data.mcp) {
-            parsed.data.mcp = {
-                priority: 'normal',
-                exclude_sections: []
-            };
-            updated = true;
-        } else if (!parsed.data.mcp.exclude_sections) {
-            parsed.data.mcp.exclude_sections = [];
-            updated = true;
-        }
-        
-        if (!parsed.data.canonical_url || parsed.data.canonical_url.includes(' copy')) {
-            parsed.data.canonical_url = `/${namespace}/${basename}`;
+        // Essential ID to ensure consistency
+        if (!parsed.data.id || parsed.data.id !== slug) {
+            parsed.data.id = slug;
             updated = true;
         }
 

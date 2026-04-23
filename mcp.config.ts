@@ -16,8 +16,7 @@ export const MCP_CONFIG = {
     metric: 'cosine'
   },
   chunking: {
-    size: 500,
-    overlap: 50
+    size: 500
   },
   search: {
     defaultTopK: 5
@@ -43,6 +42,7 @@ export const MCP_CONFIG = {
     version: '/mcp/version',
     listDocs: '/mcp/list_docs',
     indexJson: '/mcp/index.json',
+    chunksJson: '/mcp/chunks.json',
     message: '/mcp/message',
     search: '/mcp/search',
     context: '/mcp/context'
