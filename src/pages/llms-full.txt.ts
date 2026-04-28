@@ -8,7 +8,7 @@ export async function GET() {
     const blogroll = await getCollection('blogroll');
     const photos = await getCollection('photos');
 
-    const content = `# ${SITE_CONFIG.title} Full Content Index
+    const content = `\uFEFF# ${SITE_CONFIG.title} Full Content Index
 
 > This manifest provides a comprehensive index of all content on ${SITE_CONFIG.title}, with links to both the web version and the raw markdown version for optimized AI consumption.
 

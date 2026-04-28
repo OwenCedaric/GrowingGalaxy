@@ -5,7 +5,7 @@ export async function GET() {
     const title = SITE_CONFIG.title;
     const description = SITE_CONFIG.description;
 
-    const content = `# ${title}
+    const content = `\uFEFF# ${title}
 
 > ${description}
 
