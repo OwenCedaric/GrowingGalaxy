@@ -9,7 +9,7 @@ interface MDXImageProps {
 
 const MDXImage: React.FC<MDXImageProps> = (props) => {
     return (
-        <div className="my-12 mx-auto w-fit rounded-xl md:rounded-2xl overflow-hidden shadow-2xl border border-black/5 dark:border-white/10 group">
+        <span className="my-12 mx-auto block w-fit rounded-xl md:rounded-2xl overflow-hidden shadow-2xl border border-black/5 dark:border-white/10 group">
             <GlareHover
                 borderRadius="inherit"
                 glareOpacity={0.15}
@@ -20,7 +20,7 @@ const MDXImage: React.FC<MDXImageProps> = (props) => {
                     className="!m-0 max-w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-[1.02]"
                 />
             </GlareHover>
-        </div>
+        </span>
     );
 };
 

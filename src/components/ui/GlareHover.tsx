@@ -54,11 +54,11 @@ export default function GlareHover({
     };
 
     return (
-        <div
-            className={`glare-hover ${playOnce ? 'glare-hover--play-once' : ''} ${className}`}
+        <span
+            className={`glare-hover block ${playOnce ? 'glare-hover--play-once' : ''} ${className}`}
             style={{ ...vars, ...style } as CSSProperties}
         >
             {children}
-        </div>
+        </span>
     );
 }

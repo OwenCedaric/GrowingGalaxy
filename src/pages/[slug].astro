@@ -9,6 +9,7 @@ import { SITE_CONFIG } from "@/config";
 import TextReveal from "@/components/ui/TextReveal";
 import ArticleAnimate from "@/components/ui/ArticleAnimate";
 import FadeContent from "@/components/ui/FadeContent";
+import MDXImage from "@/components/blog/MDXImage.astro";
 
 export async function getStaticPaths() {
     const pages = await getCollection("pages");
@@ -99,7 +100,7 @@ const {
             client:load
             className="prose dark:prose-invert max-w-none prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4"
         >
-            <Content />
+            <Content components={{ img: MDXImage }} />
         </ArticleAnimate>
     </article>
 </Layout>
