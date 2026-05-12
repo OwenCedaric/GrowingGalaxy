@@ -8,6 +8,7 @@ import { useTheme } from "@/utils/useTheme";
 interface NavItem {
     text: string;
     href: string;
+    children?: { text: string; href: string }[];
 }
 
 interface NavigationProps {
@@ -64,7 +65,7 @@ export default function Navigation({ title, navItems, pathname = "" }: Navigatio
         <>
             {/* Top Navigation Bar */}
             <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
-                <nav className="glass pl-4 pr-3 py-2 sm:pl-6 sm:pr-5 sm:py-3 flex items-center gap-3 sm:gap-6 overflow-hidden">
+                <nav className="glass pl-4 pr-3 py-2 sm:pl-6 sm:pr-5 sm:py-3 flex items-center gap-3 sm:gap-6 relative">
                     {/* Persistent Logo */}
                     <div className="shrink-0">
                         <AnimatedNavLink href="/" text={title} isLogo={true} />
@@ -85,8 +86,24 @@ export default function Navigation({ title, navItems, pathname = "" }: Navigatio
                             >
                                 {/* Nav Items */}
                                 {navItems.map((item) => (
-                                    <div key={item.href}>
+                                    <div key={item.href} className="relative group/navitem">
                                         <AnimatedNavLink href={item.href} text={item.text} />
+                                        {/* Dropdown Menu */}
+                                        {item.children && item.children.length > 0 && (
+                                            <div className="absolute top-full left-1/2 -translate-x-1/2 pt-5 sm:pt-6 opacity-0 invisible group-hover/navitem:opacity-100 group-hover/navitem:visible transition-all duration-300 z-50">
+                                                <div className="glass !rounded-2xl py-1.5 px-1.5 flex flex-col gap-0.5 min-w-[130px] shadow-xl">
+                                                    {item.children.map(child => (
+                                                        <a 
+                                                            key={child.href} 
+                                                            href={child.href}
+                                                            className="text-sm font-medium text-secondary-text dark:text-gray-300 hover:text-primary-text dark:hover:text-white transition-all px-4 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 text-center whitespace-nowrap block"
+                                                        >
+                                                            {child.text}
+                                                        </a>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
 

@@ -8,7 +8,13 @@ export const SITE_CONFIG = {
     defaultImage: "/blog-placeholder-1.png",
     nav: [
         { text: "Blog", href: "/blog" },
-        { text: "Gallery", href: "/gallery" },
+        {
+            text: "Gallery",
+            href: "/gallery",
+            children: [
+                { text: "2025", href: "/gallery/2025/shinjukugyoencherryblossoms" }
+            ]
+        },
         { text: "About", href: "/about" },
     ],
     homepage: {
