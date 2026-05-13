@@ -11,6 +11,8 @@
         "jsx": "react-jsx",
         "jsxImportSource": "react",
         "baseUrl": ".",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
         "types": ["astro/client"],
         "paths": {
             "@/*": [
