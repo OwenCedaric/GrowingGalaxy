@@ -184,8 +184,8 @@ export default function StackedCardSlider({ images = [] }: StackedCardSliderProp
                                                 <div 
                                                     className={`absolute bottom-0 left-0 right-0 transition-all duration-300 flex flex-col justify-end ${
                                                         expandedTextIndex === index
-                                                            ? "p-6 sm:p-8 pt-12 bg-black/70 backdrop-blur-md h-full overflow-y-auto cursor-pointer" 
-                                                            : `p-4 sm:p-6 pt-16 bg-gradient-to-t from-black/80 via-black/40 to-transparent ${hasMoreContent ? 'cursor-pointer' : ''}`
+                                                            ? "p-6 sm:p-8 pt-8 bg-black/50 backdrop-blur-2xl backdrop-saturate-200 max-h-[90%] overflow-y-auto cursor-pointer rounded-t-2xl border-t border-white/10" 
+                                                            : `p-4 sm:p-6 pt-32 bg-transparent border-t border-transparent ${hasMoreContent ? 'cursor-pointer' : ''}`
                                                     }`}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -197,17 +197,24 @@ export default function StackedCardSlider({ images = [] }: StackedCardSliderProp
                                                     }}
                                                     style={{ pointerEvents: isCurrent ? "auto" : "none" }}
                                                 >
+                                                    {/* Soft faded glass background for collapsed state */}
+                                                    <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${
+                                                        expandedTextIndex === index ? "opacity-0" : "opacity-100"
+                                                    }`}>
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent backdrop-blur-md backdrop-saturate-150 [mask-image:linear-gradient(to_top,black_30%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_top,black_30%,transparent_100%)]" />
+                                                    </div>
+
                                                     {expandedTextIndex === index ? (
-                                                        <p className="text-white text-sm sm:text-base font-light leading-snug sm:leading-relaxed text-shadow-sm whitespace-pre-wrap mt-auto animate-in fade-in duration-300">
+                                                        <p className="relative z-10 text-white text-sm sm:text-base font-light leading-snug sm:leading-relaxed text-shadow-sm whitespace-pre-wrap mt-auto animate-in fade-in duration-300">
                                                             {item.description}
                                                         </p>
                                                     ) : (
-                                                        <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
-                                                            <div className={`text-white/90 text-xs sm:text-sm font-light ${hasMoreContent ? 'truncate mr-4' : 'whitespace-pre-wrap'}`}>
+                                                        <div className="relative z-10 flex items-center justify-between w-full animate-in fade-in duration-300 text-white">
+                                                            <div className={`text-white text-xs sm:text-sm font-light drop-shadow-md ${hasMoreContent ? 'truncate mr-4' : 'whitespace-pre-wrap'}`}>
                                                                 {hasMoreContent ? item.description.split('\n')[0] : item.description}
                                                             </div>
                                                             {hasMoreContent && (
-                                                                <div className="text-white/60 text-[10px] sm:text-xs font-mono uppercase tracking-widest shrink-0">
+                                                                <div className="text-white opacity-80 text-[10px] sm:text-xs font-mono uppercase tracking-widest shrink-0 drop-shadow-md">
                                                                     More +
                                                                 </div>
                                                             )}
