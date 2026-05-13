@@ -9,6 +9,7 @@ import ArticleAnimate from "@/components/ui/ArticleAnimate";
 import FadeContent from "@/components/ui/FadeContent";
 import ScrollFloat from "@/components/ui/ScrollFloat";
 import MDXImage from "@/components/blog/MDXImage.astro";
+import TableOfContents from "@/components/blog/TableOfContents.astro";
 
 export async function getStaticPaths() {
     const posts = (await getCollection("blog")).sort(
@@ -48,6 +49,7 @@ const {
 
 const {
     Content,
+    headings,
 } =
     await render(
         entry,
@@ -133,9 +135,10 @@ const blogCopyright =
     rawContentUrl={`/raw/blog/${entry.id}${extension}`}
 >
     <article
-        class="max-w-3xl mx-auto pt-12 md:pt-20"
+        class="max-w-3xl mx-auto pt-12 md:pt-20 relative"
         data-pagefind-body
     >
+        <TableOfContents headings={headings} />
         {
             /* Minimal Header */
         }

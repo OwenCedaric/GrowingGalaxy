@@ -1,0 +1,60 @@
+---
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+
+// Filter to only include H2 headings as requested
+const filteredHeadings = headings.filter((h) => h.depth === 2);
+
+if (filteredHeadings.length === 0) return null;
+---
+
+<nav class="toc-container" aria-label="Table of Contents">
+  <div class="toc-sticky-wrapper">
+    <div class="toc-header">
+      <span class="toc-line"></span>
+      <span class="toc-title">Contents</span>
+    </div>
+    <ul class="toc-list">
+      {filteredHeadings.map((heading) => (
+        <li>
+          <a href={`#${heading.slug}`} class="toc-link">
+            <span class="link-text">{heading.text}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>
+
+<script>
+  function setupTOC() {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-10% 0px -80% 0px',
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          document.querySelectorAll('.toc-link').forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+          });
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('h2[id]').forEach((h2) => {
+      observer.observe(h2);
+    });
+  }
+
+  // Run on initial load
+  setupTOC();
+  // Run on view transitions
+  document.addEventListener('astro:after-swap', setupTOC);
+</script>
