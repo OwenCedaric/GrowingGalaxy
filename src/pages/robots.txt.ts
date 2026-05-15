@@ -5,7 +5,7 @@ const robotsTxt = `
 User-agent: *
 Allow: /
 
-Sitemap: ${import.meta.env.SITE}/sitemap-index.xml
+Sitemap: ${import.meta.env.SITE}/sitemap.xml
 llms-txt: ${import.meta.env.SITE}/llms.txt
 `.trim();
 

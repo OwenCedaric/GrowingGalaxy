@@ -17,35 +17,6 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
-            <path
-                id="strand-1"
-                d=""
-                stroke="currentColor"
-                stroke-width="0.35"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-            </path>
-            <path
-                id="strand-2"
-                d=""
-                stroke="currentColor"
-                stroke-width="0.35"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-opacity="0.6"
-            >
-            </path>
-            <path
-                id="strand-3"
-                d=""
-                stroke="currentColor"
-                stroke-width="0.35"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-opacity="0.2"
-            >
-            </path>
         </svg>
 
         <div
@@ -62,60 +33,40 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
         padding-left: 8%; /* offset center visually due to slant */
     }
 
-    /* 保留底层微小网格 */
-    .bg-grid {
-        background-size: 32px
-            32px;
+    /* 保留底层微小网格，并增加渐隐遮罩打破边缘的僵硬感 */
+    .bg-grid::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background-size: 32px 32px;
+        background-position: center center;
         background-image: linear-gradient(
                 to right,
-                rgba(
-                        0,
-                        0,
-                        0,
-                        0.03
-                    )
-                    1px,
-                transparent
-                    1px
+                rgba(0, 0, 0, 0.04) 1px,
+                transparent 1px
             ),
             linear-gradient(
                 to bottom,
-                rgba(
-                        0,
-                        0,
-                        0,
-                        0.03
-                    )
-                    1px,
-                transparent
-                    1px
+                rgba(0, 0, 0, 0.04) 1px,
+                transparent 1px
             );
+        /* 径向渐变遮罩，使网格在边缘自然消隐，竖线呈现错落的虚化效果 */
+        -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%);
+        mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%);
     }
     
-    :global(.dark) .bg-grid {
+    :global(.dark) .bg-grid::before {
         background-image: linear-gradient(
                 to right,
-                rgba(
-                        255,
-                        255,
-                        255,
-                        0.03
-                    )
-                    1px,
-                transparent
-                    1px
+                rgba(255, 255, 255, 0.03) 1px,
+                transparent 1px
             ),
             linear-gradient(
                 to bottom,
-                rgba(
-                        255,
-                        255,
-                        255,
-                        0.03
-                    )
-                    1px,
-                transparent
-                    1px
+                rgba(255, 255, 255, 0.03) 1px,
+                transparent 1px
             );
     }
 </style>
@@ -125,124 +76,154 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
         const svgSection = document.getElementById("parametric-svg");
         if (!svgSection) return;
 
+        // Clear any existing paths for clean initialization
+        svgSection.innerHTML = "";
+
         let timePhase = 0;
         
-        // Local constants previously in config
+        // Local constants
         const ampPrimary = 75;
         const ampSecondary = 35;
-        const resolution = 400;
+        const resolution = 150;
 
-        // PRNG seeded by config.seed
-        let currentSeed = Number(config.seed) || 1234;
+        let displaySeed = Number(config.seed) || 1234;
+        let currentSpeed = config.speed || 0.0042;
+        let targetSpeed = currentSpeed;
+        
+        let morphProgress = 0; 
+        let isMorphing = false;
+        let isCooldown = false;
 
-        function seededRandom() {
-            var x = Math.sin(currentSeed++) * 10000;
+        const baseOpacities = [1.0, 0.6, 0.2];
+        const systemLayers = [];
+
+        function seededRandom(seedVal) {
+            var x = Math.sin(seedVal) * 10000;
             return x - Math.floor(x);
         }
 
-        // Generate strands based on the seed deterministically
-        const strands = [];
-        for(let i=0; i<3; i++) {
-            const pX = Math.floor(seededRandom() * 5) + 1;
-            const pY = Math.floor(seededRandom() * 5) + 1;
-            const sX = Math.floor(seededRandom() * 5) + 1;
-            const sY = Math.floor(seededRandom() * 5) + 1;
-            const offset = seededRandom() * Math.PI * 2;
-            
-            strands.push({
-                id: `strand-${i+1}`,
-                pX, pY, sX, sY, offset
+        function generateAllStrandParams(seed) {
+            const paramsList = [];
+            let s = seed;
+            for(let i = 0; i < 3; i++) {
+                const pX = Math.floor(seededRandom(s++) * 5) + 1;
+                const pY = Math.floor(seededRandom(s++) * 5) + 1;
+                const sX = Math.floor(seededRandom(s++) * 5) + 1;
+                const sY = Math.floor(seededRandom(s++) * 5) + 1;
+                const offset = seededRandom(s++) * Math.PI * 2;
+                paramsList.push({ pX, pY, sX, sY, offset });
+            }
+            return paramsList;
+        }
+
+        const initialParams = generateAllStrandParams(displaySeed);
+
+        for (let i = 0; i < 3; i++) {
+            const pathNode = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            pathNode.setAttribute("stroke", "currentColor");
+            pathNode.setAttribute("stroke-width", "0.35");
+            pathNode.setAttribute("stroke-linecap", "round");
+            pathNode.setAttribute("stroke-linejoin", "round");
+            pathNode.setAttribute("stroke-opacity", baseOpacities[i].toString());
+            svgSection.appendChild(pathNode);
+
+            systemLayers.push({
+                baseOpacity: baseOpacities[i],
+                pathNode: pathNode,
+                params: initialParams[i],
+                targetParams: null
             });
         }
+
+        window.addEventListener("mousemove", (e) => {
+            if (isMorphing || isCooldown) return;
+            const newSeed = Math.floor(e.clientX * 3.14 + e.clientY * 2.71);
+            targetSpeed = 0.001 + (e.clientY / window.innerHeight) * 0.01;
+            
+            const newParams = generateAllStrandParams(newSeed);
+            for (let i = 0; i < 3; i++) {
+                systemLayers[i].targetParams = newParams[i];
+            }
+            
+            displaySeed = newSeed;
+            isMorphing = true;
+            morphProgress = 0;
+        });
 
         const labelPhase = document.getElementById("label-phase");
 
-        // 生成复合谐波路径
-        function generateComplexPath(
-            strand,
-            phaseOffset,
-        ) {
-            let pathString = "";
-            for (
-                let i = 0;
-                i <= resolution;
-                i++
-            ) {
-                const theta =
-                    (i / resolution) * Math.PI * 2;
-
-                const x =
-                    ampPrimary *
-                        Math.sin(
-                            strand.pX *
-                                theta +
-                                phaseOffset,
-                        ) +
-                    ampSecondary *
-                        Math.cos(
-                            strand.sX *
-                                theta -
-                                phaseOffset *
-                                    0.5,
-                        );
-
-                const y =
-                    ampPrimary *
-                        Math.cos(
-                            strand.pY *
-                                theta,
-                        ) +
-                    ampSecondary *
-                        Math.sin(
-                            strand.sY *
-                                theta +
-                                phaseOffset *
-                                    0.8,
-                        );
-
-                if (i === 0) {
-                    pathString += `M ${x.toFixed(2)} ${y.toFixed(2)} `;
-                } else {
-                    pathString += `L ${x.toFixed(2)} ${y.toFixed(2)} `;
-                }
-            }
-            return pathString + "Z";
+        function easeInOutQuad(t) {
+            return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
         }
 
-        // 动画渲染循环
-        let animationFrameId;
-        function animateSystem() {
-            timePhase += config.speed;
+        function generatePath(params, globalPhase) {
+            const phase = globalPhase + params.offset;
+            const points = [];
+            for (let i = 0; i <= resolution; i++) {
+                const theta = (i / resolution) * Math.PI * 2;
+                const x = ampPrimary * Math.sin(params.pX * theta + phase) +
+                          ampSecondary * Math.cos(params.sX * theta - phase * 0.5);
+                const y = ampPrimary * Math.cos(params.pY * theta) +
+                          ampSecondary * Math.sin(params.sY * theta + phase * 0.8);
 
-            strands.forEach((strand) => {
-                const element =
-                    document.getElementById(
-                        strand.id,
-                    );
-                if (element) {
-                    const newPath =
-                        generateComplexPath(
-                            strand,
-                            timePhase +
-                                strand.offset,
-                        );
-                    element.setAttribute(
-                        "d",
-                        newPath,
-                    );
+                if (i === 0) {
+                    points.push(`M ${x.toFixed(2)} ${y.toFixed(2)}`);
+                } else {
+                    points.push(`L ${x.toFixed(2)} ${y.toFixed(2)}`);
                 }
-            });
+            }
+            return points.join(" ") + " Z";
+        }
+
+        let animationFrameId;
+
+        function animateSystem() {
+            currentSpeed += (targetSpeed - currentSpeed) * 0.02;
+            timePhase += currentSpeed;
+
+            if (isMorphing) {
+                morphProgress += 0.005;
+                if (morphProgress >= 1) {
+                    for (let i = 0; i < systemLayers.length; i++) {
+                        systemLayers[i].params = { ...systemLayers[i].targetParams };
+                        systemLayers[i].targetParams = null;
+                    }
+                    isMorphing = false;
+                    morphProgress = 0;
+                    
+                    isCooldown = true;
+                    setTimeout(() => {
+                        isCooldown = false;
+                    }, 3300);
+                }
+            }
+
+            const t = easeInOutQuad(morphProgress);
+
+            for (let i = 0; i < systemLayers.length; i++) {
+                const layer = systemLayers[i];
+                let currentParams = layer.params;
+
+                if (isMorphing && layer.targetParams) {
+                    currentParams = {
+                        pX: layer.params.pX + (layer.targetParams.pX - layer.params.pX) * t,
+                        pY: layer.params.pY + (layer.targetParams.pY - layer.params.pY) * t,
+                        sX: layer.params.sX + (layer.targetParams.sX - layer.params.sX) * t,
+                        sY: layer.params.sY + (layer.targetParams.sY - layer.params.sY) * t,
+                        offset: layer.params.offset + (layer.targetParams.offset - layer.params.offset) * t
+                    };
+                }
+
+                layer.pathNode.setAttribute("d", generatePath(currentParams, timePhase));
+            }
 
             if (labelPhase) {
                 labelPhase.textContent = `Δ_PHASE: ${timePhase.toFixed(2)}`;
             }
             
-            animationFrameId = requestAnimationFrame(
-                animateSystem,
-            );
+            animationFrameId = requestAnimationFrame(animateSystem);
         }
 
-        // 启动机制
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -261,6 +242,5 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
         observer.observe(svgSection);
     }
 
-    // Initialize on first load and subsequent navigations
     document.addEventListener('astro:page-load', init);
 </script>
