@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "astro dev",
         "build": "astro build && pagefind --site dist",
-        "postbuild": "rm -rf public/pagefind && cp -r dist/pagefind public/pagefind && mv dist/sitemap-0.xml dist/sitemap.xml && rm -f dist/sitemap-index.xml || true",
+        "postbuild": "rm -rf public/pagefind && cp -r dist/pagefind public/pagefind || true",
         "preview": "astro preview",
         "astro": "astro",
         "check": "astro check",
