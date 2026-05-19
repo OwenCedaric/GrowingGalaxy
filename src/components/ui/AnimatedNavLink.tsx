@@ -5,12 +5,13 @@ interface AnimatedNavLinkProps {
     text: string;
     className?: string;
     isLogo?: boolean;
+    isActive?: boolean;
 }
 
-export default function AnimatedNavLink({ href, text, className = "", isLogo = false }: AnimatedNavLinkProps) {
+export default function AnimatedNavLink({ href, text, className = "", isLogo = false, isActive = false }: AnimatedNavLinkProps) {
     const baseClasses = isLogo
-        ? "text-sm font-medium hover:text-black dark:hover:text-white transition-colors block px-2 py-1 relative overflow-hidden group"
-        : "text-sm font-medium text-secondary-text dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors relative group block px-2 py-1 overflow-hidden";
+        ? "text-sm font-medium hover:text-primary-text dark:hover:text-primary-text-dark transition-colors block px-2 py-1 relative overflow-hidden group"
+        : `text-sm font-medium nav-link ${isActive ? "active" : ""} relative group block px-2 py-1 overflow-hidden`;
 
     const DURATION = 0.3;
     const STAGGER = 0.02;
@@ -70,7 +71,7 @@ export default function AnimatedNavLink({ href, text, className = "", isLogo = f
             </motion.div>
 
             {!isLogo && (
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-black/50 dark:bg-white/50 transition-all duration-300 group-hover:w-full" />
+                <span className={`absolute -bottom-1 left-0 h-px bg-black/50 dark:bg-white/50 transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"}`} />
             )}
         </a>
     );

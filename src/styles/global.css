@@ -19,7 +19,7 @@
     --color-decoration-dark: rgba(234, 234, 234, 0.2);
 
     --color-glass-bg: rgba(255, 255, 255, 0.3);
-    --color-glass-bg-dark: rgba(24, 24, 27, 0.5);
+    --color-glass-bg-dark: rgba(20, 20, 22, 0.85);
     --color-glass-border: rgba(255, 255, 255, 0.2);
     --color-glass-border-dark: rgba(255, 255, 255, 0.1);
     --color-glass-shadow: rgba(0, 0, 0, 0.05);
@@ -66,6 +66,7 @@
         --color-secondary-text: var(--color-secondary-text-dark);
         --color-primary-text: var(--color-primary-text-dark);
         --color-decoration: var(--color-decoration-dark);
+        --color-accent: #ffffff;
         --glass-bg: var(--color-glass-bg-dark);
         --glass-border: var(--color-glass-border-dark);
         --glass-shadow: var(--color-glass-shadow-dark);
@@ -342,14 +343,76 @@
     }
 
     .toc-link {
-        @apply block text-[0.8rem] text-secondary-text no-underline transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] leading-tight font-normal relative dark:text-secondary-text-dark dark:opacity-80;
+        display: block;
+        font-size: 0.8rem;
+        color: var(--color-secondary-text);
+        text-decoration: none;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        line-height: 1.25;
+        font-weight: 400;
+        position: relative;
+        opacity: 0.6;
+    }
+
+    .dark .toc-link {
+        color: var(--color-secondary-text-dark);
+        opacity: 0.8;
     }
 
     .toc-link:hover {
-        @apply text-primary-text translate-x-1 dark:text-primary-text-dark dark:opacity-100;
+        color: var(--color-primary-text);
+        transform: translateX(4px);
+        opacity: 1;
+    }
+
+    .dark .toc-link:hover {
+        color: var(--color-primary-text-dark);
+        opacity: 1;
     }
 
     .toc-link.active {
-        @apply text-primary-text font-semibold dark:text-primary-text-dark dark:opacity-100;
+        color: var(--color-primary-text);
+        font-weight: 600;
+        opacity: 1;
+    }
+
+    .dark .toc-link.active {
+        color: var(--color-primary-text-dark);
+        font-weight: 600;
+        opacity: 1;
+    }
+
+    /* Navigation Link styling */
+    .nav-link {
+        color: var(--color-secondary-text);
+        opacity: 0.8;
+        transition: color 0.3s ease, opacity 0.3s ease;
+    }
+
+    .dark .nav-link {
+        color: var(--color-secondary-text-dark);
+        opacity: 0.85;
+    }
+
+    .nav-link:hover {
+        color: var(--color-primary-text);
+        opacity: 1;
+    }
+
+    .dark .nav-link:hover {
+        color: var(--color-primary-text-dark);
+        opacity: 1;
+    }
+
+    .nav-link.active {
+        color: var(--color-primary-text);
+        font-weight: 600;
+        opacity: 1;
+    }
+
+    .dark .nav-link.active {
+        color: var(--color-primary-text-dark);
+        font-weight: 600;
+        opacity: 1;
     }
 }

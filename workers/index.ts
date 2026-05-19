@@ -20,7 +20,46 @@ export default {
     }
 
     // 默认回退到静态资源
-    return env.ASSETS.fetch(request);
+    const response = await env.ASSETS.fetch(request);
+
+    if (request.method === 'GET' && response.status === 200) {
+      const pathname = url.pathname.toLowerCase();
+      const contentType = (response.headers.get('content-type') || '').toLowerCase();
+      
+      const newHeaders = new Headers(response.headers);
+      let modified = false;
+      
+      if (
+        pathname.endsWith('.js') || 
+        pathname.endsWith('.css') || 
+        pathname.match(/\.(woff2?|eot|ttf|otf)$/) || 
+        pathname.match(/\.(avif|webp|png|jpe?g|gif|svg|ico)$/) ||
+        contentType.includes('application/javascript') ||
+        contentType.includes('text/css') ||
+        contentType.startsWith('image/') ||
+        contentType.includes('font/')
+      ) {
+        newHeaders.set('Cache-Control', 'public, max-age=31536000, immutable');
+        modified = true;
+      } else if (
+        contentType.includes('text/html') || 
+        pathname.endsWith('/') || 
+        pathname.endsWith('.html')
+      ) {
+        newHeaders.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+        modified = true;
+      }
+      
+      if (modified) {
+        return new Response(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: newHeaders
+        });
+      }
+    }
+
+    return response;
   }
 }
 

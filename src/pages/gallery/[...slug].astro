@@ -24,6 +24,33 @@ const { photo } = Astro.props;
 <html lang="zh-CN">
     <head>
         <BaseHead title={`${photo.name} | ${SITE_CONFIG.title}`} description={photo.name} />
+        <script
+            type="application/ld+json"
+            set:html={JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": SITE_CONFIG.site
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Gallery",
+                        "item": `${SITE_CONFIG.site}/gallery`
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": photo.name,
+                        "item": `${SITE_CONFIG.site}/gallery/${photo.slug}`
+                    }
+                ]
+            })}
+        />
         <style>
             body {
                 margin: 0;

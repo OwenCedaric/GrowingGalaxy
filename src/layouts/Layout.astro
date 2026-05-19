@@ -14,13 +14,21 @@ import ShinyText from "@/components/ui/ShinyText";
 interface Props {
     title: string;
     description: string;
+    image?: string;
     rawContentUrl?: string;
+    publishDate?: Date;
+    modifiedDate?: Date;
+    authorName?: string;
 }
 
 const {
     title,
     description,
+    image,
     rawContentUrl,
+    publishDate,
+    modifiedDate,
+    authorName,
 } =
     Astro.props;
 ---
@@ -34,6 +42,7 @@ const {
         <BaseHead
             title={title}
             description={description}
+            image={image}
         />
         <ViewTransitions
         />
@@ -57,7 +66,7 @@ const {
             )
         }
         {
-            rawContentUrl && (
+            rawContentUrl && !publishDate && (
                 <script
                     type="application/ld+json"
                     set:html={JSON.stringify(
@@ -81,6 +90,46 @@ const {
                                 },
                         },
                     )}
+                />
+            )
+        }
+        {
+            publishDate && (
+                <script
+                    type="application/ld+json"
+                    set:html={JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Article",
+                        headline: title,
+                        description: description,
+                        author: {
+                            "@type": "Person",
+                            name: authorName || SITE_CONFIG.author,
+                            url: `${Astro.site || SITE_CONFIG.site}/about`
+                        },
+                        datePublished: publishDate.toISOString(),
+                        dateModified: (modifiedDate || publishDate).toISOString(),
+                        image: image ? new URL(image, Astro.site || SITE_CONFIG.site).toString() : new URL(SITE_CONFIG.defaultImage, Astro.site || SITE_CONFIG.site).toString(),
+                        publisher: {
+                            "@type": "Organization",
+                            name: SITE_CONFIG.title,
+                            logo: {
+                                "@type": "ImageObject",
+                                url: new URL("/favicon.svg", Astro.site || SITE_CONFIG.site).toString()
+                            }
+                        },
+                        mainEntityOfPage: {
+                            "@type": "WebPage",
+                            "@id": Astro.url.toString()
+                        },
+                        ...(rawContentUrl ? {
+                            encoding: {
+                                "@type": "MediaObject",
+                                encodingFormat: "text/markdown",
+                                contentUrl: new URL(rawContentUrl, Astro.site || SITE_CONFIG.site).toString(),
+                            }
+                        } : {})
+                    })}
                 />
             )
         }

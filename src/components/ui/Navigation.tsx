@@ -85,9 +85,13 @@ export default function Navigation({ title, navItems, pathname = "" }: Navigatio
                                 className="flex items-center gap-3 sm:gap-6 whitespace-nowrap"
                             >
                                 {/* Nav Items */}
-                                {navItems.map((item) => (
-                                    <div key={item.href} className="relative group/navitem">
-                                        <AnimatedNavLink href={item.href} text={item.text} />
+                                {navItems.map((item) => {
+                                    const isActive = item.href === "/"
+                                        ? pathname === "/"
+                                        : pathname.startsWith(item.href);
+                                    return (
+                                        <div key={item.href} className="relative group/navitem">
+                                            <AnimatedNavLink href={item.href} text={item.text} isActive={isActive} />
                                         {/* Dropdown Menu */}
                                         {item.children && item.children.length > 0 && (
                                             <div className="absolute top-full left-1/2 -translate-x-1/2 pt-5 sm:pt-6 opacity-0 invisible group-hover/navitem:opacity-100 group-hover/navitem:visible transition-all duration-300 z-50">
@@ -96,7 +100,7 @@ export default function Navigation({ title, navItems, pathname = "" }: Navigatio
                                                         <a 
                                                             key={child.href} 
                                                             href={child.href}
-                                                            className="text-sm font-medium text-secondary-text dark:text-gray-300 hover:text-primary-text dark:hover:text-white transition-all px-4 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 text-center whitespace-nowrap block"
+                                                            className="text-sm font-medium nav-link hover:bg-black/5 dark:hover:bg-white/10 px-4 py-2 rounded-xl text-center whitespace-nowrap block transition-all"
                                                         >
                                                             {child.text}
                                                         </a>
@@ -104,15 +108,16 @@ export default function Navigation({ title, navItems, pathname = "" }: Navigatio
                                                 </div>
                                             </div>
                                         )}
-                                    </div>
-                                ))}
+                                        </div>
+                                    );
+                                })}
 
                                 <div className="h-4 w-px bg-black/10 dark:bg-white/10 shrink-0 hidden sm:block" />
 
                                 {/* Search Trigger */}
                                 <button
                                     onClick={() => setIsSearchActive(true)}
-                                    className="relative inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-secondary-text"
+                                    className="relative inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer nav-link transition-all"
                                     aria-label="Open search"
                                 >
                                     <RiSearchLine className="w-4 h-4 sm:w-5 sm:h-5" />
