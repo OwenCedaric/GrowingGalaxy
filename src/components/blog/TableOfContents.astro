@@ -8,24 +8,41 @@ const { headings } = Astro.props;
 // Filter to only include H2 headings as requested
 const filteredHeadings = headings.filter((h) => h.depth === 2);
 
-if (filteredHeadings.length === 0) return null;
+import { RiArrowUpLine } from "@remixicon/react";
 ---
 
 <nav class="toc-container" aria-label="Table of Contents">
   <div class="toc-sticky-wrapper">
-    <div class="toc-header">
-      <span class="toc-line"></span>
-      <span class="toc-title">Contents</span>
+    {filteredHeadings.length > 0 && (
+      <>
+        <div class="toc-header">
+          <span class="toc-line"></span>
+          <span class="toc-title">Contents</span>
+        </div>
+        <ul class="toc-list mb-6">
+          {filteredHeadings.map((heading) => (
+            <li>
+              <a href={`#${heading.slug}`} class="toc-link">
+                <span class="link-text">{heading.text}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    {/* Back to Top button - only visible when scrolled */}
+    <div class={`back-to-top-wrapper pt-6 flex-shrink-0 ${filteredHeadings.length > 0 ? 'border-t border-black/5 dark:border-white/10' : ''}`}>
+      <button 
+        id="back-to-top-btn"
+        class="group inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest hover:text-accent transition-colors text-left w-full cursor-pointer"
+      >
+        <span class="transition-transform duration-300 group-hover:-translate-y-0.5">
+          <RiArrowUpLine className="w-3.5 h-3.5" />
+        </span>
+        <span>Top</span>
+      </button>
     </div>
-    <ul class="toc-list">
-      {filteredHeadings.map((heading) => (
-        <li>
-          <a href={`#${heading.slug}`} class="toc-link">
-            <span class="link-text">{heading.text}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
   </div>
 </nav>
 

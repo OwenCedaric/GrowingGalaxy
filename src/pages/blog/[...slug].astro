@@ -10,6 +10,7 @@ import FadeContent from "@/components/ui/FadeContent";
 import ScrollFloat from "@/components/ui/ScrollFloat";
 import MDXImage from "@/components/blog/MDXImage.astro";
 import TableOfContents from "@/components/blog/TableOfContents.astro";
+import { RiArrowLeftDoubleLine, RiArrowRightDoubleLine, RiArrowRightUpLine } from "@remixicon/react";
 
 export async function getStaticPaths() {
     const posts = (await getCollection("blog")).sort(
@@ -166,319 +167,349 @@ const blogCopyright =
         data-pagefind-body
     >
         <TableOfContents headings={headings} />
-        <header
-            class="mb-12 text-left"
-        >
-            <FadeContent
-                client:load
-                delay={100}
-                duration={600}
-                blur={true}
-            >
-                <nav class="flex items-center gap-2 text-[10px] sm:text-xs font-mono uppercase tracking-widest text-secondary-text mb-6 not-prose">
-                    <a href="/" class="hover:text-accent opacity-80 hover:opacity-100 transition-colors">Home</a>
-                    <span class="opacity-40 dark:opacity-60">/</span>
-                    <a href="/blog" class="hover:text-accent opacity-80 hover:opacity-100 transition-colors">Blog</a>
-                    <span class="opacity-40 dark:opacity-60">/</span>
-                    <span class="text-primary-text opacity-50 dark:opacity-75 truncate max-w-[150px] sm:max-w-none">{entry.data.title}</span>
-                </nav>
-            </FadeContent>
 
-            <h1
-                class="text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-8"
+        {/* Content Area */}
+        <div class="w-full">
+            <header
+                class="mb-12 text-left"
             >
-                <ScrollFloat
+                <FadeContent
                     client:load
-                    text={entry
-                        .data
-                        .title}
-                    className="text-3xl md:text-5xl font-bold tracking-tight leading-tight"
-                    scrollStart="top bottom"
-                    scrollEnd="top center+=200"
-                    stagger={0.02}
-                />
-            </h1>
-
-            <FadeContent
-                client:load
-                delay={300}
-                duration={800}
-                blur={true}
-            >
-                <p
-                    class="text-sm sm:text-base text-secondary-text/80 leading-relaxed"
+                    delay={100}
+                    duration={600}
+                    blur={true}
                 >
-                    {
-                        entry
+                    <nav class="flex items-center gap-2 text-[10px] sm:text-xs font-mono uppercase tracking-widest text-secondary-text mb-6 not-prose">
+                        <a href="/" class="hover:text-accent opacity-80 hover:opacity-100 transition-colors">Home</a>
+                        <span class="opacity-40 dark:opacity-60">/</span>
+                        <a href="/blog" class="hover:text-accent opacity-80 hover:opacity-100 transition-colors">Blog</a>
+                        <span class="opacity-40 dark:opacity-60">/</span>
+                        <span class="text-primary-text opacity-50 dark:opacity-75 truncate max-w-[150px] sm:max-w-none">{entry.data.title}</span>
+                    </nav>
+                </FadeContent>
+
+                <h1
+                    class="text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-8"
+                >
+                    <ScrollFloat
+                        client:load
+                        text={entry
                             .data
-                            .description
-                    }
-                </p>
-                <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] sm:text-xs font-mono text-secondary-text mt-8 opacity-60 dark:opacity-85">
-                    <span>
+                            .title}
+                        className="text-3xl md:text-5xl font-bold tracking-tight leading-tight"
+                        scrollStart="top bottom"
+                        scrollEnd="top center+=200"
+                        stagger={0.02}
+                    />
+                </h1>
+
+                <FadeContent
+                    client:load
+                    delay={300}
+                    duration={800}
+                    blur={true}
+                >
+                    <p
+                        class="text-sm sm:text-base text-secondary-text/80 leading-relaxed"
+                    >
                         {
-                            entry.data.pubDate.toLocaleDateString(
-                                "en-US",
-                                {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric",
-                                },
-                            )
+                            entry
+                                .data
+                                .description
                         }
-                    </span>
-                    <span class="opacity-40">•</span>
-                    <span class="uppercase tracking-wider text-accent font-semibold">{entry.data.category}</span>
-                    <span class="opacity-40">•</span>
-                    <span class="uppercase tracking-wider">{entry.data.depth}</span>
-                </div>
-            </FadeContent>
-        </header>
-
-        {
-            /* Content */
-        }
-        <ArticleAnimate
-            client:load
-            className="prose dark:prose-invert max-w-none prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4 prose-blockquote:not-italic prose-blockquote:border-l-2 prose-blockquote:pl-6 prose-blockquote:border-black/20 dark:prose-blockquote:border-white/20"
-        >
-            <Content
-                components={{
-                    img: MDXImage,
-                }}
-            />
-
-            {
-                /* Tags */
-            }
-            {
-                entry.data.tags &&
-                    entry.data.tags.length > 0 && (
-                        <div class="mt-12 flex flex-wrap gap-2 not-prose">
-                            {entry.data.tags.map((tag: string) => (
-                                <span class="inline-flex items-center gap-1 px-3 py-1 bg-black/5 dark:bg-white/5 rounded-full text-xs font-mono text-secondary-text">
-                                    <span class="opacity-40">#</span>
-                                    <span>{tag}</span>
-                                </span>
-                            ))}
+                    </p>
+                    <div class="flex items-center justify-between text-[11px] sm:text-xs font-mono text-secondary-text mt-4 opacity-60 dark:opacity-85">
+                        <span>
+                            {
+                                entry.data.pubDate.toLocaleDateString(
+                                    "en-US",
+                                    {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    },
+                                )
+                            }
+                        </span>
+                        <div class="flex items-center gap-3">
+                            <span class="uppercase tracking-wider text-accent font-semibold">{entry.data.category}</span>
+                            <span class="opacity-40">•</span>
+                            <span class="uppercase tracking-wider">{entry.data.depth}</span>
                         </div>
-                    )
-            }
+                    </div>
+                </FadeContent>
+            </header>
 
-            {
-                /* Copyright Declaration */
-            }
-            {
-                /* Copyright Declaration */
-            }
-            {
-                blogCopyright.enabled &&
-                    (entry
-                        .data
-                        .copyrightBg ? (
-                        <div class="relative mt-16 rounded-2xl md:rounded-[2rem] overflow-hidden not-prose flex flex-col justify-center group">
-                            <div class="absolute inset-0 z-0">
-                                <img
-                                    src={
-                                        entry
-                                            .data
-                                            .copyrightBg
-                                    }
-                                    alt="Copyright Background"
-                                    loading="lazy"
-                                    decoding="async"
-                                    class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                                />
-                                <div class="absolute inset-0 bg-black/60 md:bg-black/40 pointer-events-none" />
-                                <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent pointer-events-none" />
+            <ArticleAnimate
+                client:load
+                className="prose dark:prose-invert max-w-none prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4 prose-blockquote:not-italic prose-blockquote:border-l-2 prose-blockquote:pl-6 prose-blockquote:border-black/20 dark:prose-blockquote:border-white/20"
+            >
+                <Content
+                    components={{
+                        img: MDXImage,
+                    }}
+                />
+
+                {
+                    /* Tags */
+                }
+                {
+                    entry.data.tags &&
+                        entry.data.tags.length > 0 && (
+                            <div class="mt-12 flex flex-wrap gap-2 not-prose">
+                                {entry.data.tags.map((tag: string) => (
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-black/5 dark:bg-white/5 rounded-full text-xs font-mono text-secondary-text">
+                                        <span class="opacity-40">#</span>
+                                        <span>{tag}</span>
+                                    </span>
+                                ))}
                             </div>
-                            <div class="relative z-10 p-5 md:px-8 md:py-6">
-                                <div class="flex flex-col md:flex-row gap-5 md:gap-10 items-start md:items-center drop-shadow-lg">
-                                    {/* Auto & Action Column */}
-                                    <div class="w-full md:w-5/12 flex flex-row md:flex-col justify-between items-center md:items-start gap-3">
-                                        <div class="flex flex-col gap-1.5">
-                                            <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/70">
-                                                Copyright
-                                                Declaration
-                                            </span>
-                                            <p class="text-sm md:text-base font-sans text-white/90 tracking-wide">
-                                                &copy;{" "}
-                                                {entry.data.pubDate.getFullYear()}{" "}
-                                                <span class="font-medium">
-                                                    {
-                                                        blogCopyright.author
-                                                    }
+                        )
+                }
+
+                {
+                    /* Copyright Declaration */
+                }
+                {
+                    /* Copyright Declaration */
+                }
+                {
+                    blogCopyright.enabled &&
+                        (entry
+                            .data
+                            .copyrightBg ? (
+                            <div class="relative mt-16 rounded-2xl md:rounded-[2rem] overflow-hidden not-prose flex flex-col justify-center group">
+                                <div class="absolute inset-0 z-0">
+                                    <img
+                                        src={
+                                            entry
+                                                .data
+                                                .copyrightBg
+                                        }
+                                        alt="Copyright Background"
+                                        loading="lazy"
+                                        decoding="async"
+                                        class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                    />
+                                    <div class="absolute inset-0 bg-black/60 md:bg-black/40 pointer-events-none" />
+                                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent pointer-events-none" />
+                                </div>
+                                <div class="relative z-10 p-5 md:px-8 md:py-6">
+                                    <div class="flex flex-col md:flex-row gap-5 md:gap-10 items-start md:items-center drop-shadow-lg">
+                                        {/* Auto & Action Column */}
+                                        <div class="w-full md:w-5/12 flex flex-row md:flex-col justify-between items-center md:items-start gap-3">
+                                            <div class="flex flex-col gap-1.5">
+                                                <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-white/70">
+                                                    Copyright
+                                                    Declaration
                                                 </span>
+                                                <p class="text-sm md:text-base font-sans text-white/90 tracking-wide">
+                                                    &copy;{" "}
+                                                    {entry.data.pubDate.getFullYear()}{" "}
+                                                    <span class="font-medium">
+                                                        {
+                                                            blogCopyright.author
+                                                        }
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            {blogCopyright
+                                                .proof
+                                                ?.enabled && (
+                                                <a
+                                                    href={
+                                                        blogCopyright
+                                                            .proof
+                                                            .mode ===
+                                                        "dynamic"
+                                                            ? `${blogCopyright.proof.baseUrl}/blog/${entry.id}`
+                                                            : blogCopyright
+                                                                  .proof
+                                                                  .baseUrl
+                                                    }
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    class="inline-flex self-start items-center gap-1.5 text-[10px] uppercase tracking-widest font-mono px-4 py-1.5 border border-white/30 text-white/90 rounded-full hover:bg-white/10 hover:border-white/60 transition-all backdrop-blur-md flex-shrink-0 group/link"
+                                                >
+                                                    <span>
+                                                        {
+                                                            blogCopyright
+                                                                .proof
+                                                                .linkText
+                                                        }
+                                                    </span>
+                                                    <RiArrowRightUpLine className="w-3.5 h-3.5 transition-transform duration-300 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
+                                                </a>
+                                            )}
+                                        </div>
+                                        {/* Declaration Column */}
+                                        <div class="w-full md:w-7/12">
+                                            <p class="text-xs md:text-sm leading-relaxed text-white/80 font-light">
+                                                {
+                                                    blogCopyright.declaration
+                                                }
                                             </p>
                                         </div>
-                                        {blogCopyright
-                                            .proof
-                                            ?.enabled && (
-                                            <a
-                                                href={
-                                                    blogCopyright
-                                                        .proof
-                                                        .mode ===
-                                                    "dynamic"
-                                                        ? `${blogCopyright.proof.baseUrl}/blog/${entry.id}`
-                                                        : blogCopyright
-                                                              .proof
-                                                              .baseUrl
-                                                }
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                class="inline-flex self-start items-center text-[10px] uppercase tracking-widest font-mono px-4 py-1.5 border border-white/30 text-white/90 rounded-full hover:bg-white/10 hover:border-white/60 transition-all backdrop-blur-md flex-shrink-0"
-                                            >
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div class="mt-16 p-6 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/10 text-sm leading-relaxed text-secondary-text not-prose">
+                                <div class="flex justify-between items-center gap-2 mb-4">
+                                    <p class="font-medium text-primary-text text-xs sm:text-sm">
+                                        Copyright
+                                        Declaration
+                                    </p>
+                                    {blogCopyright
+                                        .proof
+                                        ?.enabled && (
+                                        <a
+                                            href={
+                                                blogCopyright
+                                                    .proof
+                                                    .mode ===
+                                                "dynamic"
+                                                    ? `${blogCopyright.proof.baseUrl}/blog/${entry.id}`
+                                                    : blogCopyright
+                                                          .proof
+                                                          .baseUrl
+                                            }
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-mono px-3 py-1 border border-black/20 dark:border-white/20 text-primary-text rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors whitespace-nowrap flex-shrink-0 group/link"
+                                        >
+                                            <span>
                                                 {
                                                     blogCopyright
                                                         .proof
                                                         .linkText
-                                                }{" "}
-                                                ↗
-                                            </a>
-                                        )}
-                                    </div>
-                                    {/* Declaration Column */}
-                                    <div class="w-full md:w-7/12">
-                                        <p class="text-xs md:text-sm leading-relaxed text-white/80 font-light">
-                                            {
-                                                blogCopyright.declaration
-                                            }
-                                        </p>
-                                    </div>
+                                                }
+                                            </span>
+                                            <RiArrowRightUpLine className="w-3.5 h-3.5 transition-transform duration-300 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
+                                        </a>
+                                    )}
                                 </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <div class="mt-16 p-6 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/10 text-sm leading-relaxed text-secondary-text not-prose">
-                            <div class="flex justify-between items-center gap-2 mb-4">
-                                <p class="font-medium text-primary-text text-xs sm:text-sm">
-                                    Copyright
-                                    Declaration
-                                </p>
-                                {blogCopyright
-                                    .proof
-                                    ?.enabled && (
-                                    <a
-                                        href={
-                                            blogCopyright
-                                                .proof
-                                                .mode ===
-                                            "dynamic"
-                                                ? `${blogCopyright.proof.baseUrl}/blog/${entry.id}`
-                                                : blogCopyright
-                                                      .proof
-                                                      .baseUrl
-                                        }
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="text-[10px] uppercase tracking-widest font-mono px-3 py-1 border border-black/20 dark:border-white/20 text-primary-text rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors whitespace-nowrap flex-shrink-0"
-                                    >
+                                <p>
+                                    &copy;{" "}
+                                    {entry.data.pubDate.getFullYear()}{" "}
+                                    <span class="font-semibold">
                                         {
-                                            blogCopyright
-                                                .proof
-                                                .linkText
-                                        }{" "}
-                                        ↗
-                                    </a>
-                                )}
+                                            blogCopyright.author
+                                        }
+                                    </span>
+                                    .
+                                    All
+                                    Rights
+                                    Reserved.
+                                    <br />
+                                    {
+                                        blogCopyright.declaration
+                                    }
+                                </p>
                             </div>
-                            <p>
-                                &copy;{" "}
-                                {entry.data.pubDate.getFullYear()}{" "}
-                                <span class="font-semibold">
-                                    {
-                                        blogCopyright.author
-                                    }
-                                </span>
-                                .
-                                All
-                                Rights
-                                Reserved.
-                                <br />
-                                {
-                                    blogCopyright.declaration
-                                }
-                            </p>
-                        </div>
-                    ))
-            }
-        </ArticleAnimate>
+                        ))
+                }
+            </ArticleAnimate>
 
-        {
-            /* Footer / Signature */
-        }
-        <footer
-            class="mt-16 pt-12 border-t border-black/5 dark:border-white/5 space-y-12"
-        >
             {
-                /* Navigation Links */
+                /* Footer / Signature */
             }
-            <div
-                class="flex flex-col sm:flex-row justify-between gap-6"
+            <footer
+                class="mt-16 pt-12 border-t border-black/5 dark:border-white/5 space-y-12"
             >
+                {
+                    /* Navigation Links */
+                }
                 <div
-                    class="flex-1 text-left"
+                    class="flex flex-col sm:flex-row justify-between gap-6"
                 >
-                    {
-                        nextPost && (
-                            <a
-                                href={`/blog/${nextPost.id}`}
-                                class="group block"
-                            >
-                                <span class="text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 block mb-2 group-hover:opacity-100 transition-opacity">
-                                    ←
-                                    Next
-                                    Post
-                                </span>
-                                <span class="text-lg font-bold group-hover:underline">
-                                    {
-                                        nextPost
-                                            .data
-                                            .title
-                                    }
-                                </span>
-                            </a>
-                        )
-                    }
+                    <div
+                        class="flex-1 text-left"
+                    >
+                        {
+                            nextPost && (
+                                <a
+                                    href={`/blog/${nextPost.id}`}
+                                    class="group block"
+                                >
+                                    <span class="text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 flex items-center gap-1.5 mb-2 group-hover:opacity-100 transition-opacity">
+                                        <RiArrowLeftDoubleLine className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-0.5" />
+                                        <span>Next Post</span>
+                                    </span>
+                                    <span class="text-lg font-bold group-hover:underline">
+                                        {
+                                            nextPost
+                                                .data
+                                                .title
+                                        }
+                                    </span>
+                                </a>
+                            )
+                        }
+                    </div>
+                    <div
+                        class="flex-1 text-right"
+                    >
+                        {
+                            prevPost && (
+                                <a
+                                    href={`/blog/${prevPost.id}`}
+                                    class="group block"
+                                >
+                                    <span class="text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 flex items-center justify-end gap-1.5 mb-2 group-hover:opacity-100 transition-opacity">
+                                        <span>Previous Post</span>
+                                        <RiArrowRightDoubleLine className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+                                    </span>
+                                    <span class="text-lg font-bold group-hover:underline">
+                                        {
+                                            prevPost
+                                                .data
+                                                .title
+                                        }
+                                    </span>
+                                </a>
+                            )
+                        }
+                    </div>
                 </div>
-                <div
-                    class="flex-1 text-right"
-                >
-                    {
-                        prevPost && (
-                            <a
-                                href={`/blog/${prevPost.id}`}
-                                class="group block"
-                            >
-                                <span class="text-xs font-mono uppercase tracking-widest opacity-60 dark:opacity-80 block mb-2 group-hover:opacity-100 transition-opacity">
-                                    Previous
-                                    Post
-                                    →
-                                </span>
-                                <span class="text-lg font-bold group-hover:underline">
-                                    {
-                                        prevPost
-                                            .data
-                                            .title
-                                    }
-                                </span>
-                            </a>
-                        )
-                    }
-                </div>
-            </div>
-
-            <div
-                class="flex justify-between items-center opacity-60 dark:opacity-80 pt-8 border-t border-black/5 dark:border-white/5"
-            >
-                <a
-                    href="/blog"
-                    class="text-xs font-mono uppercase tracking-widest hover:text-accent transition-colors"
-                >
-                    Back to Blog
-                </a>
-            </div>
-        </footer>
+            </footer>
+        </div>
     </article>
 </Layout>
+
+
+
+<script>
+    function setupTOC() {
+        const toc = document.querySelector('.toc-container');
+        const backToTopBtn = document.getElementById('back-to-top-btn');
+
+        if (backToTopBtn) {
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        if (!toc) return;
+
+        // Clean up previous event listener if it exists to prevent memory leaks during SPA navigations
+        if ((window as any)._tocScrollListener) {
+            window.removeEventListener('scroll', (window as any)._tocScrollListener);
+        }
+
+        const handleScroll = () => {
+            const isScrolled = window.scrollY > 220;
+            if (isScrolled) toc.classList.add('is-scrolled');
+            else toc.classList.remove('is-scrolled');
+        };
+
+        (window as any)._tocScrollListener = handleScroll;
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); // Initial execution
+    }
+
+    // Initialize on page load
+    setupTOC();
+    // Re-initialize after view transitions
+    document.addEventListener('astro:after-swap', setupTOC);
+</script>
