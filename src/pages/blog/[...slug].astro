@@ -162,12 +162,12 @@ const blogCopyright =
         })}
     />
     <article
-        class="max-w-3xl mx-auto pt-12 md:pt-20 relative"
+        class="max-w-3xl mx-auto pt-4 md:pt-6 relative"
         data-pagefind-body
     >
         <TableOfContents headings={headings} />
         <header
-            class="mb-20 text-left"
+            class="mb-12 text-left"
         >
             <FadeContent
                 client:load
@@ -256,8 +256,9 @@ const blogCopyright =
                     entry.data.tags.length > 0 && (
                         <div class="mt-12 flex flex-wrap gap-2 not-prose">
                             {entry.data.tags.map((tag: string) => (
-                                <span class="px-3 py-1 bg-black/5 dark:bg-white/5 rounded-full text-xs font-mono text-secondary-text">
-                                    #{tag}
+                                <span class="inline-flex items-center gap-1 px-3 py-1 bg-black/5 dark:bg-white/5 rounded-full text-xs font-mono text-secondary-text">
+                                    <span class="opacity-40">#</span>
+                                    <span>{tag}</span>
                                 </span>
                             ))}
                         </div>
