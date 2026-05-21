@@ -29,8 +29,11 @@ export const SITE_CONFIG = {
             { text: "View the gallery", href: "/gallery" }
         ],
         harmonicSystem: {
-            seed: 2026,
-            speed: 0.0042
+            type: "p5", // 'svg' or 'p5'
+            parameters: {
+                seed: 2026,
+                speed: 0.0042
+            }
         }
     },
     footer: {

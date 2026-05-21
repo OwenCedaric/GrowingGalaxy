@@ -1,0 +1,77 @@
+---
+// HarmonicSystemP5.astro
+// Renders the P5.js Lorenz Attractor graphic natively via Astro hydration and TS
+---
+
+<div id="p5-container" class="w-[120%] h-[120%] -ml-[10%] -mt-[10%] border-none pointer-events-none invert dark:invert-0 flex items-center justify-center"></div>
+
+<script>
+    import p5 from "p5";
+
+    let p5Instance: p5 | null = null;
+
+    function initP5() {
+        const container = document.getElementById("p5-container");
+        if (!container) return;
+
+        if (p5Instance) {
+            p5Instance.remove();
+        }
+
+        const customLogic = (p: p5) => {
+            let t = 0;
+            const d = 6e-4;
+            const w = 400;
+
+            p.setup = () => {
+                p.createCanvas(w, w);
+            };
+
+            p.draw = () => {
+                p.clear();
+                p.stroke(255, 96);
+                
+                t += p.PI / 240;
+                
+                // 开启变换矩阵，将图形完美居中并放大
+                p.push();
+                p.translate(p.width / 2, p.height / 2);
+                p.scale(1.3); // 将整体缩放放大 1.3 倍
+                p.translate(-200, -200); // 抵消原公式硬编码的 200, 200 偏移中心
+                
+                for (let i = 20000; i--;) {
+                    const k = (i / 8) % 25 - 12.5;
+                    const e = i / 800 - 12.5;
+                    const d = 7 * p.cos(p.mag(k, e) / 3 - t / 2);
+                    
+                    const px = k * 4 + d * k / 2 * p.sin(d + e / 19 + t) + 200;
+                    const py = e * 2 - d * 9 - d * 9 * p.cos(d + t) + 200;
+                    
+                    p.point(px, py);
+                }
+                
+                p.pop();
+            };
+        };
+
+        p5Instance = new p5(customLogic, container);
+    }
+
+    document.addEventListener("astro:page-load", initP5);
+
+    document.addEventListener("astro:before-preparation", () => {
+        if (p5Instance) {
+            p5Instance.remove();
+            p5Instance = null;
+        }
+    });
+</script>
+
+<style>
+    #p5-container :global(canvas) {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain;
+        border-radius: 50%;
+    }
+</style>

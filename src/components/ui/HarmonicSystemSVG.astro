@@ -1,0 +1,133 @@
+---
+import { SITE_CONFIG } from "@/config";
+
+const { harmonicSystem } = SITE_CONFIG.homepage;
+---
+
+<svg
+    id="parametric-svg"
+    class="w-full h-full text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-700"
+    viewBox="-120 -120 240 240"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+>
+</svg>
+
+<script define:vars={{ config: harmonicSystem }}>
+    function init() {
+        const svgSection = document.getElementById("parametric-svg");
+        if (!svgSection) return;
+
+        // Clear any existing paths for clean initialization
+        svgSection.innerHTML = "";
+
+        let timePhase = 0;
+        
+        // Local constants
+        const ampPrimary = 75;
+        const ampSecondary = 35;
+        const resolution = 150;
+
+        let displaySeed = Number(config.parameters?.seed) || 1234;
+        let currentSpeed = config.parameters?.speed || 0.0042;
+
+        const baseOpacities = [1.0, 0.6, 0.2];
+        const systemLayers = [];
+
+        function seededRandom(seedVal) {
+            var x = Math.sin(seedVal) * 10000;
+            return x - Math.floor(x);
+        }
+
+        function generateAllStrandParams(seed) {
+            const paramsList = [];
+            let s = seed;
+            for(let i = 0; i < 3; i++) {
+                const pX = Math.floor(seededRandom(s++) * 5) + 1;
+                const pY = Math.floor(seededRandom(s++) * 5) + 1;
+                const sX = Math.floor(seededRandom(s++) * 5) + 1;
+                const sY = Math.floor(seededRandom(s++) * 5) + 1;
+                const offset = seededRandom(s++) * Math.PI * 2;
+                paramsList.push({ pX, pY, sX, sY, offset });
+            }
+            return paramsList;
+        }
+
+        const initialParams = generateAllStrandParams(displaySeed);
+
+        for (let i = 0; i < 3; i++) {
+            const pathNode = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            pathNode.setAttribute("stroke", "currentColor");
+            pathNode.setAttribute("stroke-width", "0.35");
+            pathNode.setAttribute("stroke-linecap", "round");
+            pathNode.setAttribute("stroke-linejoin", "round");
+            pathNode.setAttribute("stroke-opacity", baseOpacities[i].toString());
+            svgSection.appendChild(pathNode);
+
+            systemLayers.push({
+                baseOpacity: baseOpacities[i],
+                pathNode: pathNode,
+                params: initialParams[i],
+                targetParams: null
+            });
+        }
+
+        const labelPhase = document.getElementById("label-phase");
+
+        function generatePath(params, globalPhase) {
+            const phase = globalPhase + params.offset;
+            const points = [];
+            for (let i = 0; i <= resolution; i++) {
+                const theta = (i / resolution) * Math.PI * 2;
+                const x = ampPrimary * Math.sin(params.pX * theta + phase) +
+                          ampSecondary * Math.cos(params.sX * theta - phase * 0.5);
+                const y = ampPrimary * Math.cos(params.pY * theta) +
+                          ampSecondary * Math.sin(params.sY * theta + phase * 0.8);
+
+                if (i === 0) {
+                    points.push(`M ${x.toFixed(2)} ${y.toFixed(2)}`);
+                } else {
+                    points.push(`L ${x.toFixed(2)} ${y.toFixed(2)}`);
+                }
+            }
+            return points.join(" ") + " Z";
+        }
+
+        let animationFrameId;
+
+        function animateSystem() {
+            // 只保留基础的时间相位推移
+            timePhase += currentSpeed;
+
+            for (let i = 0; i < systemLayers.length; i++) {
+                const layer = systemLayers[i];
+                layer.pathNode.setAttribute("d", generatePath(layer.params, timePhase));
+            }
+
+            if (labelPhase) {
+                labelPhase.textContent = `Δ_PHASE: ${timePhase.toFixed(2)}`;
+            }
+            
+            animationFrameId = requestAnimationFrame(animateSystem);
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (!animationFrameId) {
+                        animateSystem();
+                    }
+                } else {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = null;
+                    }
+                }
+            });
+        });
+        
+        observer.observe(svgSection);
+    }
+
+    document.addEventListener('astro:page-load', init);
+</script>
