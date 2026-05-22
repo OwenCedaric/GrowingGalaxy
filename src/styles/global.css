@@ -348,13 +348,30 @@
 
     .toc-list {
         @apply flex flex-col gap-[0.85rem] list-none p-0 m-0 overflow-y-auto pr-4;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-border-custom) transparent;
         mask-image: linear-gradient(to bottom, transparent, black 15px, black calc(100% - 15px), transparent);
     }
 
+    .dark .toc-list {
+        scrollbar-color: var(--color-border-custom-dark) transparent;
+    }
+
     .toc-list::-webkit-scrollbar {
-        display: none;
+        width: 4px;
+    }
+
+    .toc-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .toc-list::-webkit-scrollbar-thumb {
+        background-color: var(--color-border-custom);
+        border-radius: 4px;
+    }
+
+    .dark .toc-list::-webkit-scrollbar-thumb {
+        background-color: var(--color-border-custom-dark);
     }
 
     .toc-link {

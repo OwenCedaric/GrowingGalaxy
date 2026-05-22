@@ -59,7 +59,19 @@ import { RiArrowUpLine } from "@remixicon/react";
         if (entry.isIntersecting) {
           const id = entry.target.getAttribute('id');
           document.querySelectorAll('.toc-link').forEach(link => {
-            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+            const isActive = link.getAttribute('href') === `#${id}`;
+            if (isActive) {
+              link.classList.add('active');
+              // Auto-scroll the TOC list to show the active item
+              const list = link.closest('.toc-list');
+              if (list) {
+                // Use scrollIntoView with block: 'nearest' or 'center' 
+                // nearest avoids jumping if it's already visible
+                link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }
+            } else {
+              link.classList.remove('active');
+            }
           });
         }
       });

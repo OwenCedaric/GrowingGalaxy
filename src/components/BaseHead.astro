@@ -157,17 +157,17 @@ const {
         return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     };
 
-    const applyTheme = (theme) => {
+    const applyTheme = (theme, doc = document) => {
         const isDark = theme === "dark";
-        document.documentElement.classList.toggle("dark", isDark);
+        doc.documentElement.classList.toggle("dark", isDark);
 
         // Update theme-color meta tag
         const themeColor = isDark ? "#0a0a0a" : "#ffffff";
-        let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        let metaThemeColor = doc.querySelector('meta[name="theme-color"]');
         if (!metaThemeColor) {
-            metaThemeColor = document.createElement("meta");
+            metaThemeColor = doc.createElement("meta");
             metaThemeColor.name = "theme-color";
-            document.head.appendChild(metaThemeColor);
+            doc.head.appendChild(metaThemeColor);
         }
         metaThemeColor.content = themeColor;
 
@@ -182,7 +182,7 @@ const {
     applyTheme(theme);
 
     // Astro View Transitions Support
-    document.addEventListener("astro:after-swap", () => {
-        applyTheme(getTheme());
+    document.addEventListener("astro:before-swap", (event) => {
+        applyTheme(getTheme(), event.newDocument);
     });
 </script>
