@@ -33,22 +33,6 @@ blogroll.sort(
     <div
         class="max-w-4xl mx-auto pt-20 px-6"
     >
-        <div
-            class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center"
-        >
-            <TextReveal
-                client:load
-                text="Blogroll"
-                type="char"
-                className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[6vh] lg:text-[10vh] leading-none whitespace-nowrap"
-                style={{
-                    writingMode:
-                        "vertical-rl",
-                    textOrientation:
-                        "mixed",
-                }}
-            />
-        </div>
 
         <div
             class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16"
@@ -77,7 +61,7 @@ blogroll.sort(
                                 className="p-1"
                             >
                                 <article class="flex flex-row gap-6 group items-start relative z-10">
-                                    <div class="relative w-20 h-20 flex-shrink-0 rounded-full overflow-hidden border border-black/10 dark:border-white/10 group-hover:border-black/30 dark:group-hover:border-white/30 transition-colors">
+                                    <div class="relative w-20 h-20 flex-shrink-0 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 group-hover:border-black/30 dark:group-hover:border-white/30 transition-colors">
                                         <img
                                             src={
                                                 entry

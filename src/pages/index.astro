@@ -23,26 +23,7 @@ import CursorGlow from "@/components/ui/CursorGlow";
         class="hero-section"
     >
         <div class="hero-content w-full md:w-[62%] lg:w-[58%] flex flex-col justify-center z-10 transition-all duration-500 relative">
-            <!-- Eyebrow -->
-            <FadeContent
-                client:load
-                delay={100}
-                duration={800}
-                blur={true}
-            >
-                <div
-                    class="hero-eyebrow"
-                >
-                    <span
-                        class="eyebrow-line"
-                    >
-                    </span>
-                    <span
-                        >Digital
-                        Narratives</span
-                    >
-                </div>
-            </FadeContent>
+
 
             <!-- Main Title -->
             <div
@@ -193,38 +174,6 @@ import CursorGlow from "@/components/ui/CursorGlow";
         }
     }
 
-    /* Eyebrow */
-    .hero-eyebrow {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 12px;
-        font-weight: 500;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
-        color: var(
-            --color-secondary-text
-        );
-        margin-bottom: 28px;
-    }
-
-    .eyebrow-line {
-        display: block;
-        width: 40px;
-        height: 1px;
-        background: var(
-            --color-border-custom
-        );
-    }
-
-    :global(
-            .dark
-        )
-        .eyebrow-line {
-        background: var(
-            --color-border-custom-dark
-        );
-    }
 
     /* Title */
     .hero-title-wrap {
