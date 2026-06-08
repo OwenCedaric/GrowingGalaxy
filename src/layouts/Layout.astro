@@ -193,11 +193,9 @@ const {
                                 ) => (
                                     <>
                                         <a
-                                            href={
-                                                item.href
-                                            }
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                            href={item.href}
+                                            target={item.href.startsWith('http') ? "_blank" : undefined}
+                                            rel={item.href.startsWith('http') ? "noopener noreferrer" : undefined}
                                             class="hover:underline"
                                         >
                                             <ShinyText

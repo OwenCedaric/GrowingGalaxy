@@ -38,9 +38,9 @@ export const SITE_CONFIG = {
     },
     footer: {
         social: [
-            { text: "RSS", href: "/rss.xml" },
+            { text: "Projects", href: "/projects" },
             { text: "Blogroll", href: "/blogroll" },
-            { text: "GitHub", href: "https://github.com/OwenCedaric" },
+            { text: "RSS", href: "/rss.xml" },
             { text: "X", href: "https://x.com/OwenCedaric" }
         ],
         copyright: "Growing Galaxy. Designed with intention."

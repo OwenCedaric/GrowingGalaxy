@@ -1,0 +1,200 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import FadeContent from "@/components/ui/FadeContent";
+import TextReveal from "@/components/ui/TextReveal";
+import SpotlightCard from "@/components/ui/SpotlightCard";
+import { SITE_CONFIG } from "@/config";
+import {
+    RiGithubLine,
+    RiGithubFill,
+} from "@remixicon/react";
+
+type ProjectEntry =
+    CollectionEntry<"projects">;
+
+const projects =
+    await getCollection(
+        "projects",
+    );
+
+projects.sort(
+    (
+        a: ProjectEntry,
+        b: ProjectEntry,
+    ) =>
+        a.data.title.localeCompare(
+            b
+                .data
+                .title,
+        ),
+);
+---
+
+<Layout
+    title={`Projects | ${SITE_CONFIG.title}`}
+    description="A collection of my projects and experiments."
+>
+    <div
+        class="max-w-4xl mx-auto pt-24 md:pt-32 px-6"
+    >
+        <div
+            class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center"
+        >
+            <TextReveal
+                client:load
+                text="Projects"
+                type="char"
+                className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
+                style={{
+                    writingMode:
+                        "vertical-rl",
+                    textOrientation:
+                        "mixed",
+                }}
+            />
+        </div>
+
+        <div
+            class="flex items-center justify-between mb-8 px-2"
+        >
+            <div
+                class="text-secondary-text font-mono text-xs md:text-sm uppercase tracking-widest"
+            >
+                Works
+                &
+                Experiments
+            </div>
+            <a
+                href="https://github.com/OwenCedaric"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-2 text-secondary-text hover:text-primary-text transition-colors"
+                title="GitHub"
+            >
+                <RiGithubFill
+                    size={20}
+                />
+                <span
+                    class="text-sm font-medium"
+                    >@OwenCedaric</span
+                >
+            </a>
+        </div>
+
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+            {
+                projects.map(
+                    (
+                        entry: ProjectEntry,
+                        index: number,
+                    ) => (
+                        <FadeContent
+                            client:visible
+                            delay={
+                                index *
+                                50
+                            }
+                            duration={
+                                500
+                            }
+                            blur={
+                                true
+                            }
+                        >
+                            <SpotlightCard
+                                client:visible
+                                className="h-full p-5 relative group"
+                            >
+                                {/* Stretched main link for the entire card */}
+                                {(entry
+                                    .data
+                                    .url ||
+                                    entry
+                                        .data
+                                        .github) && (
+                                    <a
+                                        href={
+                                            entry
+                                                .data
+                                                .url ||
+                                            entry
+                                                .data
+                                                .github
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="absolute inset-0 z-20 cursor-pointer rounded-xl"
+                                        aria-label="View Project"
+                                    />
+                                )}
+
+                                <div class="flex flex-col gap-1.5 h-full relative z-30 pointer-events-none">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <h2 class="text-base md:text-lg font-bold tracking-tight text-primary-text transition-colors">
+                                            {
+                                                entry
+                                                    .data
+                                                    .title
+                                            }
+                                        </h2>
+                                        {entry
+                                            .data
+                                            .github && (
+                                            <div class="flex items-center mt-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto relative z-30">
+                                                <a
+                                                    href={
+                                                        entry
+                                                            .data
+                                                            .github
+                                                    }
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    class="text-secondary-text hover:text-black dark:hover:text-white transition-colors p-1 -m-1"
+                                                    title="Source Code"
+                                                    aria-label="Source Code"
+                                                >
+                                                    <RiGithubLine
+                                                        size={
+                                                            20
+                                                        }
+                                                    />
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {entry
+                                        .data
+                                        .description && (
+                                        <p class="text-sm text-secondary-text leading-relaxed opacity-90">
+                                            {
+                                                entry
+                                                    .data
+                                                    .description
+                                            }
+                                        </p>
+                                    )}
+                                </div>
+                            </SpotlightCard>
+                        </FadeContent>
+                    ),
+                )
+            }
+            {
+                projects.length ===
+                    0 && (
+                    <div class="col-span-full text-secondary-text py-12 px-4">
+                        <p class="text-sm font-mono">
+                            No
+                            projects
+                            yet.
+                        </p>
+                    </div>
+                )
+            }
+        </div>
+    </div>
+</Layout>

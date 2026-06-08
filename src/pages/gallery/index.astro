@@ -81,9 +81,19 @@ const ldJsons =
         )
     }
 
-    <div
-        class="max-w-7xl w-full mx-auto pt-4 md:pt-6 px-6"
-    >
+    <div class="max-w-7xl w-full mx-auto pt-4 md:pt-6 px-6">
+        <div class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center">
+            <TextReveal
+                client:load
+                text="Gallery"
+                type="char"
+                className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
+                style={{
+                    writingMode: "vertical-rl",
+                    textOrientation: "mixed",
+                }}
+            />
+        </div>
 
         <PhotoGrid
             client:load

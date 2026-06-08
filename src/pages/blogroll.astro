@@ -27,16 +27,24 @@ blogroll.sort(
 ---
 
 <Layout
-    title=`Blogroll | ${SITE_CONFIG.title}`
+    title={`Blogroll | ${SITE_CONFIG.title}`}
     description="A collection of friends and interesting links."
 >
-    <div
-        class="max-w-4xl mx-auto pt-20 px-6"
-    >
+    <div class="max-w-4xl mx-auto pt-4 md:pt-6 px-6">
+        <div class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center">
+            <TextReveal
+                client:load
+                text="Blogroll"
+                type="char"
+                className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
+                style={{
+                    writingMode: "vertical-rl",
+                    textOrientation: "mixed",
+                }}
+            />
+        </div>
 
-        <div
-            class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16"
-        >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 mt-16">
             {
                 blogroll.map(
                     (
