@@ -19,9 +19,23 @@ interface NavigationProps {
 
 export default function Navigation({ title, navItems, pathname = "" }: NavigationProps) {
     const isDark = useTheme();
-    const [isSearchActive, setIsSearchActive] = useState(pathname.includes("/search"));
+    const [currentPath, setCurrentPath] = useState(pathname);
+    const [isSearchActive, setIsSearchActive] = useState(currentPath.includes("/search"));
     const [searchQuery, setSearchQuery] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // Listen for Astro page navigations when using transition:persist
+    useEffect(() => {
+        const handlePageChange = () => {
+            setCurrentPath(window.location.pathname);
+        };
+        document.addEventListener("astro:after-swap", handlePageChange);
+        document.addEventListener("astro:page-load", handlePageChange);
+        return () => {
+            document.removeEventListener("astro:after-swap", handlePageChange);
+            document.removeEventListener("astro:page-load", handlePageChange);
+        };
+    }, []);
 
     // Handle initial query population on client side
     useEffect(() => {
@@ -34,10 +48,10 @@ export default function Navigation({ title, navItems, pathname = "" }: Navigatio
 
     // Focus input when search becomes active (only if it wasn't active on mount)
     useEffect(() => {
-        if (isSearchActive && inputRef.current && !pathname.includes("/search")) {
+        if (isSearchActive && inputRef.current && !currentPath.includes("/search")) {
             setTimeout(() => inputRef.current?.focus(), 50);
         }
-    }, [isSearchActive, pathname]);
+    }, [isSearchActive, currentPath]);
 
     // Handle global Cmd+K shortcut
     useEffect(() => {
@@ -63,122 +77,136 @@ export default function Navigation({ title, navItems, pathname = "" }: Navigatio
 
     return (
         <>
-            {/* Top Navigation Bar */}
-            <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
-                <nav className="glass pl-4 pr-3 py-2 sm:pl-6 sm:pr-5 sm:py-3 flex items-center gap-3 sm:gap-6 relative">
-                    {/* Persistent Logo */}
-                    <div className="shrink-0">
+            {/* Minimalist Top Navigation (Left/Right Layout) */}
+            <header className="absolute top-0 left-0 w-full z-50 pointer-events-none transition-colors duration-300">
+                <div className="w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-8 sm:pt-10 grid grid-cols-[1fr_auto] md:flex md:flex-nowrap md:items-center md:justify-between pointer-events-auto gap-y-5 md:gap-y-0 md:gap-8">
+                    
+                    {/* 1. Logo (Always Top Left) */}
+                    <div className="col-start-1 row-start-1 flex items-center shrink-0 font-sans font-medium text-sm tracking-tight opacity-90 order-1">
                         <AnimatedNavLink href="/" text={title} isLogo={true} />
                     </div>
 
-                    <div className="h-4 w-px bg-black/10 dark:bg-white/10 shrink-0" />
+                    {/* 2. Controls: Search Trigger & Theme Toggle (Mobile Top Right, Desktop Rightmost) */}
+                    <div className="col-start-2 row-start-1 flex items-center justify-end gap-4 sm:gap-6 order-3 shrink-0">
+                        <button
+                            onClick={() => setIsSearchActive(!isSearchActive)}
+                            className="opacity-40 hover:opacity-100 transition-opacity cursor-pointer text-primary-text md:hidden"
+                            aria-label={isSearchActive ? "Close search" : "Open search"}
+                        >
+                            {isSearchActive ? <RiCloseLine className="w-4 h-4" /> : <RiSearchLine className="w-4 h-4" />}
+                        </button>
+                        
+                        {/* Divider */}
+                        <div className="hidden md:block w-px h-4 bg-black/10 dark:bg-white/10" />
 
-                    {/* Dynamic Section: Links vs Search */}
-                    <AnimatePresence mode="popLayout" initial={false}>
-                        {!isSearchActive ? (
-                            <motion.div
-                                key="nav-links"
-                                initial={{ opacity: 0, x: -20, filter: "blur(4px)" }}
-                                animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                                exit={{ opacity: 0, x: 20, filter: "blur(4px)" }}
-                                transition={{ type: "spring", damping: 25, stiffness: 350 }}
-                                className="flex items-center gap-3 sm:gap-6 whitespace-nowrap"
-                            >
-                                {/* Nav Items */}
-                                {navItems.map((item) => {
-                                    const isActive = item.href === "/"
-                                        ? pathname === "/"
-                                        : pathname.startsWith(item.href);
-                                    return (
-                                        <div key={item.href} className="relative group/navitem">
-                                            <AnimatedNavLink href={item.href} text={item.text} isActive={isActive} />
-                                        {/* Dropdown Menu */}
-                                        {item.children && item.children.length > 0 && (
-                                            <div className="absolute top-full left-1/2 -translate-x-1/2 pt-5 sm:pt-6 opacity-0 invisible group-hover/navitem:opacity-100 group-hover/navitem:visible transition-all duration-300 z-50">
-                                                <div className="glass !rounded-2xl py-1.5 px-1.5 flex flex-col gap-0.5 min-w-[130px] shadow-xl">
-                                                    {item.children.map(child => (
-                                                        <a 
-                                                            key={child.href} 
-                                                            href={child.href}
-                                                            className="text-sm font-medium nav-link hover:bg-black/5 dark:hover:bg-white/10 px-4 py-2 rounded-xl text-center whitespace-nowrap block transition-all"
-                                                        >
-                                                            {child.text}
-                                                        </a>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                        </div>
-                                    );
-                                })}
+                        {/* Theme Toggle */}
+                        <div className="opacity-40 hover:opacity-100 transition-opacity flex items-center">
+                            <ThemeToggle />
+                        </div>
+                    </div>
 
-                                <div className="h-4 w-px bg-black/10 dark:bg-white/10 shrink-0 hidden sm:block" />
-
-                                {/* Search Trigger */}
-                                <button
-                                    onClick={() => setIsSearchActive(true)}
-                                    className="relative inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer nav-link transition-all"
-                                    aria-label="Open search"
+                    {/* 3. Dynamic Section: Nav / Search Form (Mobile Row 2 Full Width, Desktop Middle) */}
+                    <div className="col-span-2 row-start-2 flex items-center w-full md:w-auto md:flex-1 md:justify-end order-2 font-mono text-[11px] sm:text-xs uppercase tracking-widest">
+                        <AnimatePresence mode="wait">
+                            {!isSearchActive ? (
+                                <motion.div
+                                    key="nav-links"
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="flex items-center justify-between md:justify-end w-full md:w-auto gap-5 sm:gap-8"
                                 >
-                                    <RiSearchLine className="w-4 h-4 sm:w-5 sm:h-5" />
-                                </button>
-                            </motion.div>
-                        ) : (
-                            <motion.form
+                                    {/* Nav Items */}
+                                    <div className="flex items-center justify-between w-full md:w-auto px-4 md:px-0 gap-2 sm:gap-8">
+                                        {navItems.map((item) => {
+                                            const isActive = item.href === "/"
+                                                ? currentPath === "/"
+                                                : currentPath.startsWith(item.href);
+                                            return (
+                                                <div key={item.href} className="relative group/navitem">
+                                                    <a 
+                                                        href={item.href} 
+                                                        className={`transition-opacity duration-300 ${isActive ? 'opacity-100 text-primary-text font-medium' : 'opacity-40 hover:opacity-100 text-primary-text'}`}
+                                                    >
+                                                        {item.text}
+                                                    </a>
+                                                    {/* Dropdown Menu (Pure Typography & Strong Hover) */}
+                                                    {item.children && item.children.length > 0 && (
+                                                        <div className="absolute top-full left-0 pt-4 opacity-0 invisible group-hover/navitem:opacity-100 group-hover/navitem:visible transition-all duration-300 z-50">
+                                                            <div className="flex flex-col min-w-[120px] border-l border-black/20 dark:border-white/20 pl-4 py-1">
+                                                                {item.children.map(child => (
+                                                                    <a 
+                                                                        key={child.href} 
+                                                                        href={child.href}
+                                                                        className="text-[11px] font-mono tracking-widest px-3 py-2 whitespace-nowrap block transition-all duration-200 opacity-60 hover:opacity-100 text-primary-text hover:bg-black/5 dark:hover:bg-white/10 rounded-sm"
+                                                                    >
+                                                                        {child.text}
+                                                                    </a>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {/* Search Trigger (Desktop only, as mobile is in controls) */}
+                                    <button
+                                        onClick={() => setIsSearchActive(true)}
+                                        className="hidden md:block opacity-40 hover:opacity-100 transition-opacity cursor-pointer text-primary-text shrink-0"
+                                        aria-label="Open search"
+                                    >
+                                        <RiSearchLine className="w-4 h-4" />
+                                    </button>
+                                </motion.div>
+                            ) : (
+                                <motion.form
                                 key="search-form"
-                                initial={{ opacity: 0, x: 20, width: 0, filter: "blur(4px)" }}
-                                animate={{ opacity: 1, x: 0, width: "auto", filter: "blur(0px)" }}
-                                exit={{ opacity: 0, x: 20, width: 0, filter: "blur(4px)" }}
-                                transition={{ type: "spring", damping: 28, stiffness: 350 }}
-                                className="flex items-center min-w-[200px] sm:min-w-[320px] w-full"
+                                initial={{ opacity: 0, width: "0%" }}
+                                animate={{ opacity: 1, width: "100%" }}
+                                exit={{ opacity: 0, width: "0%" }}
+                                transition={{ duration: 0.2 }}
+                                className="flex items-center w-full px-4 md:px-0 md:max-w-[240px] h-full md:ml-auto"
                                 onSubmit={handleSearchSubmit}
                             >
-                                <div className="flex-1 flex items-center px-1 sm:px-2 w-full">
+                                {/* Pure Typographic Search Input */}
+                                <div className="flex-1 flex items-center w-full bg-transparent border-b border-black/30 dark:border-white/30 pb-1.5">
                                     <input
                                         ref={inputRef}
                                         type="text"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Search..."
-                                        className="flex-1 bg-transparent border-none outline-none text-primary-text font-serif italic font-light text-base sm:text-lg placeholder-secondary-text/40 min-w-0"
+                                        placeholder="SEARCH..."
+                                        className="flex-1 bg-transparent border-none outline-none text-primary-text font-mono text-base md:text-[11px] lg:text-xs uppercase tracking-widest placeholder-secondary-text/40 min-w-0"
                                         autoComplete="off"
                                         spellCheck="false"
                                     />
-                                    <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-2 border-l border-black/5 dark:border-white/10 pl-2 sm:pl-3">
+                                    <div className="flex items-center gap-4 shrink-0 ml-4">
                                         <button
                                             type="submit"
-                                            className="relative inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-primary-text"
+                                            className="opacity-50 hover:opacity-100 transition-opacity cursor-pointer text-primary-text"
                                             aria-label="Submit search"
                                         >
-                                            <RiSearchLine className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+                                            <RiSearchLine className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setIsSearchActive(false)}
-                                            className="relative inline-flex h-6 w-6 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-secondary-text opacity-40 hover:opacity-100"
+                                            className="hidden md:block opacity-40 hover:opacity-100 transition-opacity cursor-pointer text-primary-text"
                                             aria-label="Close search"
                                         >
-                                            <RiCloseLine className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                            <RiCloseLine className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                                         </button>
                                     </div>
                                 </div>
                             </motion.form>
-                        )}
-                    </AnimatePresence>
-                </nav>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
             </header>
-
-            {/* Floating Theme Toggles */}
-            <div className="fixed bottom-6 right-6 z-50">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="glass p-1 flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow"
-                >
-                    <ThemeToggle />
-                </motion.div>
-            </div>
         </>
     );
 }

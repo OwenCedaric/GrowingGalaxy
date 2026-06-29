@@ -15,6 +15,7 @@ export const SITE_CONFIG = {
                 { text: "2025", href: "/gallery/2025/shinjukugyoencherryblossoms" }
             ]
         },
+        { text: "Traces", href: "/traces" },
         { text: "About", href: "/about" },
     ],
     homepage: {
@@ -26,7 +27,7 @@ export const SITE_CONFIG = {
         ],
         links: [
             { text: "Read the blog", href: "/blog" },
-            { text: "View the gallery", href: "/gallery" }
+            { text: "Explore the Traces", href: "/traces" }
         ],
         harmonicSystem: {
             type: "p5", // 'svg' or 'p5'

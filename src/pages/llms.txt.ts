@@ -14,6 +14,7 @@ export async function GET() {
 - [Homepage](${site}/)
 - [Blog](${site}/blog)
 - [Gallery](${site}/gallery)
+- [Traces](${site}/traces)
 - [About](${site}/about)
 
 ## LLM & AI Services

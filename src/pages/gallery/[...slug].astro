@@ -8,50 +8,77 @@ import { SITE_CONFIG } from "@/config";
 import "@/styles/global.css";
 
 export async function getStaticPaths() {
-    const photos = await getPhotos();
-    return photos.map((photo) => {
-        return {
-            params: { slug: photo.slug },
-            props: { photo },
-        };
-    });
+    const photos =
+        await getPhotos();
+    return photos.map(
+        (
+            photo,
+        ) => {
+            return {
+                params: {
+                    slug: photo.slug,
+                },
+                props: {
+                    photo,
+                },
+            };
+        },
+    );
 }
 
-const { photo } = Astro.props;
+const {
+    photo,
+} =
+    Astro.props;
 ---
 
 <!doctype html>
-<html lang="zh-CN">
-    <head>
-        <BaseHead title={`${photo.name} | ${SITE_CONFIG.title}`} description={photo.name} />
+<html
+    lang="zh-CN"
+>
+    <head
+    >
+        <BaseHead
+            title={`${photo.name} // ${SITE_CONFIG.title}`}
+            description={photo.name}
+        />
         <script
             type="application/ld+json"
-            set:html={JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "BreadcrumbList",
-                "itemListElement": [
-                    {
-                        "@type": "ListItem",
-                        "position": 1,
-                        "name": "Home",
-                        "item": SITE_CONFIG.site
-                    },
-                    {
-                        "@type": "ListItem",
-                        "position": 2,
-                        "name": "Gallery",
-                        "item": `${SITE_CONFIG.site}/gallery`
-                    },
-                    {
-                        "@type": "ListItem",
-                        "position": 3,
-                        "name": photo.name,
-                        "item": `${SITE_CONFIG.site}/gallery/${photo.slug}`
-                    }
-                ]
-            })}
+            set:html={JSON.stringify(
+                {
+                    "@context":
+                        "https://schema.org",
+                    "@type":
+                        "BreadcrumbList",
+                    itemListElement:
+                        [
+                            {
+                                "@type":
+                                    "ListItem",
+                                position: 1,
+                                name: "Home",
+                                item: SITE_CONFIG.site,
+                            },
+                            {
+                                "@type":
+                                    "ListItem",
+                                position: 2,
+                                name: "Gallery",
+                                item: `${SITE_CONFIG.site}/gallery`,
+                            },
+                            {
+                                "@type":
+                                    "ListItem",
+                                position: 3,
+                                name: photo.name,
+                                item: `${SITE_CONFIG.site}/gallery/${photo.slug}`,
+                            },
+                        ],
+                },
+            )}
         />
-        <style>
+        <style
+        >
             body {
                 margin: 0;
                 padding: 0;
@@ -59,19 +86,31 @@ const { photo } = Astro.props;
             }
         </style>
     </head>
-    <body class="min-h-screen relative">
-        <div class="vignette"></div>
-        <BlurBackground />
-        
+    <body
+        class="min-h-screen relative"
+    >
+        <div
+            class="vignette"
+        >
+        </div>
+        <BlurBackground
+        />
+
         <Navigation
             client:load
+            transition:persist="navigation"
             title={SITE_CONFIG.title}
             navItems={SITE_CONFIG.nav}
             pathname={Astro.url.pathname}
         />
-        
-        <main class="relative z-10 w-full h-screen">
-            <StackedCardSlider client:load images={photo.images} />
+
+        <main
+            class="relative z-10 w-full h-screen"
+        >
+            <StackedCardSlider
+                client:load
+                images={photo.images}
+            />
         </main>
     </body>
 </html>

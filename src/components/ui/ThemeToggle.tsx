@@ -56,13 +56,13 @@ export default function ThemeToggle() {
     };
 
     if (!mounted) {
-        return <div className="w-10 h-10" />; // Prevent hydration mismatch
+        return <div className="w-5 h-5" />; // Prevent hydration mismatch
     }
 
     return (
         <button
             onClick={toggleTheme}
-            className="relative inline-flex h-9 w-9 items-center justify-center rounded-full hover-trigger cursor-pointer"
+            className="relative inline-flex h-5 w-5 items-center justify-center cursor-pointer"
             aria-label="Toggle theme"
         >
             <AnimatePresence mode="wait" initial={false}>

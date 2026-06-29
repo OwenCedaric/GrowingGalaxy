@@ -49,7 +49,7 @@ const {
 ---
 
 <Layout
-    title={entry.data.title}
+    title={`${entry.data.title} // ${SITE_CONFIG.title}`}
     description={entry.data.description || `${entry.data.title} - ${SITE_CONFIG.title}`}
     rawContentUrl={`/raw/pages/${entry.id}${extension}`}
 >

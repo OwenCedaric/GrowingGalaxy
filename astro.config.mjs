@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import { SITE_CONFIG } from "./src/config";
 import mdx from '@astrojs/mdx';
+import { unified } from '@astrojs/markdown-remark';
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import tailwindcore from '@tailwindcss/vite';
@@ -12,6 +13,7 @@ import matter from 'gray-matter';
 
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeTracesBrutalism from './src/utils/rehype-traces-brutalism.ts';
 
 /**
  * @param {Date | string | number | undefined} date
@@ -95,16 +97,17 @@ async function findContentFile(collection, slug) {
  * @param {string} defaultLastMod
  * @param {string} latestBlogDate
  * @param {string} latestGalleryDate
+ * @param {string} latestTracesDate
  * @param {string} today
  * @returns {Promise<void>}
  */
-async function processSitemapFile(filePath, collection, defaultLastMod, latestBlogDate, latestGalleryDate, today) {
+async function processSitemapFile(filePath, collection, defaultLastMod, latestBlogDate, latestGalleryDate, latestTracesDate, today) {
     try {
         let xml = await fs.readFile(filePath, 'utf-8');
-        
+
         // Regex to match <url>...</url> blocks
         const urlRegex = /<url>([\s\S]*?)<\/url>/gi;
-        
+
         let updatedXml = xml;
         const urlBlocks = [];
         let match;
@@ -114,33 +117,39 @@ async function processSitemapFile(filePath, collection, defaultLastMod, latestBl
                 inner: match[1]
             });
         }
-        
+
         for (const block of urlBlocks) {
             const locMatch = /<loc>(.*?)<\/loc>/i.exec(block.inner);
             if (!locMatch) continue;
-            
+
             const loc = locMatch[1];
             const urlObj = new URL(loc);
             const pathname = urlObj.pathname.replace(/\/$/, ''); // Remove trailing slash
-            
+
             let lastmod = defaultLastMod;
             let imageTags = '';
-            
+
             // Extract collection and slug from pathname
             let slug = '';
             let currentCollection = collection;
-            
+
             if (pathname.startsWith('/blog/')) {
                 currentCollection = 'blog';
                 slug = pathname.substring(6);
             } else if (pathname.startsWith('/gallery/')) {
                 currentCollection = 'photos';
                 slug = pathname.substring(9);
+            } else if (pathname.startsWith('/traces/')) {
+                currentCollection = 'traces';
+                slug = pathname.substring(8);
             } else if (pathname === '/blog' || pathname === '/blog/') {
                 lastmod = latestBlogDate;
                 slug = '';
             } else if (pathname === '/gallery' || pathname === '/gallery/') {
                 lastmod = latestGalleryDate;
+                slug = '';
+            } else if (pathname === '/traces' || pathname === '/traces/') {
+                lastmod = latestTracesDate;
                 slug = '';
             } else if (pathname === '/blogroll' || pathname === '/search' || pathname === '') {
                 slug = '';
@@ -148,14 +157,14 @@ async function processSitemapFile(filePath, collection, defaultLastMod, latestBl
                 currentCollection = 'pages';
                 slug = pathname.substring(1);
             }
-            
+
             if (slug) {
                 const file = await findContentFile(currentCollection, slug);
                 if (file) {
                     const content = await fs.readFile(file, 'utf-8');
                     const { data, content: body } = matter(content);
-                    
-                    const date = data.updatedDate || data.pubDate || data.date;
+
+                    const date = data.updatedDate || data.pubDate || (data.baseline && data.baseline.date) || data.endDate || data.date;
                     if (date) {
                         const formatted = formatDate(date);
                         if (formatted) lastmod = formatted;
@@ -164,9 +173,9 @@ async function processSitemapFile(filePath, collection, defaultLastMod, latestBl
                             const stat = await fs.stat(file);
                             const formatted = formatDate(stat.mtime);
                             if (formatted) lastmod = formatted;
-                        } catch {}
+                        } catch { }
                     }
-                    
+
                     // Add images
                     if (currentCollection === 'blog' && data.copyrightBg) {
                         imageTags = `<image:image><image:loc>${data.copyrightBg}</image:loc></image:image>`;
@@ -184,23 +193,23 @@ async function processSitemapFile(filePath, collection, defaultLastMod, latestBl
                     }
                 }
             }
-            
+
             // Build the replacement url block
             let newInner = block.inner;
-            
+
             // Ensure no duplicate lastmod
             newInner = newInner.replace(/<lastmod>.*?<\/lastmod>/gi, '');
             newInner += `<lastmod>${lastmod}</lastmod>`;
-            
+
             if (imageTags) {
                 newInner = newInner.replace(/<image:image>.*?<\/image:image>/gi, '');
                 newInner += imageTags;
             }
-            
+
             const replacement = `<url>${newInner}</url>`;
             updatedXml = updatedXml.replace(block.full, replacement);
         }
-        
+
         await fs.writeFile(filePath, updatedXml, 'utf-8');
         console.log(`Successfully enriched sitemap: ${filePath}`);
     } catch (err) {
@@ -211,10 +220,13 @@ async function processSitemapFile(filePath, collection, defaultLastMod, latestBl
 // https://astro.build/config
 export default defineConfig({
     site: SITE_CONFIG.site,
-    integrations: [mdx({
-        remarkPlugins: [remarkMath],
-        rehypePlugins: [rehypeKatex]
-    }), sitemap({
+    markdown: {
+        processor: unified({
+            remarkPlugins: [remarkMath],
+            rehypePlugins: [rehypeKatex, rehypeTracesBrutalism]
+        })
+    },
+    integrations: [mdx(), sitemap({
         chunks: {
             'blog': (item) => {
                 const urlPath = new URL(item.url).pathname;
@@ -226,6 +238,13 @@ export default defineConfig({
             'gallery': (item) => {
                 const urlPath = new URL(item.url).pathname;
                 if (urlPath === '/gallery' || urlPath === '/gallery/' || urlPath.startsWith('/gallery/')) {
+                    return item;
+                }
+                return undefined;
+            },
+            'traces': (item) => {
+                const urlPath = new URL(item.url).pathname;
+                if (urlPath === '/traces' || urlPath === '/traces/' || urlPath.startsWith('/traces/')) {
                     return item;
                 }
                 return undefined;
@@ -249,14 +268,17 @@ export default defineConfig({
                     const today = formatDate(new Date()) || '';
                     const latestBlogDate = formatDate(await getLatestDateFromDir('src/content/blog')) || today;
                     const latestGalleryDate = formatDate(await getLatestDateFromDir('src/content/photos')) || today;
+                    const latestTracesDate = formatDate(await getLatestDateFromDir('src/content/traces')) || today;
 
                     const blogSitemap = fileURLToPath(new URL('sitemap-blog-0.xml', dir));
                     const gallerySitemap = fileURLToPath(new URL('sitemap-gallery-0.xml', dir));
+                    const tracesSitemap = fileURLToPath(new URL('sitemap-traces-0.xml', dir));
                     const defaultSitemap = fileURLToPath(new URL('sitemap-pages-0.xml', dir));
 
-                    await processSitemapFile(blogSitemap, 'blog', today, latestBlogDate, latestGalleryDate, today);
-                    await processSitemapFile(gallerySitemap, 'photos', today, latestBlogDate, latestGalleryDate, today);
-                    await processSitemapFile(defaultSitemap, 'pages', today, latestBlogDate, latestGalleryDate, today);
+                    await processSitemapFile(blogSitemap, 'blog', today, latestBlogDate, latestGalleryDate, latestTracesDate, today);
+                    await processSitemapFile(gallerySitemap, 'photos', today, latestBlogDate, latestGalleryDate, latestTracesDate, today);
+                    await processSitemapFile(tracesSitemap, 'traces', today, latestBlogDate, latestGalleryDate, latestTracesDate, today);
+                    await processSitemapFile(defaultSitemap, 'pages', today, latestBlogDate, latestGalleryDate, latestTracesDate, today);
                 } catch (err) {
                     console.error('Error post-processing sitemap chunks:', err);
                 }

@@ -1,0 +1,201 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { SITE_CONFIG } from "@/config";
+import {
+    getCollection,
+    render,
+} from "astro:content";
+import RemoteDynamicMap from "@/components/traces/RemoteDynamicMap";
+import AbstractVectorMap from "@/components/traces/AbstractVectorMap";
+import {
+    RiArrowLeftLine,
+} from "@remixicon/react";
+
+export async function getStaticPaths() {
+    const traces =
+        await getCollection(
+            "traces",
+        );
+    return traces.map(
+        (
+            trace: any,
+        ) => ({
+            params: {
+                id: trace.id,
+            },
+            props: {
+                trace,
+            },
+        }),
+    );
+}
+
+const {
+    trace,
+} =
+    Astro.props;
+const {
+    Content,
+} =
+    await render(
+        trace,
+    );
+---
+
+<Layout
+    title={`${trace.data.title.replace(/^SYS_TRACE:\s*/i, "")} // ${SITE_CONFIG.title}`}
+    description={`Trace record from ${trace.data.baseline.environment} at ${trace.data.baseline.coordinates}`}
+>
+    {/* Ambient Background Map */}
+    <div
+        class="fixed inset-0 z-0 pointer-events-none opacity-10 dark:opacity-[0.15] mix-blend-multiply dark:mix-blend-screen transition-opacity duration-1000"
+        style="mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 10%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 10%, transparent 80%);"
+    >
+        {
+            trace.data.baseline.mapUrl ? (
+                <RemoteDynamicMap
+                    client:load
+                    mapUrl={trace.data.baseline.mapUrl}
+                    className="w-full h-full object-cover sm:object-contain map-blend"
+                />
+            ) : (
+                <AbstractVectorMap
+                    client:load
+                    coordinates={trace.data.baseline.coordinates}
+                />
+            )
+        }
+    </div>
+
+    <article
+        class="font-sans relative z-10 pb-32 pt-20 lg:pt-24 max-w-6xl mx-auto w-full px-6 sm:px-8 lg:px-12 flex flex-col lg:flex-row gap-16 lg:gap-24 justify-center"
+    >
+        {
+            /* Left Column (Metadata - Desktop Only / Back button - Both) */
+        }
+        <aside
+            class="w-full lg:w-[180px] xl:w-[200px] flex-shrink-0 flex flex-col lg:sticky lg:top-32 lg:self-start"
+        >
+            <a
+                href={`/traces?year=${trace.id.split("/")[0]}&id=${trace.id}`}
+                class="inline-flex items-center gap-2 text-[10px] md:text-xs font-mono tracking-widest text-secondary-text hover:text-primary-text transition-all duration-300 mb-10 lg:mb-16 uppercase opacity-80 hover:opacity-100 group"
+            >
+                <RiArrowLeftLine
+                    className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-0.5"
+                />
+                REGISTRY_RETURN
+            </a>
+
+            <div
+                class="hidden lg:flex flex-col gap-6"
+            >
+                <div
+                    class="text-[13px] font-mono uppercase tracking-widest text-primary-text opacity-80 whitespace-nowrap"
+                >
+                    {trace.data.date}
+                </div>
+
+                <div
+                    class="text-[13px] font-mono uppercase tracking-widest text-primary-text opacity-80 whitespace-nowrap"
+                >
+                    {trace.data.baseline.coordinates}
+                </div>
+
+                <div
+                    class="text-[13px] font-mono uppercase tracking-widest text-primary-text opacity-80 whitespace-nowrap"
+                >
+                    {trace.data.baseline.environment}
+                </div>
+            </div>
+        </aside>
+
+        {
+            /* Right Column: MAIN CONTENT STREAM */
+        }
+        <main
+            class="flex-1 w-full max-w-3xl min-w-0 pt-0 lg:pt-[44px]"
+        >
+            {
+                /* Title */
+            }
+            <div
+                class="mb-8 lg:mb-14"
+            >
+                <h1
+                    class="text-3xl md:text-4xl lg:text-[40px] font-medium tracking-wide uppercase text-primary-text"
+                    style={`view-transition-name: trace-title-${trace.id}`}
+                >
+                    {
+                        trace.data.title.replace(
+                            /^SYS_TRACE:\s*/i,
+                            "",
+                        )
+                    }
+                </h1>
+            </div>
+
+            {
+                /* Mobile Metadata (Hidden on Desktop) */
+            }
+            <div
+                class="block lg:hidden mb-10"
+            >
+                <div
+                    class="flex flex-wrap items-center gap-x-6 gap-y-3 mb-6"
+                >
+                    <div
+                        class="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-primary-text opacity-80 whitespace-nowrap"
+                    >
+                        {trace.data.date}
+                    </div>
+                    <div
+                        class="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-primary-text opacity-80 whitespace-nowrap"
+                    >
+                        {trace.data.baseline.coordinates}
+                    </div>
+                    <div
+                        class="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-primary-text opacity-80 whitespace-nowrap"
+                    >
+                        {trace.data.baseline.environment}
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="prose dark:prose-invert max-w-none prose-headings:font-sans prose-headings:font-medium prose-headings:tracking-tight prose-a:text-black dark:prose-a:text-white prose-a:underline prose-a:decoration-1 prose-a:underline-offset-4 prose-blockquote:not-italic prose-blockquote:border-l-2 prose-blockquote:pl-6 prose-blockquote:border-black/20 dark:prose-blockquote:border-white/20 prose-p:font-light prose-p:opacity-90 prose-p:tracking-wide"
+            >
+                <Content />
+            </div>
+
+            {
+                trace.data.tags &&
+                    trace.data.tags.length > 0 && (
+                        <div class="mt-12 flex flex-wrap gap-2 not-prose">
+                            {trace.data.tags.map((tag: string) => (
+                                <span class="inline-flex items-center gap-1 px-3 py-1 bg-black/5 dark:bg-white/5 rounded-full text-xs font-mono text-secondary-text">
+                                    <span class="opacity-40">#</span>
+                                    <span>{tag}</span>
+                                </span>
+                            ))}
+                        </div>
+                    )
+            }
+
+            <div
+                class="mt-24 pt-8 border-t border-black/10 dark:border-white/10 text-[10px] font-mono text-secondary-text opacity-40 uppercase tracking-widest"
+            >
+                EOF
+            </div>
+        </main>
+    </article>
+</Layout>
+
+<style is:global>
+    /* Simple image wrapper without background/card effects */
+    .traces-image-wrapper {
+        margin-top: 3.5rem;
+        margin-bottom: 3.5rem;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+</style>

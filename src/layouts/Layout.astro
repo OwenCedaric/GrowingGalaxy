@@ -6,7 +6,7 @@ import "@/styles/global.css";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/playfair-display";
 import "katex/dist/katex.min.css";
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
 import { SITE_CONFIG } from "@/config";
 import ClickSpark from "@/components/ui/ClickSpark";
 import ShinyText from "@/components/ui/ShinyText";
@@ -44,7 +44,7 @@ const {
             description={description}
             image={image}
         />
-        <ViewTransitions
+        <ClientRouter
         />
         {
             rawContentUrl && (
@@ -157,6 +157,7 @@ const {
 
         <Navigation
             client:load
+            transition:persist="navigation"
             title={SITE_CONFIG.title}
             navItems={SITE_CONFIG.nav}
             pathname={Astro.url.pathname}
@@ -227,18 +228,8 @@ const {
                             )
                         }
                     </div>
-                    <div
-                        class="text-xs font-sans text-secondary-text"
-                    >
-                        &copy;
-                        {
-                            new Date().getFullYear()
-                        }
-                        {
-                            SITE_CONFIG
-                                .footer
-                                .copyright
-                        }
+                    <div class="text-xs font-sans text-secondary-text tracking-wide">
+                        &copy; {new Date().getFullYear()} {SITE_CONFIG.footer.copyright}
                     </div>
                 </footer>
             </main>

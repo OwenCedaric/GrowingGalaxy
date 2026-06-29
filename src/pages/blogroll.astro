@@ -27,8 +27,8 @@ blogroll.sort(
 ---
 
 <Layout
-    title={`Blogroll | ${SITE_CONFIG.title}`}
-    description="A collection of friends and interesting links."
+    title={`BLOGROLL // ${SITE_CONFIG.title}`}
+    description="A curated list of blogs and digital gardens I follow."
 >
     <div class="max-w-4xl mx-auto pt-4 md:pt-6 px-6">
         <div class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center">
@@ -44,7 +44,7 @@ blogroll.sort(
             />
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 mt-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 md:gap-y-12 mt-12 md:mt-16">
             {
                 blogroll.map(
                     (
@@ -53,66 +53,39 @@ blogroll.sort(
                     ) => (
                         <FadeContent
                             client:visible
-                            delay={
-                                index *
-                                80
-                            }
-                            duration={
-                                700
-                            }
-                            blur={
-                                true
-                            }
+                            delay={index * 80}
+                            duration={700}
+                            blur={true}
                         >
                             <SpotlightCard
                                 client:visible
                                 className="p-1"
                             >
-                                <article class="flex flex-row gap-6 group items-start relative z-10">
-                                    <div class="relative w-20 h-20 flex-shrink-0 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 group-hover:border-black/30 dark:group-hover:border-white/30 transition-colors">
+                                <article class="flex flex-row gap-5 group items-start relative z-10">
+                                    <div class="relative w-14 h-14 md:w-16 md:h-16 flex-shrink-0 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 group-hover:border-black/30 dark:group-hover:border-white/30 transition-colors">
                                         <img
-                                            src={
-                                                entry
-                                                    .data
-                                                    .avatar
-                                            }
-                                            alt={
-                                                entry
-                                                    .data
-                                                    .name
-                                            }
+                                            src={entry.data.avatar}
+                                            alt={entry.data.name}
                                             loading="lazy"
                                             decoding="async"
                                             class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500"
                                         />
                                     </div>
 
-                                    <div class="space-y-3">
+                                    <div class="space-y-1.5 md:space-y-2 mt-0.5">
                                         <a
-                                            href={
-                                                entry
-                                                    .data
-                                                    .link
-                                            }
+                                            href={entry.data.link}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             class="block"
                                         >
-                                            <h2 class="text-2xl font-bold tracking-tight hover:text-secondary-text transition-colors">
-                                                {
-                                                    entry
-                                                        .data
-                                                        .name
-                                                }
+                                            <h2 class="text-[17px] md:text-lg font-medium tracking-wide text-primary-text hover:text-secondary-text transition-colors">
+                                                {entry.data.name}
                                             </h2>
                                         </a>
 
-                                        <p class="text-lg text-secondary-text leading-relaxed">
-                                            {
-                                                entry
-                                                    .data
-                                                    .description
-                                            }
+                                        <p class="text-[13px] md:text-sm font-light text-secondary-text leading-relaxed opacity-90">
+                                            {entry.data.description}
                                         </p>
                                     </div>
                                 </article>

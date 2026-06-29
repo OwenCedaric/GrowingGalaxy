@@ -61,8 +61,11 @@ export const PhotoCard: React.FC<{ photo: PhotoEntry }> = ({ photo }) => {
         <a
             ref={cardRef}
             href={`/gallery/${photo.slug}`}
-            className="block relative group overflow-hidden rounded-lg mb-6 break-inside-avoid bg-zinc-100 dark:bg-zinc-800 transition-transform duration-300 hover:scale-[1.01]"
-            style={{ minHeight: isMobile ? '200px' : 'auto' }}
+            className="block relative group overflow-hidden rounded-lg mb-6 break-inside-avoid bg-zinc-100 dark:bg-zinc-800 transition-transform duration-300 hover:scale-[1.01] transform-gpu"
+            style={{ 
+                minHeight: isMobile ? '200px' : 'auto',
+                WebkitMaskImage: '-webkit-radial-gradient(white, black)'
+            }}
         >
             <SpotlightCard spotlightColor="rgba(255, 255, 255, 0.15)" className="w-full h-full rounded-lg">
                 <div className={`relative w-full overflow-hidden bg-zinc-200 dark:bg-zinc-900 transition-all duration-700 ${!isLoaded ? 'aspect-[4/3]' : ''}`}>

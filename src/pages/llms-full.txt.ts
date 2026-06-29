@@ -7,6 +7,7 @@ export async function GET() {
     const pages = await getCollection('pages');
     const blogroll = await getCollection('blogroll');
     const photos = await getCollection('photos');
+    const traces = await getCollection('traces');
 
     const content = `\uFEFF# ${SITE_CONFIG.title} Full Content Index
 
@@ -23,6 +24,10 @@ ${pages.map(entry => `- [${entry.data.title}](${site}/${entry.id}) ([Raw Markdow
 ## Gallery & Photos (Web Only)
 
 ${photos.map(entry => `- [${entry.data.name}](${site}/gallery/2025/${entry.id.toLowerCase()})`).join('\n')}
+
+## Traces
+
+${traces.map(entry => `- [Trace: ${entry.data.title.replace(/^SYS_TRACE:\\s*/i, '')}](${site}/traces/${entry.id}) ([Raw Markdown](${site}/raw/traces/${entry.id}.md))`).join('\n')}
 
 ## Blogroll
 

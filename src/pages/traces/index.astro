@@ -1,0 +1,205 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { SITE_CONFIG } from "@/config";
+import { getCollection } from "astro:content";
+import TracesExplorer from "@/components/traces/TracesExplorer";
+
+const allTraces =
+    await getCollection(
+        "traces",
+    );
+
+export interface TraceDestination {
+    id: string;
+    name: string;
+    description: string;
+    photos: string[];
+    detailUrl: string;
+    coordinates: string;
+    mapUrl?: string;
+    dateStr: string;
+}
+
+export interface TraceYear {
+    year: number;
+    destinations: TraceDestination[];
+}
+
+function extractTraceInfo(
+    body: string,
+) {
+    const lines =
+        body.split(
+            "\n",
+        );
+    let description =
+        "";
+    const photos: string[] =
+        [];
+
+    for (const line of lines) {
+        const trimmed =
+            line.trim();
+        if (
+            !trimmed
+        )
+            continue;
+
+        // Match markdown image: ![alt](url)
+        const imgMatch =
+            trimmed.match(
+                /!\[.*?\]\((.*?)\)/,
+            );
+        if (
+            imgMatch
+        ) {
+            if (
+                photos.length <
+                3
+            ) {
+                photos.push(
+                    imgMatch[1],
+                );
+            }
+        } else if (
+            !description &&
+            !trimmed.startsWith(
+                "#",
+            ) &&
+            !trimmed.startsWith(
+                "<",
+            )
+        ) {
+            description =
+                trimmed;
+        }
+    }
+    return {
+        description,
+        photos,
+    };
+}
+
+// Group by year descending
+const tracesByYear =
+    allTraces.reduce(
+        (
+            acc,
+            trace,
+        ) => {
+            const year =
+                trace.data.endDate.getFullYear();
+            if (
+                !acc[
+                    year
+                ]
+            )
+                acc[
+                    year
+                ] =
+                    [];
+            acc[
+                year
+            ].push(
+                trace,
+            );
+            return acc;
+        },
+        {} as Record<
+            number,
+            typeof allTraces
+        >,
+    );
+
+const sortedYears =
+    Object.keys(
+        tracesByYear,
+    )
+        .map(
+            Number,
+        )
+        .sort(
+            (
+                a,
+                b,
+            ) =>
+                b -
+                a,
+        );
+
+// Transform to TraceYear schema
+const traceYears: TraceYear[] =
+    sortedYears.map(
+        (
+            year,
+        ) => {
+            const tracesForYear =
+                tracesByYear[
+                    year
+                ].sort(
+                    (
+                        a,
+                        b,
+                    ) =>
+                        b.data.endDate.valueOf() -
+                        a.data.endDate.valueOf(),
+                );
+
+            const destinations: TraceDestination[] =
+                tracesForYear.map(
+                    (
+                        trace,
+                    ) => {
+                        const {
+                            description,
+                            photos,
+                        } =
+                            extractTraceInfo(
+                                trace.body ||
+                                    "",
+                            );
+
+                        return {
+                            id: trace.id,
+                            name: trace.data.title.replace(
+                                /^SYS_TRACE:\s*/i,
+                                "",
+                            ),
+                            description:
+                                description ||
+                                "No visual or textual records available for this trace log.",
+                            photos: photos,
+                            detailUrl: `/traces/${trace.id}`,
+                            coordinates:
+                                trace
+                                    .data
+                                    .baseline
+                                    .coordinates,
+                            mapUrl: trace
+                                .data
+                                .baseline
+                                .mapUrl,
+                            dateStr:
+                                trace
+                                    .data
+                                    .date, // Now a string directly from frontmatter
+                        };
+                    },
+                );
+            return {
+                year,
+                destinations,
+            };
+        },
+    );
+---
+
+<Layout
+    title={`TRACES // ${SITE_CONFIG.title}`}
+    description="Geographic logs and traces."
+>
+    <TracesExplorer
+        client:load
+        data={traceYears}
+    />
+</Layout>
