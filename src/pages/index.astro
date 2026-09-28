@@ -12,7 +12,6 @@ import CursorGlow from "@/components/ui/CursorGlow";
 <Layout
     title={`HOME // ${SITE_CONFIG.title}`}
     description={SITE_CONFIG.description}
-    isHome={true}
 >
     <!-- Cursor Glow -->
     <CursorGlow
@@ -161,7 +160,7 @@ import CursorGlow from "@/components/ui/CursorGlow";
        ======================================== */
     .hero-section {
         position: relative;
-        flex: 1;
+        min-height: 80vh;
         display: flex;
         flex-direction: column;
         align-items: stretch;

@@ -19,7 +19,6 @@ interface Props {
     publishDate?: Date;
     modifiedDate?: Date;
     authorName?: string;
-    isHome?: boolean;
 }
 
 const {
@@ -30,7 +29,6 @@ const {
     publishDate,
     modifiedDate,
     authorName,
-    isHome,
 } =
     Astro.props;
 ---
@@ -173,24 +171,20 @@ const {
             duration={350}
         >
             <main
-                class={isHome
-                    ? "h-[100dvh] flex flex-col pt-32 px-6 max-w-7xl mx-auto w-full relative z-10"
-                    : "min-h-screen flex flex-col pt-32 pb-12 px-6 max-w-7xl mx-auto w-full relative z-10"}
+                class="min-h-screen flex flex-col pt-32 pb-12 px-6 max-w-7xl mx-auto w-full relative z-10"
             >
                 <div
-                    class={isHome ? "flex-1 min-h-0 flex flex-col" : "flex-grow flex flex-col justify-center"}
+                    class="flex-grow flex flex-col justify-center"
                 >
                     <slot
                     />
                 </div>
 
                 <footer
-                    class={isHome
-                        ? "relative mt-auto pt-4 pb-6 text-center opacity-60 hover:opacity-100 transition-opacity duration-300"
-                        : "relative mt-20 pt-12 text-center opacity-60 hover:opacity-100 transition-opacity duration-300"}
+                    class="relative mt-20 pt-12 text-center opacity-60 hover:opacity-100 transition-opacity duration-300"
                 >
                     <div
-                        class="flex items-center justify-center gap-6 text-xs font-mono uppercase tracking-widest mb-2"
+                        class="flex items-center justify-center gap-6 text-xs font-mono uppercase tracking-widest mb-4"
                     >
                         {
                             SITE_CONFIG.footer.social.map(
