@@ -1,6 +1,10 @@
 ---
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
+import type {
+    GetStaticPaths,
+    InferGetStaticPropsType,
+} from "astro";
 import Layout from "@/layouts/Layout.astro";
 import FadeContent from "@/components/ui/FadeContent";
 import TextReveal from "@/components/ui/TextReveal";
@@ -14,22 +18,34 @@ import {
 type ProjectEntry =
     CollectionEntry<"projects">;
 
-const projects =
-    await getCollection(
-        "projects",
-    );
+export const getStaticPaths =
+    (async ({
+        paginate,
+    }) => {
+        const projects = (
+            await getCollection("projects")
+        ).sort(
+            (
+                a: ProjectEntry,
+                b: ProjectEntry,
+            ) =>
+                a.data.title.localeCompare(
+                    b.data.title,
+                ),
+        );
 
-projects.sort(
-    (
-        a: ProjectEntry,
-        b: ProjectEntry,
-    ) =>
-        a.data.title.localeCompare(
-            b
-                .data
-                .title,
-        ),
-);
+        return paginate(projects, {
+            pageSize:
+                SITE_CONFIG.projectsPerPage,
+        });
+    }) satisfies GetStaticPaths;
+
+type Props =
+    InferGetStaticPropsType<
+        typeof getStaticPaths
+    >;
+
+const { page } = Astro.props;
 ---
 
 <Layout
@@ -87,7 +103,7 @@ projects.sort(
             class="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
             {
-                projects.map(
+                page.data.map(
                     (
                         entry: ProjectEntry,
                         index: number,
@@ -164,7 +180,7 @@ projects.sort(
                 )
             }
             {
-                projects.length ===
+                page.data.length ===
                     0 && (
                     <div class="col-span-full text-secondary-text py-12 px-4">
                         <p class="text-sm font-mono">
@@ -176,5 +192,41 @@ projects.sort(
                 )
             }
         </div>
+
+        <!-- Pagination Navigation -->
+        {
+            page.lastPage > 1 && (
+                <div class="flex justify-between items-center mt-16 pt-12 border-t border-black/5 dark:border-white/5 opacity-60 dark:opacity-80">
+                    {page.url.prev ? (
+                        <a
+                            href={
+                                page.url.prev
+                            }
+                            class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
+                        >
+                            ← Previous
+                        </a>
+                    ) : (
+                        <span />
+                    )}
+                    <span class="text-xs font-mono">
+                        Page {page.currentPage} of{" "}
+                        {page.lastPage}
+                    </span>
+                    {page.url.next ? (
+                        <a
+                            href={
+                                page.url.next
+                            }
+                            class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
+                        >
+                            Next →
+                        </a>
+                    ) : (
+                        <span />
+                    )}
+                </div>
+            )
+        }
     </div>
 </Layout>

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { User, Loader2 } from 'lucide-react';
+import { RiUserLine, RiLoader4Line } from '@remixicon/react';
 import type { PhotoEntry } from '@/types/photo';
 import SpotlightCard from '@/components/reactbits/SpotlightCard';
 
@@ -71,7 +71,7 @@ export const PhotoCard: React.FC<{ photo: PhotoEntry }> = ({ photo }) => {
                 <div className={`relative w-full overflow-hidden bg-zinc-200 dark:bg-zinc-900 transition-all duration-700 ${!isLoaded ? 'aspect-[4/3]' : ''}`}>
                     {!isLoaded && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <Loader2 className="w-5 h-5 animate-spin text-zinc-400 opacity-50" />
+                            <RiLoader4Line className="w-5 h-5 animate-spin text-zinc-400 opacity-50" />
                         </div>
                     )}
                     {isVisible && (
@@ -99,7 +99,7 @@ export const PhotoCard: React.FC<{ photo: PhotoEntry }> = ({ photo }) => {
                     </h3>
 
                     <div className="flex items-center text-white/90 text-sm mb-1">
-                        <User className="w-3.5 h-3.5 mr-1.5 opacity-80" />
+                        <RiUserLine className="w-3.5 h-3.5 mr-1.5 opacity-80" />
                         <span className="font-light">{photo.author}</span>
                     </div>
 

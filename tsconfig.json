@@ -5,14 +5,13 @@
         "**/*"
     ],
     "exclude": [
-        "dist"
+        "dist",
+        "public"
     ],
     "compilerOptions": {
         "jsx": "react-jsx",
         "jsxImportSource": "react",
-        "module": "ESNext",
-        "moduleResolution": "bundler",
-        "types": ["astro/client"],
+        "verbatimModuleSyntax": false,
         "paths": {
             "@/*": [
                 "./src/*"

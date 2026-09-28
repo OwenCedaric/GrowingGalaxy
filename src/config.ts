@@ -5,6 +5,7 @@ export const SITE_CONFIG = {
     site: "https://galaxy.ceda.is",
     imageServer: ["https://images.pexels.com"],
     postsPerPage: 6,
+    projectsPerPage: 12,
     defaultImage: "/blog-placeholder-1.png",
     nav: [
         { text: "Blog", href: "/blog" },

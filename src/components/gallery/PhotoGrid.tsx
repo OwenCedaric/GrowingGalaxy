@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Masonry from 'react-masonry-css';
 import { PhotoCard } from '@/components/gallery/PhotoCard';
 import type { PhotoEntry } from '@/types/photo';
-import { Loader2 } from 'lucide-react';
+import { RiLoader4Line } from '@remixicon/react';
 import FadeContent from '@/components/reactbits/FadeContent';
 
 interface PhotoGridProps {
@@ -122,7 +122,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ photos }) => {
             {hasMore && (
                 <div ref={loadMoreRef} className="py-12 flex justify-center items-center h-32">
                     {isLoading ? (
-                        <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
+                        <RiLoader4Line className="w-6 h-6 animate-spin text-zinc-400" />
                     ) : (
                         <div className="w-1 h-1" />
                     )}
