@@ -28,8 +28,8 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
         const ampSecondary = 35;
         const resolution = 150;
 
-        let displaySeed = Number(config.parameters?.seed) || 1234;
-        let currentSpeed = config.parameters?.speed || 0.0042;
+        let displaySeed = Number(config.seed) || 1234;
+        let currentSpeed = config.speed || 0.0042;
 
         const baseOpacities = [1.0, 0.6, 0.2];
         const systemLayers = [];

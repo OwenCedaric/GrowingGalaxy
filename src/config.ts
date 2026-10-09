@@ -2,6 +2,7 @@ export const SITE_CONFIG = {
     title: "Galaxy",
     description: "A curated space for digital galleries and storytelling.",
     author: "Cedar",
+    signature: "Owen Cedar",
     site: "https://galaxy.ceda.is",
     imageServer: ["https://images.pexels.com"],
     postsPerPage: 6,
@@ -17,26 +18,16 @@ export const SITE_CONFIG = {
             ]
         },
         { text: "Traces", href: "/traces" },
-        { text: "About", href: "/about" },
     ],
     homepage: {
-        title: "I'm DG.",
-        subtitle: "Doctor.",
-        description: [
-            "Exploring the intersection of design, technology, and human experience through a minimalist lens. Growing Galaxy is a digital garden for curated blog and visual experiments.",
-            "Every pixel is placed with intention. Every interaction is designed to be felt, not just seen. Welcome to a sanctuary of digital calmness."
-        ],
+        harmonicSystem: {
+            seed: 2026,
+            speed: 0.0042
+        },
         links: [
             { text: "Read the blog", href: "/blog" },
             { text: "Explore the Traces", href: "/traces" }
-        ],
-        harmonicSystem: {
-            type: "p5", // 'svg' or 'p5'
-            parameters: {
-                seed: 2026,
-                speed: 0.0042
-            }
-        }
+        ]
     },
     footer: {
         social: [
