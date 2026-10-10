@@ -13,11 +13,12 @@ interface NavItem {
 
 interface NavigationProps {
     title: string;
+    logoSrc?: string;
     navItems: NavItem[];
     pathname?: string;
 }
 
-export default function Navigation({ title, navItems, pathname = "" }: NavigationProps) {
+export default function Navigation({ title, logoSrc, navItems, pathname = "" }: NavigationProps) {
     const isDark = useTheme();
     const [currentPath, setCurrentPath] = useState(pathname);
     const [isSearchActive, setIsSearchActive] = useState(currentPath.includes("/search"));
@@ -82,8 +83,28 @@ export default function Navigation({ title, navItems, pathname = "" }: Navigatio
                 <div className="w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-8 sm:pt-10 grid grid-cols-[1fr_auto] md:flex md:flex-nowrap md:items-center md:justify-between pointer-events-auto gap-y-5 md:gap-y-0 md:gap-8">
                     
                     {/* 1. Logo (Always Top Left) */}
-                    <div className="col-start-1 row-start-1 flex items-center shrink-0 font-sans font-medium text-sm tracking-tight opacity-90 order-1">
-                        <AnimatedNavLink href="/" text={title} isLogo={true} />
+                    <div className="col-start-1 row-start-1 flex items-center shrink-0 order-1">
+                        {logoSrc ? (
+                            <a href="/" className="block relative group outline-none" aria-label="Home">
+                                <motion.div
+                                    whileHover={{ scale: 1.04 }}
+                                    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                                    className="h-[18px] sm:h-[22px] aspect-[1.446] bg-current text-primary-text opacity-70 hover:opacity-100 transition-opacity duration-500" 
+                                    style={{ 
+                                        WebkitMaskImage: `url(${logoSrc})`,
+                                        WebkitMaskSize: "contain",
+                                        WebkitMaskRepeat: "no-repeat",
+                                        WebkitMaskPosition: "left center",
+                                        maskImage: `url(${logoSrc})`,
+                                        maskSize: "contain",
+                                        maskRepeat: "no-repeat",
+                                        maskPosition: "left center"
+                                    }} 
+                                />
+                            </a>
+                        ) : (
+                            <AnimatedNavLink href="/" text={title} isLogo={true} />
+                        )}
                     </div>
 
                     {/* 2. Controls: Search Trigger & Theme Toggle (Mobile Top Right, Desktop Rightmost) */}

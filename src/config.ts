@@ -1,5 +1,6 @@
 export const SITE_CONFIG = {
     title: "Galaxy",
+    logoSrc: "/favicon.svg",
     description: "A curated space for digital galleries and storytelling.",
     author: "DG",
     signature: "DGX",
