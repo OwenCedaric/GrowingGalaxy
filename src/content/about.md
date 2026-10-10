@@ -10,7 +10,7 @@ Growing Galaxy is a digital exploration of minimalism, technology, and storytell
 
 We believe in **digital essentialism**. In a world of infinite scroll and notification overload, we aim to create a space that respects your attention.
 
-> ”Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.“ — Antoine de Saint-Exupéry
+> "Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away." — Antoine de Saint-Exupéry
 
 ## The Tech Stack
 

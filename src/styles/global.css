@@ -122,6 +122,35 @@
         font-weight: 400;
     }
 
+    /* Blockquote custom styling with Remixicon */
+    .prose blockquote {
+        @apply relative border-none pl-10 pr-0 py-1 bg-transparent mt-8 mb-8 font-serif text-lg leading-relaxed;
+        font-style: normal;
+        color: var(--secondary);
+        quotes: none !important;
+    }
+
+    .dark .prose blockquote {
+        color: var(--color-secondary-text-dark);
+    }
+
+    /* Remove default Tailwind typography quotes */
+    .prose blockquote p:first-of-type::before {
+        content: none !important;
+    }
+    
+    .prose blockquote p:last-of-type::after {
+        content: none !important;
+    }
+    
+    /* Add Remixicon RiDoubleQuotesL */
+    .prose blockquote::before {
+        content: "";
+        @apply absolute top-1 left-0 w-6 h-6 bg-black/20 dark:bg-white/20;
+        -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='currentColor' d='M14 6.99997V13C14 15.2091 12.2091 17 10 17H9V15H10C11.1046 15 12 14.1046 12 13V12.9999H9V6.99997H14ZM21 6.99997V13C21 15.2091 19.2091 17 17 17H16V15H17C18.1046 15 19 14.1046 19 13V12.9999H16V6.99997H21Z'/%3E%3C/svg%3E") no-repeat center / contain;
+        mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='currentColor' d='M14 6.99997V13C14 15.2091 12.2091 17 10 17H9V15H10C11.1046 15 12 14.1046 12 13V12.9999H9V6.99997H14ZM21 6.99997V13C21 15.2091 19.2091 17 17 17H16V15H17C18.1046 15 19 14.1046 19 13V12.9999H16V6.99997H21Z'/%3E%3C/svg%3E") no-repeat center / contain;
+    }
+
     /* Fix transparent images (like diagrams) in dark mode */
     .dark .prose img {
         background-color: var(--color-canvas);

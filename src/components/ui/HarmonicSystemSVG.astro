@@ -72,8 +72,6 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
             });
         }
 
-        const labelPhase = document.getElementById("label-phase");
-
         function generatePath(params, globalPhase) {
             const phase = globalPhase + params.offset;
             const points = [];
@@ -102,10 +100,6 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
             for (let i = 0; i < systemLayers.length; i++) {
                 const layer = systemLayers[i];
                 layer.pathNode.setAttribute("d", generatePath(layer.params, timePhase));
-            }
-
-            if (labelPhase) {
-                labelPhase.textContent = `Δ_PHASE: ${timePhase.toFixed(2)}`;
             }
             
             animationFrameId = requestAnimationFrame(animateSystem);
