@@ -2,7 +2,10 @@
 import Layout from "@/layouts/Layout.astro";
 import { SITE_CONFIG } from "@/config";
 
-import { Content as AboutContent, frontmatter as aboutFrontmatter } from "@/content/about.md";
+import {
+    Content as AboutContent,
+    frontmatter as aboutFrontmatter,
+} from "@/content/about.md";
 
 import DecryptedText from "@/components/ui/DecryptedText";
 import FadeContent from "@/components/ui/FadeContent";
@@ -15,26 +18,49 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
     description={SITE_CONFIG.description}
 >
     <!-- Cursor Glow -->
-    <CursorGlow client:load />
+    <CursorGlow
+        client:load
+    />
 
     <!-- Background Layer -->
-    <div class="fixed inset-0 flex items-center justify-center md:items-end md:justify-end z-[-1] pointer-events-none opacity-15 overflow-hidden">
-        <div class="relative w-[120vw] md:w-[800px] aspect-square md:-mr-32 md:-mb-32 flex items-center justify-center">
-            <HarmonicSystemSVG />
-            <div class="absolute bottom-20 md:bottom-40 font-mono text-[9px] tracking-widest uppercase">
-                <span id="label-phase">Δ_PHASE: 0.00</span>
+    <div
+        class="fixed inset-0 flex items-center justify-center md:items-end md:justify-end z-[-1] pointer-events-none opacity-15 dark:opacity-30 overflow-hidden"
+    >
+        <div
+            class="relative w-[120vw] md:w-[800px] aspect-square md:-mr-32 md:-mb-32 flex items-center justify-center"
+        >
+            <HarmonicSystemSVG
+            />
+            <div
+                class="absolute bottom-20 md:bottom-40 font-mono text-[9px] tracking-widest uppercase"
+            >
+                <span
+                    id="label-phase"
+                    >Δ_PHASE:
+                    0.00</span
+                >
             </div>
         </div>
     </div>
 
     <!-- Foreground Content Layer -->
-    <div class="relative z-10 w-full min-h-screen flex flex-col pt-32 pb-20 px-6 sm:px-12 md:px-24">
+    <div
+        class="relative z-10 w-full min-h-screen flex flex-col pt-4 md:pt-8 pb-20 px-6 sm:px-12 md:px-24"
+    >
         <!-- Reading Content Wrapper -->
-        <div class="max-w-2xl mx-auto md:mx-0 w-full">
-            
+        <div
+            class="max-w-2xl mx-auto md:mx-0 w-full"
+        >
             <!-- Header Area -->
-            <FadeContent client:load delay={200} duration={800} blur={true}>
-                <h1 class="font-serif text-5xl md:text-7xl font-normal leading-none tracking-tight text-black dark:text-white mb-2">
+            <FadeContent
+                client:load
+                delay={200}
+                duration={800}
+                blur={true}
+            >
+                <h1
+                    class="font-serif text-5xl md:text-7xl font-normal leading-none tracking-tight text-black dark:text-white mb-2"
+                >
                     <DecryptedText
                         client:load
                         text={SITE_CONFIG.author}
@@ -43,41 +69,85 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
                         sequential={true}
                         revealDirection="start"
                         animateOn="view"
-                    />
+                    />.
                 </h1>
-                
+
                 <!-- Epigraph -->
-                <p class="text-sm text-gray-500 italic mt-6 md:mt-8">
-                    {aboutFrontmatter.epigraph}
+                <p
+                    class="text-sm text-gray-500 italic mt-6 md:mt-8"
+                >
+                    {
+                        aboutFrontmatter.epigraph
+                    }
                 </p>
             </FadeContent>
 
             <!-- About Section -->
-            <FadeContent client:visible delay={400} duration={800} blur={true}>
-                <div class="prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-base text-gray-800 dark:text-gray-300 mt-12 space-y-6">
-                    <AboutContent />
+            <FadeContent
+                client:visible
+                delay={400}
+                duration={800}
+                blur={true}
+            >
+                <div
+                    class="prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-base text-gray-800 dark:text-gray-300 mt-12 space-y-6"
+                >
+                    <AboutContent
+                    />
                 </div>
             </FadeContent>
 
             <!-- Signature -->
-            <FadeContent client:visible delay={600} duration={800} blur={true}>
-                <p class="text-right italic font-serif text-gray-600 dark:text-gray-400 mt-10 text-lg">
-                    {SITE_CONFIG.signature || SITE_CONFIG.author}
+            <FadeContent
+                client:visible
+                delay={600}
+                duration={800}
+                blur={true}
+            >
+                <p
+                    class="text-right italic font-serif text-gray-600 dark:text-gray-400 mt-10 text-lg"
+                >
+                    {
+                        SITE_CONFIG.signature ||
+                            SITE_CONFIG.author
+                    }
                 </p>
             </FadeContent>
 
             <!-- CTA Links -->
-            <FadeContent client:visible delay={800} duration={800} blur={true}>
-                <div class="flex flex-col sm:flex-row gap-6 sm:gap-8 mt-16 md:mt-20">
-                    {SITE_CONFIG.homepage.links.map(link => (
-                        <a href={link.href} class="group flex items-center gap-2 text-xs font-medium tracking-widest uppercase text-gray-500 hover:text-black dark:hover:text-white transition-colors">
-                            <span class="relative">
-                                {link.text}
-                                <span class="absolute -bottom-1 left-0 w-full h-[1px] bg-gray-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
-                            </span>
-                            <span class="transition-transform group-hover:translate-x-1">→</span>
-                        </a>
-                    ))}
+            <FadeContent
+                client:visible
+                delay={800}
+                duration={800}
+                blur={true}
+            >
+                <div
+                    class="flex flex-col sm:flex-row gap-6 sm:gap-8 mt-16 md:mt-20"
+                >
+                    {
+                        SITE_CONFIG.homepage.links.map(
+                            (
+                                link,
+                            ) => (
+                                <a
+                                    href={
+                                        link.href
+                                    }
+                                    class="group flex items-center gap-2 text-xs font-medium tracking-widest uppercase text-gray-500 hover:text-black dark:hover:text-white transition-colors"
+                                >
+                                    <span class="relative">
+                                        {
+                                            link.text
+                                        }
+                                        <span class="absolute -bottom-1 left-0 w-full h-[1px] bg-gray-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300" />
+                                    </span>
+                                    <span class="transition-transform group-hover:translate-x-1">
+                                        →
+                                    </span>
+                                </a>
+                            ),
+                        )
+                    }
                 </div>
             </FadeContent>
         </div>

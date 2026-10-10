@@ -1,8 +1,8 @@
 export const SITE_CONFIG = {
     title: "Galaxy",
     description: "A curated space for digital galleries and storytelling.",
-    author: "Cedar",
-    signature: "Owen Cedar",
+    author: "DG",
+    signature: "DGX",
     site: "https://galaxy.ceda.is",
     imageServer: ["https://images.pexels.com"],
     postsPerPage: 6,
