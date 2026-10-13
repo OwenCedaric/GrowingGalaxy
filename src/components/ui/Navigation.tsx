@@ -111,14 +111,14 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                     <div className="col-start-2 row-start-1 flex items-center justify-end gap-4 sm:gap-6 order-3 shrink-0">
                         <button
                             onClick={() => setIsSearchActive(!isSearchActive)}
-                            className="opacity-40 hover:opacity-100 transition-opacity cursor-pointer text-primary-text md:hidden"
+                            className="opacity-50 hover:opacity-100 dark:opacity-75 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white md:hidden"
                             aria-label={isSearchActive ? "Close search" : "Open search"}
                         >
                             {isSearchActive ? <RiCloseLine className="w-4 h-4" /> : <RiSearchLine className="w-4 h-4" />}
                         </button>
                         
                         {/* Divider */}
-                        <div className="hidden md:block w-px h-4 bg-black/10 dark:bg-white/10" />
+                        <div className="hidden md:block w-px h-4 bg-black/15 dark:bg-white/20" />
 
                         {/* Theme Toggle */}
                         <div className="opacity-40 hover:opacity-100 transition-opacity flex items-center">
@@ -176,7 +176,7 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                                     {/* Search Trigger (Desktop only, as mobile is in controls) */}
                                     <button
                                         onClick={() => setIsSearchActive(true)}
-                                        className="hidden md:block opacity-40 hover:opacity-100 transition-opacity cursor-pointer text-primary-text shrink-0"
+                                        className="hidden md:block opacity-50 hover:opacity-100 dark:opacity-75 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white shrink-0"
                                         aria-label="Open search"
                                     >
                                         <RiSearchLine className="w-4 h-4" />
@@ -193,21 +193,21 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                                 onSubmit={handleSearchSubmit}
                             >
                                 {/* Pure Typographic Search Input */}
-                                <div className="flex-1 flex items-center w-full bg-transparent border-b border-black/10 dark:border-white/10 focus-within:border-black/30 dark:focus-within:border-white/30 transition-colors duration-300 pb-1.5">
+                                <div className="flex-1 flex items-center w-full bg-transparent border-b border-black/20 dark:border-white/25 focus-within:border-black/60 dark:focus-within:border-white/70 transition-colors duration-300 pb-1.5">
                                     <input
                                         ref={inputRef}
                                         type="text"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         placeholder="SEARCH..."
-                                        className="flex-1 bg-transparent border-none outline-none text-primary-text font-mono text-base md:text-[11px] lg:text-xs uppercase tracking-widest placeholder-secondary-text/40 min-w-0"
+                                        className="flex-1 bg-transparent border-none outline-none text-primary-text dark:text-white caret-black dark:caret-white font-mono text-base md:text-[11px] lg:text-xs uppercase tracking-widest placeholder-secondary-text/75 dark:placeholder-white/60 focus:placeholder-transparent min-w-0"
                                         autoComplete="off"
                                         spellCheck="false"
                                     />
                                     <div className="flex items-center gap-4 shrink-0 ml-4">
                                         <button
                                             type="submit"
-                                            className="opacity-40 hover:opacity-100 transition-opacity cursor-pointer text-primary-text"
+                                            className="opacity-50 hover:opacity-100 dark:opacity-75 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white"
                                             aria-label="Submit search"
                                         >
                                             <RiSearchLine className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
@@ -215,7 +215,7 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                                         <button
                                             type="button"
                                             onClick={() => setIsSearchActive(false)}
-                                            className="hidden md:block opacity-40 hover:opacity-100 transition-opacity cursor-pointer text-primary-text"
+                                            className="hidden md:block opacity-50 hover:opacity-100 dark:opacity-75 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white"
                                             aria-label="Close search"
                                         >
                                             <RiCloseLine className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
