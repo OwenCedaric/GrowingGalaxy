@@ -59,8 +59,10 @@ export default function FadeContent({
         const st = ScrollTrigger.create({
             trigger: el,
             start: `top ${startPct}%`,
-            once: true,
             onEnter: () => tl.play(),
+            onLeave: () => tl.reverse(),
+            onEnterBack: () => tl.play(),
+            onLeaveBack: () => tl.reverse(),
         });
 
         return () => {
