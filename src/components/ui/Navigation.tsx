@@ -127,7 +127,7 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                     </div>
 
                     {/* 3. Dynamic Section: Nav / Search Form (Mobile Row 2 Full Width, Desktop Middle) */}
-                    <div className="col-span-2 row-start-2 flex items-center w-full md:w-auto md:flex-1 md:justify-end order-2 font-mono text-[11px] sm:text-xs uppercase tracking-widest">
+                    <div className="col-span-2 row-start-2 flex items-center w-full md:w-auto md:flex-1 md:justify-end order-2 font-mono text-[11px] sm:text-xs uppercase tracking-widest min-h-[36px]">
                         <AnimatePresence mode="wait">
                             {!isSearchActive ? (
                                 <motion.div
@@ -185,15 +185,15 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                             ) : (
                                 <motion.form
                                 key="search-form"
-                                initial={{ opacity: 0, width: "0%" }}
-                                animate={{ opacity: 1, width: "100%" }}
-                                exit={{ opacity: 0, width: "0%" }}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10 }}
                                 transition={{ duration: 0.2 }}
                                 className="flex items-center w-full px-4 md:px-0 md:max-w-[240px] h-full md:ml-auto"
                                 onSubmit={handleSearchSubmit}
                             >
                                 {/* Pure Typographic Search Input */}
-                                <div className="flex-1 flex items-center w-full bg-transparent border-b border-black/30 dark:border-white/30 pb-1.5">
+                                <div className="flex-1 flex items-center w-full bg-transparent border-b border-black/10 dark:border-white/10 focus-within:border-black/30 dark:focus-within:border-white/30 transition-colors duration-300 pb-1.5">
                                     <input
                                         ref={inputRef}
                                         type="text"
@@ -207,7 +207,7 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                                     <div className="flex items-center gap-4 shrink-0 ml-4">
                                         <button
                                             type="submit"
-                                            className="opacity-50 hover:opacity-100 transition-opacity cursor-pointer text-primary-text"
+                                            className="opacity-40 hover:opacity-100 transition-opacity cursor-pointer text-primary-text"
                                             aria-label="Submit search"
                                         >
                                             <RiSearchLine className="w-4 h-4 sm:w-4.5 sm:h-4.5" />

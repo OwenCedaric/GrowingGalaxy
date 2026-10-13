@@ -111,6 +111,16 @@ export default function SearchResults() {
         return isBlog ? 'Blog' : 'About';
     };
 
+    // Helper to highlight query terms in plain text (for AI search results)
+    const highlightQueryText = (text: string, q: string) => {
+        if (!q.trim() || !text) return text;
+        const words = q.trim().split(/\s+/).filter(Boolean);
+        if (words.length === 0) return text;
+        const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+        const pattern = new RegExp(`(${escaped})`, 'gi');
+        return text.replace(pattern, '<mark>$1</mark>');
+    };
+
     const currentResults = activeTab === "keyword" ? keywordResults : aiResults;
     const isLoading = activeTab === "keyword" ? isKeywordLoading : isAiLoading;
 
@@ -194,7 +204,7 @@ export default function SearchResults() {
                                                     </div>
                                                 </div>
                                                 <div
-                                                    className="text-sm md:text-base text-primary-text/70 dark:text-primary-text/80 leading-relaxed prose dark:prose-invert prose-p:my-0 prose-mark:bg-accent/20 prose-mark:text-primary-text line-clamp-3"
+                                                    className="search-excerpt text-sm md:text-base text-primary-text/70 dark:text-primary-text/80 leading-relaxed prose dark:prose-invert prose-p:my-0 line-clamp-3"
                                                     dangerouslySetInnerHTML={{ __html: r.excerpt }}
                                                 />
                                             </article>
@@ -226,9 +236,12 @@ export default function SearchResults() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="text-sm md:text-base text-primary-text/80 dark:text-primary-text/90 leading-relaxed font-light italic border-l border-black/10 dark:border-white/10 pl-6">
-                                                    "{r.metadata?.text?.slice(0, 400) || "No preview available"}..."
-                                                </div>
+                                                <div
+                                                    className="search-excerpt text-sm md:text-base text-primary-text/80 dark:text-primary-text/90 leading-relaxed font-light italic border-l border-black/10 dark:border-white/10 pl-6 line-clamp-4"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: `"${highlightQueryText(r.metadata?.text?.slice(0, 400) || "No preview available", query)}..."`
+                                                    }}
+                                                />
                                             </article>
                                         </SpotlightCard>
                                     </FadeContent>
