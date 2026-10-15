@@ -57,13 +57,12 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
                     />.
                 </h1>
 
-                <!-- Epigraph / Description -->
+                <!-- Description -->
                 <p
-                    class="animate-cascade-epigraph text-sm text-gray-500 italic mt-6 md:mt-8"
+                    class="animate-cascade-description text-sm text-gray-500 italic mt-6 md:mt-8"
                 >
                     {
-                        aboutFrontmatter.description ||
-                            aboutFrontmatter.epigraph
+                        aboutFrontmatter.description
                     }
                 </p>
             </div>
@@ -169,7 +168,7 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
     will-change: opacity, transform, filter;
 }
 
-.animate-cascade-epigraph {
+.animate-cascade-description {
     animation: cascade-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
     will-change: opacity, transform, filter;
 }
@@ -197,7 +196,7 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
 /* Accessibility: gracefully disable motion when requested */
 @media (prefers-reduced-motion: reduce) {
     .animate-cascade-header,
-    .animate-cascade-epigraph,
+    .animate-cascade-description,
     .animate-cascade-prose,
     .animate-cascade-signature,
     .cascade-link-item {
