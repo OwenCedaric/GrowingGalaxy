@@ -1,5 +1,7 @@
 ---
-epigraph: Defining the philosophy behind Growing Galaxy
+title: "About"
+description: "Defining the philosophy behind Growing Galaxy"
+epigraph: "Defining the philosophy behind Growing Galaxy"
 ---
 
 ## About Growing Galaxy
@@ -23,4 +25,3 @@ This site is built with:
 ## Contact
 
 If you‘d like to reach out, find us on [X](https://x.com/OwenCedaric) or [GitHub](https://github.com/OwenCedaric).
-
