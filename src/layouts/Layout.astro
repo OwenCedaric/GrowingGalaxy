@@ -5,11 +5,10 @@ import Navigation from "@/components/ui/Navigation";
 import "@/styles/global.css";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/playfair-display";
-import "katex/dist/katex.min.css";
 import { ClientRouter } from "astro:transitions";
 import { SITE_CONFIG } from "@/config";
 import ClickSpark from "@/components/ui/ClickSpark";
-import ShinyText from "@/components/ui/ShinyText";
+import ShinyText from "@/components/ui/ShinyText.astro";
 
 interface Props {
     title: string;
@@ -19,6 +18,7 @@ interface Props {
     publishDate?: Date;
     modifiedDate?: Date;
     authorName?: string;
+    preconnectImageServer?: boolean;
 }
 
 const {
@@ -29,6 +29,7 @@ const {
     publishDate,
     modifiedDate,
     authorName,
+    preconnectImageServer = false,
 } =
     Astro.props;
 ---
@@ -43,6 +44,7 @@ const {
             title={title}
             description={description}
             image={image}
+            preconnectImageServer={preconnectImageServer}
         />
         <ClientRouter
         />
@@ -165,7 +167,7 @@ const {
         />
 
         <ClickSpark
-            client:load
+            client:idle
             sparkSize={8}
             sparkRadius={18}
             sparkCount={6}
@@ -201,7 +203,6 @@ const {
                                             class="hover:underline"
                                         >
                                             <ShinyText
-                                                client:load
                                                 text={
                                                     item.text
                                                 }

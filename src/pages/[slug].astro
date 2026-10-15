@@ -10,6 +10,7 @@ import TextReveal from "@/components/ui/TextReveal";
 import ArticleAnimate from "@/components/ui/ArticleAnimate";
 import FadeContent from "@/components/ui/FadeContent";
 import MDXImage from "@/components/blog/MDXImage.astro";
+import "katex/dist/katex.min.css";
 
 export async function getStaticPaths() {
     const pages = await getCollection("pages");

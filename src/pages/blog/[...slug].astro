@@ -11,6 +11,7 @@ import ScrollFloat from "@/components/ui/ScrollFloat";
 import MDXImage from "@/components/blog/MDXImage.astro";
 import TableOfContents from "@/components/blog/TableOfContents.astro";
 import { RiArrowLeftDoubleLine, RiArrowRightDoubleLine, RiArrowRightUpLine } from "@remixicon/react";
+import "katex/dist/katex.min.css";
 
 export async function getStaticPaths() {
     const posts = (await getCollection("blog")).sort(

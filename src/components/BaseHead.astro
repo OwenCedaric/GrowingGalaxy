@@ -5,6 +5,7 @@ interface Props {
     title: string;
     description: string;
     image?: string;
+    preconnectImageServer?: boolean;
 }
 
 const canonicalURL =
@@ -20,6 +21,7 @@ const {
     title,
     description,
     image = SITE_CONFIG.defaultImage,
+    preconnectImageServer = false,
 } = Astro.props;
 ---
 
@@ -59,17 +61,27 @@ const {
                             server
                         }
                     />
-                    <link
-                        rel="preconnect"
-                        href={
-                            server
-                        }
-                        crossorigin
-                    />
+                    {preconnectImageServer && (
+                        <link
+                            rel="preconnect"
+                            href={
+                                server
+                            }
+                            crossorigin
+                        />
+                    )}
                 </>
             ),
         )
 }
+
+<!-- Machine-readable LLM context -->
+<link
+    rel="alternate"
+    type="text/markdown"
+    href={new URL("/llms.txt", Astro.site || SITE_CONFIG.site).toString()}
+    title="LLM Context"
+/>
 
 <!-- Font Preloads -->
 <!-- Fonts are imported locally in Layout.astro -->

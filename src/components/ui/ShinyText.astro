@@ -1,0 +1,66 @@
+---
+interface Props {
+    text: string;
+    speed?: number;
+    color?: string;
+    colorDark?: string;
+    shineColor?: string;
+    shineColorDark?: string;
+    class?: string;
+}
+
+const {
+    text,
+    speed = 4,
+    color = "#999999",
+    colorDark = "#888888",
+    shineColor = "#000000",
+    shineColorDark = "#ffffff",
+    class: className = "",
+} = Astro.props;
+---
+
+<span
+    class:list={["shiny-text", className]}
+    style={{
+        "--shiny-speed": `${speed}s`,
+        "--shiny-color": color,
+        "--shiny-color-dark": colorDark,
+        "--shiny-shine": shineColor,
+        "--shiny-shine-dark": shineColorDark,
+    }}
+>
+    {text}
+</span>
+
+<style>
+.shiny-text {
+    display: inline-block;
+    background-image: linear-gradient(120deg, var(--shiny-color) 0%, var(--shiny-color) 35%, var(--shiny-shine) 50%, var(--shiny-color) 65%, var(--shiny-color) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shiny-text-anim var(--shiny-speed, 4s) linear infinite;
+}
+
+:global(.dark) .shiny-text {
+    background-image: linear-gradient(120deg, var(--shiny-color-dark) 0%, var(--shiny-color-dark) 35%, var(--shiny-shine-dark) 50%, var(--shiny-color-dark) 65%, var(--shiny-color-dark) 100%);
+}
+
+@keyframes shiny-text-anim {
+    0% {
+        background-position: 150% center;
+    }
+    100% {
+        background-position: -50% center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shiny-text {
+        animation: none;
+        -webkit-text-fill-color: currentColor;
+    }
+}
+</style>

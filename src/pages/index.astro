@@ -8,7 +8,6 @@ import {
 } from "@/content/about.md";
 
 import DecryptedText from "@/components/ui/DecryptedText";
-import FadeContent from "@/components/ui/FadeContent";
 import CursorGlow from "@/components/ui/CursorGlow";
 import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
 ---
@@ -17,9 +16,9 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
     title={`HOME // ${SITE_CONFIG.title}`}
     description={SITE_CONFIG.description}
 >
-    <!-- Cursor Glow -->
+    <!-- Cursor Glow (Desktop only: mobile has no cursor) -->
     <CursorGlow
-        client:load
+        client:media="(min-width: 768px)"
     />
 
     <!-- Background Layer -->
@@ -43,17 +42,12 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
             class="max-w-2xl mx-auto md:mx-0 w-full"
         >
             <!-- Header Area -->
-            <FadeContent
-                client:load
-                delay={200}
-                duration={800}
-                blur={true}
-            >
+            <div class="animate-hero-1">
                 <h1
                     class="font-serif text-5xl md:text-7xl font-normal leading-none tracking-tight text-black dark:text-white mb-2"
                 >
                     <DecryptedText
-                        client:load
+                        client:idle
                         text={SITE_CONFIG.author}
                         speed={40}
                         maxIterations={20}
@@ -71,30 +65,20 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
                         aboutFrontmatter.epigraph
                     }
                 </p>
-            </FadeContent>
+            </div>
 
-            <!-- About Section -->
-            <FadeContent
-                client:visible
-                delay={400}
-                duration={800}
-                blur={true}
-            >
+            <!-- About Section (LCP Element rendered with native CSS animation) -->
+            <div class="animate-hero-2">
                 <div
                     class="prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-base text-gray-800 dark:text-gray-300 mt-12 space-y-6"
                 >
                     <AboutContent
                     />
                 </div>
-            </FadeContent>
+            </div>
 
             <!-- Signature -->
-            <FadeContent
-                client:visible
-                delay={600}
-                duration={800}
-                blur={true}
-            >
+            <div class="animate-hero-3">
                 <p
                     class="text-right italic font-serif text-gray-600 dark:text-gray-400 mt-10 text-lg"
                 >
@@ -103,15 +87,10 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
                             SITE_CONFIG.author
                     }
                 </p>
-            </FadeContent>
+            </div>
 
             <!-- CTA Links -->
-            <FadeContent
-                client:visible
-                delay={800}
-                duration={800}
-                blur={true}
-            >
+            <div class="animate-hero-4">
                 <div
                     class="flex flex-col sm:flex-row gap-6 sm:gap-8 mt-16 md:mt-20"
                 >
@@ -140,7 +119,50 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
                         )
                     }
                 </div>
-            </FadeContent>
+            </div>
         </div>
     </div>
 </Layout>
+
+<style>
+@keyframes hero-fade-in {
+    from {
+        opacity: 0;
+        filter: blur(6px);
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0);
+    }
+}
+
+.animate-hero-1 {
+    animation: hero-fade-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.animate-hero-2 {
+    animation: hero-fade-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+
+.animate-hero-3 {
+    animation: hero-fade-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+.animate-hero-4 {
+    animation: hero-fade-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-hero-1,
+    .animate-hero-2,
+    .animate-hero-3,
+    .animate-hero-4 {
+        animation: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+        transform: none !important;
+    }
+}
+</style>
