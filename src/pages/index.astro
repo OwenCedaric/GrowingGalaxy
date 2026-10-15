@@ -44,7 +44,7 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
             <!-- Header Area -->
             <div>
                 <h1
-                    class="font-serif text-5xl md:text-7xl font-normal leading-none tracking-tight text-black dark:text-white mb-2"
+                    class="animate-cascade-header font-serif text-5xl md:text-7xl font-normal leading-none tracking-tight text-black dark:text-white mb-2"
                 >
                     <DecryptedText
                         client:idle
@@ -59,7 +59,7 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
 
                 <!-- Epigraph -->
                 <p
-                    class="text-sm text-gray-500 italic mt-6 md:mt-8"
+                    class="animate-cascade-epigraph text-sm text-gray-500 italic mt-6 md:mt-8"
                 >
                     {
                         aboutFrontmatter.epigraph
@@ -67,8 +67,8 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
                 </p>
             </div>
 
-            <!-- About Section (LCP Element rendered immediately) -->
-            <div>
+            <!-- About Section (LCP Element rendered smoothly) -->
+            <div class="animate-cascade-prose">
                 <div
                     class="prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-base text-gray-800 dark:text-gray-300 mt-12 space-y-6"
                 >
@@ -78,7 +78,7 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
             </div>
 
             <!-- Signature -->
-            <div class="signature-wrap text-right mt-10">
+            <div class="signature-wrap animate-cascade-signature text-right mt-10">
                 <span
                     class="signature-text group/sig relative inline-block italic font-serif text-gray-600 dark:text-gray-400 text-lg cursor-default select-none transition-all duration-500 ease-out hover:tracking-wider hover:text-black dark:hover:text-white"
                 >
@@ -108,7 +108,7 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
                                     href={
                                         link.href
                                     }
-                                    class="group flex items-center gap-2 text-xs font-medium tracking-widest uppercase text-gray-500 hover:text-black dark:hover:text-white transition-colors"
+                                    class="cascade-link-item group flex items-center gap-2 text-xs font-medium tracking-widest uppercase text-gray-500 hover:text-black dark:hover:text-white transition-colors"
                                 >
                                     <span class="relative">
                                         {
@@ -130,29 +130,81 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
 </Layout>
 
 <style>
-@keyframes signature-fade-in {
-    from {
+/* ==========================================================================
+   CASCADE ENTRANCE SYSTEM (Route A: Zero-JS, 60fps GPU Composited)
+   Restores cinema-grade staggered blur & elevation sequence
+   with ultra-smooth cubic-bezier spring easing, while protecting LCP.
+   ========================================================================== */
+
+@keyframes cascade-reveal {
+    0% {
         opacity: 0;
-        filter: blur(4px);
-        transform: translateY(8px);
+        filter: blur(8px);
+        transform: translateY(16px);
     }
-    to {
+    100% {
         opacity: 1;
         filter: blur(0px);
         transform: translateY(0);
     }
 }
 
-.signature-wrap {
-    animation: signature-fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+/* Specific keyframe for LCP prose: starts from 0.88 opacity with subtle lift
+   Ensures text is instantly recognized & painted by browser engine on frame 1,
+   while providing a gentle, natural settling motion to the eye */
+@keyframes cascade-prose-reveal {
+    0% {
+        opacity: 0.88;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+.animate-cascade-header {
+    animation: cascade-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+    will-change: opacity, transform, filter;
+}
+
+.animate-cascade-epigraph {
+    animation: cascade-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+    will-change: opacity, transform, filter;
+}
+
+.animate-cascade-prose {
+    animation: cascade-prose-reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both;
+    will-change: opacity, transform;
+}
+
+.animate-cascade-signature {
+    animation: cascade-reveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+    will-change: opacity, transform, filter;
+}
+
+.cascade-link-item:nth-child(1) {
+    animation: cascade-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+    will-change: opacity, transform, filter;
+}
+
+.cascade-link-item:nth-child(2) {
+    animation: cascade-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
+    will-change: opacity, transform, filter;
+}
+
+/* Accessibility: gracefully disable motion when requested */
 @media (prefers-reduced-motion: reduce) {
-    .signature-wrap {
+    .animate-cascade-header,
+    .animate-cascade-epigraph,
+    .animate-cascade-prose,
+    .animate-cascade-signature,
+    .cascade-link-item {
         animation: none !important;
         opacity: 1 !important;
         filter: none !important;
         transform: none !important;
+        will-change: auto !important;
     }
     .signature-text {
         transition: none !important;
