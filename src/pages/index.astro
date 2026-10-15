@@ -78,15 +78,20 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
             </div>
 
             <!-- Signature -->
-            <div>
-                <p
-                    class="text-right italic font-serif text-gray-600 dark:text-gray-400 mt-10 text-lg"
+            <div class="signature-wrap text-right mt-10">
+                <span
+                    class="signature-text group/sig relative inline-block italic font-serif text-gray-600 dark:text-gray-400 text-lg cursor-default select-none transition-all duration-500 ease-out hover:tracking-wider hover:text-black dark:hover:text-white"
                 >
-                    {
-                        SITE_CONFIG.signature ||
-                            SITE_CONFIG.author
-                    }
-                </p>
+                    <span>
+                        {
+                            SITE_CONFIG.signature ||
+                                SITE_CONFIG.author
+                        }
+                    </span>
+                    <span
+                        class="absolute -bottom-1 left-0 w-full h-[1px] bg-current opacity-30 scale-x-0 group-hover/sig:scale-x-100 origin-left transition-transform duration-500 ease-out pointer-events-none"
+                    />
+                </span>
             </div>
 
             <!-- CTA Links -->
@@ -123,3 +128,34 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
         </div>
     </div>
 </Layout>
+
+<style>
+@keyframes signature-fade-in {
+    from {
+        opacity: 0;
+        filter: blur(4px);
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0);
+    }
+}
+
+.signature-wrap {
+    animation: signature-fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .signature-wrap {
+        animation: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+        transform: none !important;
+    }
+    .signature-text {
+        transition: none !important;
+    }
+}
+</style>
