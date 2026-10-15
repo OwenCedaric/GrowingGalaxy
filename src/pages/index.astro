@@ -57,12 +57,13 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
                     />.
                 </h1>
 
-                <!-- Epigraph -->
+                <!-- Epigraph / Description -->
                 <p
                     class="animate-cascade-epigraph text-sm text-gray-500 italic mt-6 md:mt-8"
                 >
                     {
-                        aboutFrontmatter.epigraph
+                        aboutFrontmatter.description ||
+                            aboutFrontmatter.epigraph
                     }
                 </p>
             </div>

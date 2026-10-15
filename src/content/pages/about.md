@@ -1,7 +1,6 @@
 ---
 title: "About"
 description: "Defining the philosophy behind Growing Galaxy"
-epigraph: "Defining the philosophy behind Growing Galaxy"
 ---
 
 ## About Growing Galaxy
