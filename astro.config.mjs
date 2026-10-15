@@ -289,6 +289,19 @@ export default defineConfig({
         domains: SITE_CONFIG.imageServer,
     },
     vite: {
-        plugins: [tailwindcore()]
+        plugins: [tailwindcore()],
+        build: {
+            rollupOptions: {
+                onwarn(warning, defaultHandler) {
+                    if (
+                        warning.code === 'MODULE_LEVEL_DIRECTIVE' ||
+                        (warning.message && warning.message.includes('astro:head-inject'))
+                    ) {
+                        return;
+                    }
+                    defaultHandler(warning);
+                }
+            }
+        }
     }
 });
