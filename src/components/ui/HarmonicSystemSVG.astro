@@ -62,6 +62,7 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
             pathNode.setAttribute("stroke-linecap", "round");
             pathNode.setAttribute("stroke-linejoin", "round");
             pathNode.setAttribute("stroke-opacity", baseOpacities[i].toString());
+            pathNode.setAttribute("d", generatePath(initialParams[i], 0));
             svgSection.appendChild(pathNode);
 
             systemLayers.push({
@@ -92,6 +93,7 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
         }
 
         let animationFrameId;
+        let isLoopStarted = false;
 
         function animateSystem() {
             // 只保留基础的时间相位推移
@@ -105,10 +107,16 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
             animationFrameId = requestAnimationFrame(animateSystem);
         }
 
+        function startLoop() {
+            if (isLoopStarted) return;
+            isLoopStarted = true;
+            animateSystem();
+        }
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    if (!animationFrameId) {
+                    if (!animationFrameId && isLoopStarted) {
                         animateSystem();
                     }
                 } else {
@@ -121,6 +129,13 @@ const { harmonicSystem } = SITE_CONFIG.homepage;
         });
         
         observer.observe(svgSection);
+
+        // Delay starting 60fps loop until browser is idle to avoid stealing CPU during initial load
+        if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(startLoop, { timeout: 1500 });
+        } else {
+            setTimeout(startLoop, 800);
+        }
     }
 
     document.addEventListener('astro:page-load', init);

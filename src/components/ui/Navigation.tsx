@@ -1,8 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { RiSearchLine, RiCloseLine } from "@remixicon/react";
-import AnimatedNavLink from "@/components/ui/AnimatedNavLink";
 import { useTheme } from "@/utils/useTheme";
 
 interface NavItem {
@@ -86,10 +84,8 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                     <div className="col-start-1 row-start-1 flex items-center shrink-0 order-1">
                         {logoSrc ? (
                             <a href="/" className="block relative group outline-none" aria-label="Home">
-                                <motion.div
-                                    whileHover={{ scale: 1.04 }}
-                                    transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                                    className="h-[18px] sm:h-[22px] aspect-[1.446] bg-current text-primary-text opacity-70 hover:opacity-100 transition-opacity duration-500" 
+                                <div
+                                    className="h-[18px] sm:h-[22px] aspect-[1.446] bg-current text-primary-text opacity-70 hover:opacity-100 hover:scale-[1.04] transition-all duration-300 ease-out" 
                                     style={{ 
                                         WebkitMaskImage: `url(${logoSrc})`,
                                         WebkitMaskSize: "contain",
@@ -103,7 +99,9 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                                 />
                             </a>
                         ) : (
-                            <AnimatedNavLink href="/" text={title} isLogo={true} />
+                            <a href="/" className="text-sm font-medium hover:text-primary-text transition-colors block px-2 py-1">
+                                {title}
+                            </a>
                         )}
                     </div>
 
@@ -128,16 +126,10 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
 
                     {/* 3. Dynamic Section: Nav / Search Form (Mobile Row 2 Full Width, Desktop Middle) */}
                     <div className="col-span-2 row-start-2 flex items-center w-full md:w-auto md:flex-1 md:justify-end order-2 font-mono text-[11px] sm:text-xs uppercase tracking-widest min-h-[36px]">
-                        <AnimatePresence mode="wait">
-                            {!isSearchActive ? (
-                                <motion.div
-                                    key="nav-links"
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: 10 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="flex items-center justify-between md:justify-end w-full md:w-auto gap-5 sm:gap-8"
-                                >
+                        {!isSearchActive ? (
+                            <div
+                                className="flex items-center justify-between md:justify-end w-full md:w-auto gap-5 sm:gap-8 transition-opacity duration-200"
+                            >
                                     {/* Nav Items */}
                                     <div className="flex items-center justify-between w-full md:w-auto px-4 md:px-0 gap-2 sm:gap-8">
                                         {navItems.map((item) => {
@@ -181,50 +173,45 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                                     >
                                         <RiSearchLine className="w-4 h-4" />
                                     </button>
-                                </motion.div>
-                            ) : (
-                                <motion.form
-                                key="search-form"
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 10 }}
-                                transition={{ duration: 0.2 }}
-                                className="flex items-center w-full px-4 md:px-0 md:max-w-[240px] h-full md:ml-auto"
-                                onSubmit={handleSearchSubmit}
-                            >
-                                {/* Pure Typographic Search Input */}
-                                <div className="flex-1 flex items-center w-full bg-transparent border-b border-black/20 dark:border-white/25 focus-within:border-black/60 dark:focus-within:border-white/70 transition-colors duration-300 pb-1.5">
-                                    <input
-                                        ref={inputRef}
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="SEARCH..."
-                                        className="flex-1 bg-transparent border-none outline-none text-primary-text dark:text-white caret-black dark:caret-white font-mono text-base md:text-[11px] lg:text-xs uppercase tracking-widest placeholder-secondary-text/75 dark:placeholder-white/60 focus:placeholder-transparent min-w-0"
-                                        autoComplete="off"
-                                        spellCheck="false"
-                                    />
-                                    <div className="flex items-center gap-4 shrink-0 ml-4">
-                                        <button
-                                            type="submit"
-                                            className="opacity-50 hover:opacity-100 dark:opacity-75 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white"
-                                            aria-label="Submit search"
-                                        >
-                                            <RiSearchLine className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsSearchActive(false)}
-                                            className="hidden md:block opacity-50 hover:opacity-100 dark:opacity-75 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white"
-                                            aria-label="Close search"
-                                        >
-                                            <RiCloseLine className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-                                        </button>
-                                    </div>
                                 </div>
-                            </motion.form>
+                            ) : (
+                                <form
+                                    key="search-form"
+                                    className="flex items-center w-full px-4 md:px-0 md:max-w-[240px] h-full md:ml-auto transition-opacity duration-200"
+                                    onSubmit={handleSearchSubmit}
+                                >
+                                    {/* Pure Typographic Search Input */}
+                                    <div className="flex-1 flex items-center w-full bg-transparent border-b border-black/20 dark:border-white/25 focus-within:border-black/60 dark:focus-within:border-white/70 transition-colors duration-300 pb-1.5">
+                                        <input
+                                            ref={inputRef}
+                                            type="text"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder="SEARCH..."
+                                            className="flex-1 bg-transparent border-none outline-none text-primary-text dark:text-white caret-black dark:caret-white font-mono text-base md:text-[11px] lg:text-xs uppercase tracking-widest placeholder-secondary-text/75 dark:placeholder-white/60 focus:placeholder-transparent min-w-0"
+                                            autoComplete="off"
+                                            spellCheck="false"
+                                        />
+                                        <div className="flex items-center gap-4 shrink-0 ml-4">
+                                            <button
+                                                type="submit"
+                                                className="opacity-50 hover:opacity-100 dark:opacity-75 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white"
+                                                aria-label="Submit search"
+                                            >
+                                                <RiSearchLine className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsSearchActive(false)}
+                                                className="hidden md:block opacity-50 hover:opacity-100 dark:opacity-75 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white"
+                                                aria-label="Close search"
+                                            >
+                                                <RiCloseLine className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
                             )}
-                        </AnimatePresence>
                     </div>
                 </div>
             </header>

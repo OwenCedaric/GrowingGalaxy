@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import { motion } from 'motion/react';
 
 interface DecryptedTextProps {
     text: string;
@@ -121,7 +120,7 @@ export default function DecryptedText({
     }, [isHovering, text, speed, maxIterations, sequential, revealDirection, useOriginalCharsOnly, characters]);
 
     return (
-        <motion.span
+        <span
             ref={containerRef}
             className={parentClassName}
             onMouseEnter={animateOn === 'hover' ? () => setIsHovering(true) : undefined}
@@ -136,6 +135,6 @@ export default function DecryptedText({
                     {char}
                 </span>
             ))}
-        </motion.span>
+        </span>
     );
 }
