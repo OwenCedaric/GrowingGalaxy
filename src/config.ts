@@ -33,8 +33,7 @@ export const SITE_CONFIG = {
     footer: {
         social: [
             { text: "Projects", href: "/projects" },
-            { text: "Elsewhere", href: "/elsewhere" },
-            { text: "RSS", href: "/rss.xml" },
+            { text: "Elsewhere", href: "/elsewhere" }
         ],
         copyright: "Growing Galaxy. Designed with intention."
     },

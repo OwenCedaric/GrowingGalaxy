@@ -75,6 +75,14 @@ const {
         )
 }
 
+<!-- Machine-readable RSS Feed Auto-Discovery -->
+<link
+    rel="alternate"
+    type="application/rss+xml"
+    href={new URL("/rss.xml", Astro.site || SITE_CONFIG.site).toString()}
+    title={SITE_CONFIG.title}
+/>
+
 <!-- Machine-readable LLM context -->
 <link
     rel="alternate"
