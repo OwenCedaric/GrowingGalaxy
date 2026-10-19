@@ -1,10 +1,5 @@
 ---
-import { SITE_CONFIG } from "@/config";
 import HarmonicSystemSVG from "./HarmonicSystemSVG.astro";
-import HarmonicSystemP5 from "./HarmonicSystemP5.astro";
-
-const { harmonicSystem } = SITE_CONFIG.homepage;
-const type = harmonicSystem.type || 'svg';
 ---
 
 <section
@@ -13,12 +8,12 @@ const type = harmonicSystem.type || 'svg';
     <div
         class="relative w-full max-w-[340px] aspect-square flex items-center justify-center group"
     >
-        {type === 'svg' ? <HarmonicSystemSVG /> : <HarmonicSystemP5 />}
+        <HarmonicSystemSVG />
 
         <div
             class="absolute bottom-[-40px] font-mono text-[9px] text-zinc-400 dark:text-zinc-500 tracking-widest uppercase"
         >
-            <span id="label-phase">{type === 'svg' ? 'Δ_PHASE: 0.00' : 'SYSTEM: LORENZ_ATTRACTOR'}</span>
+            <span id="label-phase">Δ_PHASE: 0.00</span>
         </div>
     </div>
 </section>
