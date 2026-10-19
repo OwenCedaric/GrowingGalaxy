@@ -151,7 +151,7 @@ async function processSitemapFile(filePath, collection, defaultLastMod, latestBl
             } else if (pathname === '/traces' || pathname === '/traces/') {
                 lastmod = latestTracesDate;
                 slug = '';
-            } else if (pathname === '/blogroll' || pathname === '/search' || pathname === '') {
+            } else if (pathname === '/search' || pathname === '/projects' || pathname === '/elsewhere' || pathname === '') {
                 slug = '';
             } else {
                 currentCollection = 'pages';

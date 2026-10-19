@@ -33,12 +33,33 @@ export const SITE_CONFIG = {
     footer: {
         social: [
             { text: "Projects", href: "/projects" },
-            { text: "Blogroll", href: "/blogroll" },
+            { text: "Elsewhere", href: "/elsewhere" },
             { text: "RSS", href: "/rss.xml" },
-            { text: "X", href: "https://x.com/OwenCedaric" }
         ],
         copyright: "Growing Galaxy. Designed with intention."
     },
+    elsewhere: [
+        {
+            name: "X",
+            handle: "@OwenCedaric",
+            url: "https://x.com/OwenCedaric",
+        },
+        {
+            name: "GitHub",
+            handle: "OwenCedaric",
+            url: "https://github.com/OwenCedaric",
+        },
+        {
+            name: "Instagram",
+            handle: "@OwenCedaric",
+            url: "https://instagram.com/OwenCedaric",
+        },
+        {
+            name: "Mail",
+            handle: "hello@ceda.is",
+            url: "mailto:hello@ceda.is",
+        }
+    ],
     articleCopyright: {
         enabled: true,
         declaration: "No part of this article may be reproduced, distributed, or transmitted in any form or by any means without the prior written permission of the author.",

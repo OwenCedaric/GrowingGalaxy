@@ -12,7 +12,7 @@ import SpotlightCard from "@/components/ui/SpotlightCard";
 import { SITE_CONFIG } from "@/config";
 import {
     RiGithubLine,
-    RiGithubFill,
+    RiArrowRightUpLine,
 } from "@remixicon/react";
 
 type ProjectEntry =
@@ -46,6 +46,25 @@ type Props =
     >;
 
 const { page } = Astro.props;
+
+function getProjectSubtitle(entry: ProjectEntry['data']) {
+    if (entry.url) {
+        try {
+            return new URL(entry.url).hostname;
+        } catch {
+            return entry.url.replace(/^https?:\/\//, '');
+        }
+    }
+    if (entry.github) {
+        try {
+            const parsed = new URL(entry.github);
+            return parsed.pathname.replace(/^\//, '');
+        } catch {
+            return 'github';
+        }
+    }
+    return null;
+}
 ---
 
 <Layout
@@ -53,16 +72,17 @@ const { page } = Astro.props;
     description="A showcase of tools, designs, and experiments."
 >
     <div
-        class="max-w-4xl mx-auto pt-24 md:pt-32 px-6"
+        class="max-w-6xl mx-auto w-full pt-2 sm:pt-4 md:pt-8 pb-16 sm:pb-20"
     >
+        <!-- Background Reveal Watermark -->
         <div
-            class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center"
+            class="hidden md:flex fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden items-center justify-center"
         >
             <TextReveal
                 client:load
                 text="Projects"
                 type="char"
-                className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
+                className="font-bold text-black/[0.03] dark:text-white/[0.10] text-[8vh] sm:text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
                 style={{
                     writingMode:
                         "vertical-rl",
@@ -72,161 +92,159 @@ const { page } = Astro.props;
             />
         </div>
 
-        <div
-            class="flex items-center justify-between mb-8 px-2"
-        >
-            <div
-                class="text-secondary-text font-mono text-xs md:text-sm uppercase tracking-widest"
-            >
-                Works
-                &
-                Experiments
+        <!-- Split Layout: Left Editorial Anchor + Right Projects Stack -->
+        <div class="flex flex-col lg:flex-row gap-8 sm:gap-12 lg:gap-16 items-start justify-between">
+            <!-- Left Column: Editorial & Context Anchor (~40%) -->
+            <div class="w-full lg:w-5/12 lg:sticky lg:top-36 shrink-0">
+                <div class="flex items-center gap-2 mb-2 sm:mb-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-black/30 dark:bg-white/30"></span>
+                    <span class="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-secondary-text">
+                        Works & Experiments
+                    </span>
+                </div>
+
+                <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal leading-tight tracking-tight text-primary-text mb-2.5 sm:mb-4">
+                    Projects.
+                </h1>
+
+                <p class="text-[13px] sm:text-base text-secondary-text dark:text-gray-400 font-light leading-relaxed mb-4 sm:mb-6 max-w-md">
+                    Curated digital instruments, open-source systems, and experimental craft exploring the intersection of architecture, code, and aesthetics.
+                </p>
+
+                <div class="text-[11px] sm:text-xs font-mono text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                    // {page.total} {page.total === 1 ? 'ACTIVE SYSTEM' : 'ACTIVE SYSTEMS'}
+                </div>
             </div>
-            <a
-                href="https://github.com/OwenCedaric"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center gap-2 text-secondary-text hover:text-primary-text transition-colors"
-                title="GitHub"
-            >
-                <RiGithubFill
-                    size={20}
-                />
-                <span
-                    class="text-sm font-medium"
-                    >@OwenCedaric</span
-                >
-            </a>
-        </div>
 
-        <div
-            class="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-            {
-                page.data.map(
-                    (
-                        entry: ProjectEntry,
-                        index: number,
-                    ) => (
-                        <FadeContent
-                            client:visible
-                            delay={
-                                index *
-                                50
-                            }
-                            duration={
-                                500
-                            }
-                            blur={
-                                true
-                            }
-                        >
-                            <SpotlightCard
+            <!-- Right Column: Projects Stack (~60%) -->
+            <div class="w-full lg:w-7/12 flex-1 flex flex-col gap-3.5 sm:gap-4">
+                {
+                    page.data.map(
+                        (
+                            entry: ProjectEntry,
+                            index: number,
+                        ) => (
+                            <FadeContent
                                 client:visible
-                                className="h-full p-4 md:p-5 relative group"
+                                delay={
+                                    index * 60
+                                }
+                                duration={
+                                    500
+                                }
+                                blur={
+                                    true
+                                }
                             >
-                                {/* Stretched main link for the entire card */}
-                                {(entry
-                                    .data
-                                    .url ||
-                                    entry
-                                        .data
-                                        .github) && (
-                                    <a
-                                        href={
-                                            entry
-                                                .data
-                                                .url ||
-                                            entry
-                                                .data
-                                                .github
-                                        }
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="absolute inset-0 z-20 cursor-pointer rounded-xl"
-                                        aria-label="View Project"
-                                    />
-                                )}
+                                <SpotlightCard
+                                    client:visible
+                                    className="p-4 sm:p-5 relative group"
+                                >
+                                    {/* Stretched main link for the entire card */}
+                                    {(entry.data.url || entry.data.github) && (
+                                        <a
+                                            href={entry.data.url || entry.data.github}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="absolute inset-0 z-20 cursor-pointer rounded-xl"
+                                            aria-label={`View ${entry.data.title}`}
+                                        />
+                                    )}
 
-                                <div class="flex flex-col gap-1.5 h-full relative z-30 pointer-events-none mt-1">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <h2 class="text-base md:text-[17px] font-medium tracking-wide text-primary-text transition-colors">
-                                            {entry.data.title}
-                                        </h2>
-                                        {entry.data.github && (
-                                            <div class="flex items-center shrink-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto relative z-30">
-                                                <a
-                                                    href={entry.data.github}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    class="text-secondary-text hover:text-black dark:hover:text-white transition-colors p-1 -m-1"
-                                                    title="Source Code"
-                                                    aria-label="Source Code"
-                                                >
-                                                    <RiGithubLine size={18} />
-                                                </a>
+                                    <div class="flex flex-col gap-2.5 sm:gap-3 relative z-30 pointer-events-none">
+                                        <!-- Top Row: Title & Auto-derived Domain/Repo + Action Buttons -->
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="min-w-0">
+                                                <h2 class="text-sm sm:text-base font-medium tracking-wide text-primary-text group-hover:text-black dark:group-hover:text-white transition-colors truncate">
+                                                    {entry.data.title}
+                                                </h2>
+
+                                                {/* Auto-derived Hostname or Repo */}
+                                                {getProjectSubtitle(entry.data) && (
+                                                    <p class="font-mono text-[11px] text-secondary-text/80 dark:text-gray-400 truncate mt-0.5">
+                                                        {getProjectSubtitle(entry.data)}
+                                                    </p>
+                                                )}
                                             </div>
+
+                                            <!-- Action buttons (GitHub / External Link) -->
+                                            <div class="flex items-center gap-1 shrink-0 pt-0.5">
+                                                {entry.data.github && (
+                                                    <div class="pointer-events-auto relative z-30">
+                                                        <a
+                                                            href={entry.data.github}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            class="p-1.5 -mr-1 rounded-lg text-secondary-text/70 hover:text-black dark:hover:text-white hover:bg-black/[0.05] dark:hover:bg-white/[0.08] transition-colors inline-flex items-center justify-center"
+                                                            title="Source Code"
+                                                            aria-label={`Source Code for ${entry.data.title}`}
+                                                        >
+                                                            <RiGithubLine size={17} />
+                                                        </a>
+                                                    </div>
+                                                )}
+                                                {entry.data.url && (
+                                                    <div class="text-secondary-text/40 dark:text-white/30 group-hover:text-primary-text dark:group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 ml-1">
+                                                        <RiArrowRightUpLine size={16} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <!-- Project Description -->
+                                        {entry.data.description && (
+                                            <p class="text-[13px] sm:text-sm font-light text-secondary-text dark:text-gray-300 leading-relaxed opacity-85">
+                                                {entry.data.description}
+                                            </p>
                                         )}
                                     </div>
-                                    {entry.data.description && (
-                                        <p class="text-sm font-light text-secondary-text leading-relaxed opacity-80">
-                                            {entry.data.description}
-                                        </p>
-                                    )}
-                                </div>
-                            </SpotlightCard>
-                        </FadeContent>
-                    ),
-                )
-            }
-            {
-                page.data.length ===
-                    0 && (
-                    <div class="col-span-full text-secondary-text py-12 px-4">
-                        <p class="text-sm font-mono">
-                            No
-                            projects
-                            yet.
-                        </p>
-                    </div>
-                )
-            }
-        </div>
+                                </SpotlightCard>
+                            </FadeContent>
+                        ),
+                    )
+                }
 
-        <!-- Pagination Navigation -->
-        {
-            page.lastPage > 1 && (
-                <div class="flex justify-between items-center mt-16 pt-12 border-t border-black/5 dark:border-white/5 opacity-60 dark:opacity-80">
-                    {page.url.prev ? (
-                        <a
-                            href={
-                                page.url.prev
-                            }
-                            class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
-                        >
-                            ← Previous
-                        </a>
-                    ) : (
-                        <span />
-                    )}
-                    <span class="text-xs font-mono">
-                        Page {page.currentPage} of{" "}
-                        {page.lastPage}
-                    </span>
-                    {page.url.next ? (
-                        <a
-                            href={
-                                page.url.next
-                            }
-                            class="text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
-                        >
-                            Next →
-                        </a>
-                    ) : (
-                        <span />
-                    )}
-                </div>
-            )
-        }
+                {
+                    page.data.length === 0 && (
+                        <div class="text-secondary-text py-12 px-4 border border-dashed border-black/10 dark:border-white/10 rounded-xl text-center">
+                            <p class="text-xs sm:text-sm font-mono opacity-70">
+                                // NO ACTIVE PROJECTS REGISTERED
+                            </p>
+                        </div>
+                    )
+                }
+
+                <!-- Pagination Navigation -->
+                {
+                    page.lastPage > 1 && (
+                        <div class="flex justify-between items-center mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-black/5 dark:border-white/5 opacity-60 dark:opacity-80">
+                            {page.url.prev ? (
+                                <a
+                                    href={page.url.prev}
+                                    class="text-xs sm:text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
+                                >
+                                    ← Previous
+                                </a>
+                            ) : (
+                                <span />
+                            )}
+                            <span class="text-[10px] sm:text-xs font-mono">
+                                Page {page.currentPage} of {page.lastPage}
+                            </span>
+                            {page.url.next ? (
+                                <a
+                                    href={page.url.next}
+                                    class="text-xs sm:text-sm font-medium hover:text-black dark:hover:text-white transition-colors"
+                                >
+                                    Next →
+                                </a>
+                            ) : (
+                                <span />
+                            )}
+                        </div>
+                    )
+                }
+            </div>
+        </div>
     </div>
 </Layout>

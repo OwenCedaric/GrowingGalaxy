@@ -5,7 +5,6 @@ export async function GET() {
     const site = SITE_CONFIG.site;
     const blogs = await getCollection('blog');
     const pages = await getCollection('pages');
-    const blogroll = await getCollection('blogroll');
     const photos = await getCollection('photos');
     const traces = await getCollection('traces');
 
@@ -27,11 +26,11 @@ ${photos.map(entry => `- [${entry.data.name}](${site}/gallery/2025/${entry.id.to
 
 ## Traces
 
-${traces.map(entry => `- [Trace: ${entry.data.title.replace(/^SYS_TRACE:\\s*/i, '')}](${site}/traces/${entry.id}) ([Raw Markdown](${site}/raw/traces/${entry.id}.md))`).join('\n')}
+${traces.map(entry => `- [Trace: ${entry.data.title.replace(/^SYS_TRACE:\s*/i, '')}](${site}/traces/${entry.id}) ([Raw Markdown](${site}/raw/traces/${entry.id}.md))`).join('\n')}
 
-## Blogroll
+## Elsewhere (External Channels)
 
-${blogroll.map(entry => `- [${entry.data.name}](${entry.data.link})`).join('\n')}
+${(SITE_CONFIG.elsewhere || []).map(entry => `- [${entry.name}${entry.handle ? ` (${entry.handle})` : ''}](${entry.url})`).join('\n')}
 `;
 
     return new Response(content, {

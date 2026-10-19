@@ -123,16 +123,16 @@ heroImage: "/path/to/image.jpg"
 这里是正文排版...
 ```
 
-### 新增友情链接
-
-只需在 `src/content/blogroll/` 目录下创建一个新的 `.md` 文件：
-
+### 新增展示项目
+ 
+只需在 `src/content/projects/` 目录下创建一个新的 `.md` 文件：
+ 
 ```md
 ---
-name: "友站名称"
-link: "https://example.com"
-avatar: "/avatars/example.png"
-description: "站点摘要描述..."
+title: "项目名称"
+description: "项目一句话概览简介..."
+url: "https://example.com"
+github: "https://github.com/user/repo"
 ---
 ```
 

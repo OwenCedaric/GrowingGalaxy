@@ -1,0 +1,112 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import TextReveal from "@/components/ui/TextReveal";
+import FadeContent from "@/components/ui/FadeContent";
+import SpotlightCard from "@/components/ui/SpotlightCard";
+import DynamicIcon from "@/components/elsewhere/DynamicIcon";
+import { SITE_CONFIG } from "@/config";
+import { RiArrowRightUpLine } from "@remixicon/react";
+
+const elsewhereItems = SITE_CONFIG.elsewhere || [];
+const totalCount = elsewhereItems.length;
+---
+
+<Layout
+    title={`ELSEWHERE // ${SITE_CONFIG.title}`}
+    description="A directory of external outposts, profiles, and feeds across the open web."
+>
+    <div class="max-w-6xl mx-auto w-full pt-2 sm:pt-4 md:pt-8 pb-16 sm:pb-20">
+        <!-- Vertical Background Watermark: Hidden on mobile to prevent content overlap; desktop positioned on left -->
+        <div class="hidden md:flex fixed top-0 lg:left-0 lg:right-auto right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden items-center justify-center">
+            <TextReveal
+                client:load
+                text="Elsewhere"
+                type="char"
+                className="font-bold text-black/[0.03] dark:text-white/[0.10] text-[8vh] sm:text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
+                style={{
+                    writingMode: "vertical-rl",
+                    textOrientation: "mixed",
+                }}
+            />
+        </div>
+
+        <!-- Asymmetrical Split Layout: Left Matrix (~60%) + Right Editorial Anchor (~40%) -->
+        <div class="flex flex-col lg:flex-row gap-8 sm:gap-12 lg:gap-16 items-start justify-between">
+            <!-- Left on Desktop / Bottom on Mobile: Compact 2-column Spotlight Card Grid -->
+            <div class="w-full lg:w-7/12 order-2 lg:order-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    {
+                        elsewhereItems.map((item, index) => (
+                            <FadeContent
+                                client:visible
+                                delay={index * 50}
+                                duration={500}
+                                blur={true}
+                                className="h-full"
+                            >
+                                <SpotlightCard
+                                    client:visible
+                                    className="p-3 sm:p-3.5 relative group flex items-center justify-between"
+                                >
+                                    {/* Stretched main link for the entire card */}
+                                    <a
+                                        href={item.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="absolute inset-0 z-20 cursor-pointer rounded-xl"
+                                        aria-label={`${item.name}${item.handle ? ` (${item.handle})` : ""}`}
+                                    />
+
+                                    <!-- Left Section: Icon + Text -->
+                                    <div class="flex items-center gap-3 sm:gap-3.5 min-w-0 relative z-30 pointer-events-none">
+                                        <div class="w-8 h-8 flex items-center justify-center shrink-0 text-secondary-text/80 dark:text-gray-400 group-hover:text-primary-text dark:group-hover:text-white group-hover:scale-110 transition-all duration-300">
+                                            <DynamicIcon name={item.name} className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
+                                        </div>
+
+                                        <div class="min-w-0">
+                                            <h2 class="text-sm sm:text-[15px] font-medium tracking-wide text-primary-text dark:text-gray-100 group-hover:text-black dark:group-hover:text-white transition-colors truncate">
+                                                {item.name}
+                                            </h2>
+                                            {item.handle && (
+                                                <p class="font-mono text-[11px] sm:text-xs text-secondary-text dark:text-gray-400 truncate mt-0.5 opacity-80">
+                                                    {item.handle}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <!-- Right Section: Arrow Indicator -->
+                                    <div class="text-secondary-text/40 dark:text-white/30 group-hover:text-primary-text dark:group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 shrink-0 ml-3 relative z-30 pointer-events-none">
+                                        <RiArrowRightUpLine size={16} />
+                                    </div>
+                                </SpotlightCard>
+                            </FadeContent>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <!-- Right on Desktop / Top on Mobile: Editorial & Context Anchor -->
+            <aside class="w-full lg:w-5/12 lg:sticky lg:top-36 shrink-0 order-1 lg:order-2">
+                <div class="flex items-center gap-2 mb-2 sm:mb-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-black/30 dark:bg-white/30"></span>
+                    <span class="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-secondary-text">
+                        Network & Outposts
+                    </span>
+                </div>
+
+                <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal leading-tight tracking-tight text-primary-text mb-2.5 sm:mb-4">
+                    Elsewhere.
+                </h1>
+
+                <p class="text-[13px] sm:text-base text-secondary-text dark:text-gray-400 font-light leading-relaxed mb-4 sm:mb-6 max-w-md">
+                    External coordinates, writing archives, and open-source traces scattered across the open web. Feel free to connect or say hello.
+                </p>
+
+                <div class="text-[11px] sm:text-xs font-mono text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                    // {totalCount} ACTIVE DESTINATIONS
+                </div>
+            </aside>
+        </div>
+    </div>
+</Layout>

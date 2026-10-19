@@ -37,15 +37,6 @@ const pages = defineCollection({
     }),
 });
 
-const blogroll = defineCollection({
-    loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "./src/content/blogroll" }),
-    schema: z.object({
-        name: z.string(),
-        link: z.string().url(),
-        avatar: z.string(),
-        description: z.string(),
-    }),
-});
 
 const photos = defineCollection({
     loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "./src/content/photos" }),
@@ -84,4 +75,4 @@ const traces = defineCollection({
     }),
 });
 
-export const collections = { blog, pages, blogroll, photos, projects, traces };
+export const collections = { blog, pages, photos, projects, traces };

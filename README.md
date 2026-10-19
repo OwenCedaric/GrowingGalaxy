@@ -123,16 +123,16 @@ heroImage: "/path/to/image.jpg"
 Your content here...
 ```
 
-### New Blogroll Entry
+### New Project Entry
 
-Add a `.md` file in `src/content/blogroll/`:
+Add a `.md` file in `src/content/projects/`:
 
 ```md
 ---
-name: "Site Name"
-link: "https://example.com"
-avatar: "/avatars/example.png"
-description: "Brief description"
+title: "Project Name"
+description: "Brief project overview"
+url: "https://example.com"
+github: "https://github.com/user/repo"
 ---
 ```
 

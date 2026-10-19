@@ -6,13 +6,13 @@ import TextReveal from "@/components/ui/TextReveal";
 ---
 
 <Layout title={`SEARCH // ${SITE_CONFIG.title}`} description=`Search the ${SITE_CONFIG.title} archive`>
-    <div class="max-w-4xl mx-auto w-full pt-20 px-6">
-        <div class="fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden flex items-center justify-center">
+    <div class="max-w-6xl mx-auto w-full pt-2 sm:pt-4 md:pt-8 pb-16 sm:pb-20">
+        <div class="hidden md:flex fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden items-center justify-center">
             <TextReveal
                 client:load
                 text="Search"
                 type="char"
-                className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
+                className="font-bold text-black/[0.03] dark:text-white/[0.10] text-[8vh] sm:text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
                 style={{
                     writingMode: "vertical-rl",
                     textOrientation: "mixed",
