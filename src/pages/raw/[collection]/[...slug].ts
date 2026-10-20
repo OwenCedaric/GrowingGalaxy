@@ -72,17 +72,13 @@ export async function GET({ props }: APIContext) {
         return new Response('File not found', { status: 404 });
     }
 
-    // Dynamically supplement missing MCP metadata to reduce human error
-    const { supplementMCPMeta } = await import('@/utils/mcp-meta');
-    const supplementedContent = supplementMCPMeta(content, entry.id, props.collection, extension);
-
     // Calculate canonical URL - should include full slug/id
     const site = SITE_CONFIG.site;
     const id = entry.id; // full relative path like "2026/foo"
     const urlNamespace = collection === 'blog' ? 'blog' : '';
     const canonicalUrl = `${site}/${urlNamespace}/${id}`.replace(/\/+/g, '/').replace(':/', '://');
 
-    return new Response('\uFEFF' + supplementedContent, {
+    return new Response('\uFEFF' + content, {
         headers: {
             'Content-Type': 'text/markdown; charset=utf-8',
             'X-Robots-Tag': 'noindex, follow',

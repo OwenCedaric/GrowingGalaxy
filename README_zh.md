@@ -1,241 +1,191 @@
-# Growing Galaxy
+# Growing Galaxy — Astro 极简主题模板（Starter）
 
-> 一个专注于讲故事与视觉体验的精选数字画廊。
+> 专为 [Astro](https://astro.build/) 打造的超极简数字花园、摄影展厅与足迹探索主题。
 
-## 核心特性
+[![Built with Astro](https://astro.badg.es/v2/built-with-astro/tiny.svg)](https://astro.build)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-- **极简主义设计** 搭配毛玻璃 (glassmorphism) UI 形态
-- **平滑深色模式 (Dark mode)** 基于 View Transitions API 实现
-- **完美的响应式适配** 与移动端优化
-- **现代技术栈**: Astro 5 + React 19 + Tailwind CSS 4
-- **原生 MDX 支持** 提供丰富的排版体验
-- **丝滑的页面动画** 由 Framer Motion 驱动
-- **SEO 友好** 自动生成 sitemap 与 RSS feed
+[English](./README.md) | [简体中文](./README_zh.md)
 
-## 设计哲学
+---
 
-Ceda.is 的核心使命是“内容策展 (Content Curation)”——它不仅仅是一个阅读器，而是一个数字艺术画廊。整体体验应该像在浏览一本奢华且高端的休息室菜单，包含：
+## 主题特性
 
-- **空灵的毛玻璃效果** (背景高斯模糊 + 半透明表面)
-- **宽裕的留白** - 让内容在背景之上“悬浮”
-- **柔和的配色** - 浅色模式下的暖沙色，深色模式下的亚光黑
-- **纤细的排版** - 优雅且充满呼吸感
+- **极致极简美学**：空灵微磨砂（Glassmorphism）、呼吸感大留白与杂志级版式排版。
+- **策展级摄影展厅（Gallery）**：
+  - 紧凑型 16:10 画幅目录导航网格。
+  - 双模式展览：**Stage（聚光灯影院模式，配有底部居中胶卷片条）** 与 **Wall（密集瀑布流展墙）**。
+  - 纯净的 React Portal 顶层灯箱与全屏自适应暗色/亮色遮罩。
+- **足迹与田野日志（Traces）**：
+  - 基于 Leaflet 的交互式矢量地图。
+  - 路线追踪、环境基线数据与坐标展示。
+  - 独特的粗野主义设计日志排版。
+- **极速客户端静态搜索**：基于 [Pagefind](https://pagefind.app/) 驱动的高性能全文本离线检索。
+- **无感暗色模式**：基于原生 View Transitions API 实现丝滑主题切换。
+- **零平台锁定（Zero Lock-in）**：100% 纯静态生成（SSG），无需任何外部云服务配置，可零配置一键部署至 Cloudflare Pages、Vercel、Netlify 或 GitHub Pages。
 
-## 核心架构
+---
 
-- **框架支持**: [Astro 5](https://astro.build/) - 默认零 JS (Zero JS) 静态输出
-- **UI 组件**: [React 19](https://react.dev/) - 用于高交互的组件渲染
-- **样式方案**: [Tailwind CSS 4](https://tailwindcss.com/) - 自定义设计系统 Tokens
-- **动画引擎**: [Framer Motion 12](https://www.framer.com/motion/)
-- **图标系统**: [Lucide React](https://lucide.dev/)
-- **网络字体**: Inter (无衬线), Playfair Display (衬线体)
+## 快速上手
 
-## 快速开始
+### 方式一：使用 Astro 官方 CLI 脚手架（推荐）
 
 ```bash
-# 安装所需依赖
+# 使用本模板初始化全新项目
+pnpm create astro@latest -- --template OwenCedaric/GrowingGalaxy#starter
+# 或使用 npm
+npm create astro@latest -- --template OwenCedaric/GrowingGalaxy#starter
+```
+
+### 方式二：手动 Clone 仓库
+
+```bash
+# 拉取 starter 主题分支
+git clone -b starter https://github.com/OwenCedaric/GrowingGalaxy.git my-site
+cd my-site
+
+# 安装依赖
 pnpm install
 
-# 启动本地开发服务器 (默认端口 http://localhost:4321)
+# 启动本地开发服务器（http://localhost:4321）
 pnpm run dev
-
-# 编译为生产环境静态文件
-pnpm run build
-
-# 本地预览生产环境构建效果
-pnpm run preview
 ```
+
+---
+
+## 技术架构
+
+- **框架核心**：[Astro 7](https://astro.build/)（静态生成 SSG）
+- **UI 岛屿组件**：[React 19](https://react.dev/)
+- **原子样式**：[Tailwind CSS 4](https://tailwindcss.com/)
+- **动效引擎**：[Motion 14](https://motion.dev/)（Framer Motion）
+- **图标系统**：[Remix Icon](https://remixicon.com/) (`@remixicon/react`)
+- **交互地图**：[Leaflet](https://leafletjs.com/) & [React-Leaflet](https://react-leaflet.js.org/)
+- **全文本搜索**：[Pagefind](https://pagefind.app/)
+- **排版字体**：Inter 与 Playfair Display
+
+---
 
 ## 目录结构
 
 ```text
-.github/workflows/
-└── deploy.yml           # CI/CD: 自动化构建、向量索引生成与数据库同步
-scripts/
-├── build_index.ts      # 本地 AI 嵌入生成器 (@huggingface/transformers)
-└── patch_frontmatter.ts # Markdown 元数据批量补全工具
 src/
 ├── components/
-│   ├── ui/              # 全局可复用的 UI 架构组件
-│   │   ├── GlassCard.astro
-│   │   ├── Navigation.tsx
-│   │   └── ThemeToggle.tsx
-│   └── BaseHead.astro   # SEO 与元数据标签管理
+│   ├── gallery/           # 摄影画廊组件（PhotoCard 目录卡、PhotoGrid 网格、ExhibitionStream 展厅）
+│   ├── traces/            # 足迹探索组件（Leaflet 交互地图与路线遥测）
+│   └── ui/                # 通用 UI 原子（导航栏、主题切换、SpotlightCard）
 ├── content/
-│   ├── blog/            # 博客文章夹 (携带 MCP 检索属性)
-│   └── pages/           # 静态页面夹 (携带 MCP 检索属性)
+│   ├── blog/              # Markdown / MDX 博客文章
+│   ├── photos/            # 摄影集相册数据与照片列表
+│   ├── projects/          # 开源项目与数字实验
+│   └── traces/            # 旅行路线、坐标与地图元数据
+├── layouts/
+│   └── Layout.astro       # 基础页面布局（含导航栏、页脚与页面过渡）
 ├── pages/
-│   ├── index.astro      # 首页门户
-│   └── raw/             # 供 MCP 调用的动态原始 Markdown 端点
-workers/
-└── index.ts            # MCP API 接入层 (Search/Context 路由实现)
-init.py                 # Vectorize 数据库 API 初始化脚本
-wrangler.json           # Cloudflare Worker & Assets 部署配置
+│   ├── blog/              # 博客列表与文章阅读器
+│   ├── gallery/           # 画廊相册目录与展厅详情 (/gallery/[...slug])
+│   ├── traces/            # 足迹探索地图与田野日志
+│   ├── projects/          # 项目展示页
+│   ├── elsewhere.astro    # 社交与联络入口
+│   └── search.astro       # Pagefind 静态全文搜索界面
+└── config.ts              # 站点全局配置、导航、社交链与版权声明
 ```
 
-## 网站个性化配置
+---
 
-### 色彩主题设计
+## 内容创作
 
-你可以编辑 `src/styles/global.css` 来重新定制自己的专属配色系统：
+### 1. 新建博客文章（`src/content/blog/`）
 
-```css
-@theme {
-    --color-canvas: #ffffff;
-    --color-canvas-dark: #141414;
-    --color-surface: rgba(255, 255, 255, 0.8);
-    --color-surface-dark: rgba(30, 30, 30, 0.60);
-    /* ... */
-}
-```
-
-### 全局网站参数配置
-
-站点全局数据（像标题、描述、导航菜单以及页脚文案等）都在 `src/config.ts` 文件中修改：
-
-```typescript
-export const SITE_CONFIG = {
-    title: "你的网站名称",
-    description: "简短一句话介绍",
-    // ...
-}
-```
-
-## 创作新内容
-
-### 发布博客文章
-
-> **提示:** 强烈建议你在开始撰写前先检阅 [Markdown 与 MDX 语法指南](./MARKDOWN_SYNTAX.md)，它完整记载了网站所支持的所有排版特性（包括高等数学公式和 React 组件内嵌等功能支持）。
-
-只需在 `src/content/blog/` 下创建一个新的 `.mdx` 文件：
+新建 `.mdx` 文件：
 
 ```mdx
 ---
-title: "你的新文章标题"
-description: "文章一句话概览简介..."
-pubDate: 2026-02-03
+title: "文章标题"
+description: "简短的文章概要。"
+pubDate: 2026-10-20
 category: "Design"
-tags: ["web", "design"]
-depth: "Intermediate"
-heroImage: "/path/to/image.jpg"
+tags: ["minimalism", "web"]
+depth: "Light"
+heroImage: "/path/to/cover.jpg"
 ---
 
-这里是正文排版...
+正文内容... 支持 Markdown、MDX 组件以及 KaTeX 数学公式渲染：
+
+$$
+E = mc^2
+$$
 ```
 
-### 新增展示项目
- 
-只需在 `src/content/projects/` 目录下创建一个新的 `.md` 文件：
- 
-```md
+### 2. 新建摄影相册（`src/content/photos/`）
+
+在 `src/content/photos/[year]/` 下新建 `.md` 文件：
+
+```markdown
 ---
-title: "项目名称"
-description: "项目一句话概览简介..."
-url: "https://example.com"
-github: "https://github.com/user/repo"
+name: "新宿御苑の樱"
+date: 2025-04-05
+author: "摄影师姓名"
+location: "Tokyo, Japan"
+tag: ["Spring", "Sakura", "Tokyo"]
 ---
+
+![首图封面](https://example.com/photo1.jpg)
+第一张照片描述
+
+![第二张](https://example.com/photo2.jpg)
+第二张照片描述
 ```
 
-## 可用的运行命令
+### 3. 新建足迹日志（`src/content/traces/`）
 
-| Command 命令 | Description 说明 |
-| --- | --- |
-| `pnpm run dev` | 在本地启动热重载开发服务器 `localhost:4321` |
-| `pnpm run build` | 为生产环境打包压缩至静态的 `./dist/` 文件夹内 |
-| `pnpm run build_index` | 触发本地 AI 模型进行文章切块与向量索引生成 |
-| `pnpm run patch_meta` | 批量为所有 Markdown 文档补全 MCP 所需 Frontmatter |
-| `pnpm run preview` | 本地测试并预览编译后的静态资源构建效果 |
+在 `src/content/traces/[year]/` 下新建 `.md` 文件：
 
-## 性能目标
+```markdown
+---
+title: "Tokyo Urban Transit"
+site_name: "Tokyo"
+date: "2025-04"
+endDate: 2025-04-10
+tags: ["City", "Metro", "Japan"]
+baseline:
+  coordinates: "35.6762, 139.6503"
+  environment: "Urban / Spring"
+  mapUrl: "/maps/tokyo.geojson"
+---
 
-本项目遵循极客优化的性能实践：
-
-- [x] **静态页面生成引擎 (SSG)** - 所有内容会在部署构建期间提前编排为 HTML
-- [x] **默认无 JavaScript 包袱** - 仅那些负责强视觉交互的组件才会向客户端发送少量的 JS
-- [x] **图像托管自优化引擎** - WebP 无损转换策略
-- [x] **首屏字体优化** - 可变字体合并与子集加载
-
-项目标杆要求: **Lighthouse 各项性能指数稳定在 95 分以上。**
-
-## MCP (Model Context Protocol) 深度集成
-
-本项目原生支持 **Model Context Protocol (MCP)** 标准，允许 AI 代理（如 Cursor, Windsurf 或自定义 LLMs）以语义化的方式“理解”并检索你的全站内容。
-
-### 1. 数据库初始化 (单次操作)
-你可以使用提供的 `init.py` 脚本通过官方 API 一键开辟数据库，或者直接使用 Wrangler：
-```bash
-npx wrangler vectorize create growing-galaxy-mcp --dimensions=1024 --metric=cosine
+田野日志、漫游观察与路径记录...
 ```
-
-### 2. 自动化索引构建
-Embeddings（向量嵌入）是在构建阶段通过 `@huggingface/transformers` (BGE Small 模型) 在**本地/云端 Runner 内部离线生成**的。这意味着：
-- **零成本**：无需调用 OpenAI 等付费 Embedding API。
-- **高安全**：数据无需流向第三方 AI 平台进行处理。
-你可以手动触发：`pnpm run build_index`。
-
-### 3. 在 AI 编辑器中使用
-
-#### Cursor / Windsurf
-你可以将部署后的站点地址添加为 Cursor 或 Windsurf 的 **Context Provider** 或 **Custom Docs** 来源：
-- **搜索端点**: `https://your-domain.com/mcp/search`
-- **全文能力**: 支持全站博客与页面的全文语义检索与 RAG 还原。
-
-#### Claude Code / Claude Desktop
-
-**原生支持标准 MCP-over-HTTP** 协议。
-
-**Claude Code**:
-```bash
-claude mcp add growing-galaxy https://your-domain.com/mcp
-```
-
-**Claude Desktop** (`claude_desktop_config.json`):
-```json
-{
-  "mcpServers": {
-    "growing-galaxy": {
-      "url": "https://your-domain.com/mcp" 
-    }
-  }
-}
-```
-
-### 4. 核心可用工具
-
-- `search`: 语义检索全站精选内容（博客 + 静态页面）。
-- `get_context`: 根据搜索结果的 ID，完整还原 Markdown 原文内容。
-
-### 5. API 端点
-- `POST /mcp`: 标准 JSON-RPC 根端点 (同时支持 SSE 与 原始 POST)。
-- `GET /mcp/list_docs`: 全站可搜索文档的元数据编目。
-- `GET /mcp/version`: 协议运行健康检查。
-
-## 全自动 CI/CD 部署 (GitHub Actions)
-
-我们在 `.github/workflows/deploy.yml` 中配置了一套生产级别的持续集成流水线。
-
-### 前置准备
-在 GitHub 仓库的 **Settings > Secrets** 中，添加以下变量：
-1. `CLOUDFLARE_API_TOKEN`: 必须具备 `Account.Vectorize (Edit)`, `Account.Workers AI (Read)` 以及 `Account.Workers Scripts (Edit)` 权限。
-2. `CLOUDFLARE_ACCOUNT_ID`: 在你的 Cloudflare 控制台侧边栏即可找到。
-
-### 自动化流转
-每次向 `main` 分支执行 `git push` 时：
-1. 自动安装依赖并编译 Astro 前端。
-2. **在 Action 的云端节点运行 AI 模型**，自动提取新增文章的向量特征。
-3. 自动将 `vectors.ndjson` 增量同步至 Cloudflare Vectorize。
-4. 部署 Workers 逻辑并更新边缘节点的静态资源。
-
-## 开源许可证
-
-MIT - 您可随时使用该模板构建私人以及商业项目！
-
-## 鸣谢与致敬
-
-- 视觉设计深受“现代极简主义美术馆”的交互灵感影响
-- 基于出色的 [Astro](https://astro.build/) 引擎框架搭建
-- 依托时下最现代化的全球 Web 集成技术构建运行
 
 ---
 
-**Designed with intention. 倾注巧思与诚意构建。**
+## 常用脚本指令
+
+| 命令 | 描述 |
+| :--- | :--- |
+| `pnpm run dev` | 启动本地开发调试服务器（`localhost:4321`） |
+| `pnpm run check` | 执行全站 TypeScript 与 Astro 类型诊断 |
+| `pnpm run build` | 完整生产打包：生成静态站点并构建 Pagefind 搜索索引 |
+| `pnpm run preview` | 本地预览编译后的生产产物 |
+
+---
+
+## 一键部署
+
+由于本模板采用纯静态打包输出（`dist/` 目录），你可以在各大托管平台上免配置直接部署：
+
+* **Cloudflare Pages**：预设选择 `Astro`，构建命令 `pnpm run build`，产物目录 `dist`。
+* **Vercel**：框架预设选择 `Astro`，产物目录 `dist`。
+* **Netlify**：构建命令 `pnpm run build`，发布目录 `dist`。
+* **GitHub Pages**：仓库自带 GitHub Actions 自动构建支持。
+
+---
+
+> 💡 **想要体验更硬核的 AI Agent 与 MCP（Model Context Protocol）语义检索？**  
+> 如果你想探索原生的 Model Context Protocol 协议端点以及 Cloudflare Vectorize 向量数据库能力，欢迎切换查看我们的 [`main` 主分支](https://github.com/OwenCedaric/GrowingGalaxy/tree/main)！
+
+---
+
+## 开源协议
+
+MIT © [Growing Galaxy](https://github.com/OwenCedaric/GrowingGalaxy)

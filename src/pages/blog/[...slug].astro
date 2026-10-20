@@ -10,7 +10,7 @@ import FadeContent from "@/components/ui/FadeContent";
 import ScrollFloat from "@/components/ui/ScrollFloat";
 import MDXImage from "@/components/blog/MDXImage.astro";
 import TableOfContents from "@/components/blog/TableOfContents.astro";
-import { RiArrowLeftDoubleLine, RiArrowRightDoubleLine, RiArrowRightUpLine } from "@remixicon/react";
+import { RiArrowLeftDoubleLine, RiArrowRightDoubleLine } from "@remixicon/react";
 import "katex/dist/katex.min.css";
 
 export async function getStaticPaths() {
@@ -82,48 +82,6 @@ const blogCopyright =
                 .author ??
             SITE_CONFIG.author ??
             SITE_CONFIG.title,
-        proof: {
-            enabled:
-                entry
-                    .data
-                    .copyright
-                    ?.proof
-                    ?.enabled ??
-                SITE_CONFIG
-                    .articleCopyright
-                    ?.proof
-                    ?.enabled,
-            linkText:
-                entry
-                    .data
-                    .copyright
-                    ?.proof
-                    ?.linkText ??
-                SITE_CONFIG
-                    .articleCopyright
-                    ?.proof
-                    ?.linkText,
-            baseUrl:
-                entry
-                    .data
-                    .copyright
-                    ?.proof
-                    ?.baseUrl ??
-                SITE_CONFIG
-                    .articleCopyright
-                    ?.proof
-                    ?.baseUrl,
-            mode:
-                entry
-                    .data
-                    .copyright
-                    ?.proof
-                    ?.mode ??
-                SITE_CONFIG
-                    .articleCopyright
-                    ?.proof
-                    ?.mode,
-        },
     };
 ---
 
@@ -274,23 +232,6 @@ const blogCopyright =
                                         </p>
                                     </div>
                                 </div>
-                                {blogCopyright.proof?.enabled && (
-                                    <a
-                                        href={
-                                            blogCopyright.proof.mode === "dynamic"
-                                                ? `${blogCopyright.proof.baseUrl}/blog/${entry.id}`
-                                                : blogCopyright.proof.baseUrl
-                                        }
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="inline-flex items-center gap-1.5 text-xs font-mono text-primary-text transition-colors group/link pb-1 shrink-0 whitespace-nowrap md:mt-1"
-                                    >
-                                        <span class="opacity-60 group-hover/link:opacity-100 border-b border-black/20 dark:border-white/20 group-hover/link:border-black/60 dark:group-hover/link:border-white/60 transition-colors pb-0.5">
-                                            {blogCopyright.proof.linkText}
-                                        </span>
-                                        <RiArrowRightUpLine className="w-3.5 h-3.5 opacity-40 group-hover/link:opacity-100 transition-transform duration-300 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
-                                    </a>
-                                )}
                             </div>
                         </div>
                     )

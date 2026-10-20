@@ -17,12 +17,6 @@ const blog = defineCollection({
         copyright: z.object({
             enabled: z.boolean().optional(),
             declaration: z.string().optional(),
-            proof: z.object({
-                enabled: z.boolean().optional(),
-                linkText: z.string().optional(),
-                baseUrl: z.string().optional(),
-                mode: z.enum(['static', 'dynamic']).optional(),
-            }).optional(),
         }).optional(),
     }),
 });
