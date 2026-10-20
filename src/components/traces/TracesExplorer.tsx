@@ -82,10 +82,10 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
     return (
         <>
             {/* Ambient Background Map */}
-            <div className="fixed inset-0 z-0 pointer-events-none opacity-10 dark:opacity-[0.15] mix-blend-multiply dark:mix-blend-screen transition-opacity duration-1000"
+            <div className="fixed inset-0 z-0 pointer-events-none opacity-10 dark:opacity-[0.18] map-blend transition-opacity duration-1000"
                  style={{
-                     maskImage: 'radial-gradient(ellipse 100% 100% at 50% 50%, black 10%, transparent 80%)',
-                     WebkitMaskImage: 'radial-gradient(ellipse 100% 100% at 50% 50%, black 10%, transparent 80%)'
+                     maskImage: 'radial-gradient(ellipse 90% 90% at 50% 50%, black 40%, transparent 85%)',
+                     WebkitMaskImage: 'radial-gradient(ellipse 90% 90% at 50% 50%, black 40%, transparent 85%)'
                  }}
             >
                 <AnimatePresence>
@@ -98,7 +98,7 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
                             className="absolute inset-0"
                         >
                             {activeDest.mapUrl ? (
-                                <RemoteDynamicMap mapUrl={activeDest.mapUrl} className="w-full h-full object-cover sm:object-contain map-blend" />
+                                <RemoteDynamicMap mapUrl={activeDest.mapUrl} className="w-full h-full object-cover sm:object-contain" />
                             ) : (
                                 <AbstractVectorMap coordinates={activeDest.coordinates} />
                             )}
@@ -121,7 +121,7 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
                                 onClick={() => setActiveYear(yearItem.year)}
                                 className={`cursor-pointer text-left font-mono transition-colors duration-200 relative group flex items-center justify-between py-1.5 px-0 w-full ${isYearActive
                                         ? 'text-primary-text font-medium'
-                                        : 'text-secondary-text/40 hover:text-secondary-text/80'
+                                        : 'text-secondary-text/60 dark:text-zinc-400 hover:text-primary-text dark:hover:text-white'
                                     }`}
                             >
                                 <div className="flex items-center gap-2.5">
@@ -130,7 +130,11 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
                                     }`} />
                                     <span className="text-base md:text-lg">{yearItem.year}</span>
                                 </div>
-                                <span className="text-[11px] font-mono text-secondary-text/40 tabular-nums">
+                                <span className={`text-[11px] font-mono tabular-nums transition-colors duration-200 ${
+                                    isYearActive
+                                        ? 'text-secondary-text/80 dark:text-zinc-300 font-medium'
+                                        : 'text-secondary-text/50 dark:text-zinc-500 group-hover:text-secondary-text/80 dark:group-hover:text-zinc-300'
+                                }`}>
                                     {String(yearItem.destinations.length).padStart(2, '0')}
                                 </span>
                             </button>
@@ -148,8 +152,8 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
                             <span className="w-1.5 h-1.5 rounded-full bg-primary-text" />
                             <span className="font-medium text-primary-text">{activeYear}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-80 transition-opacity">
-                            <span className="text-[10px] font-mono uppercase tracking-widest text-secondary-text">change year</span>
+                        <div className="flex items-center gap-1.5 opacity-60 dark:opacity-80 group-hover:opacity-100 transition-opacity">
+                            <span className="text-[10px] font-mono uppercase tracking-widest text-secondary-text dark:text-zinc-400">change year</span>
                         </div>
                     </button>
                 </div>
@@ -158,7 +162,7 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
             {/* Right Area: X-Axis + Main Content */}
             <div className="flex-1 min-w-0 flex flex-col w-full relative z-10">
 
-                {/* X-Axis: Destinations (Horizontal scroll tabs, stable font dimensions) */}
+                {/* X-Axis: Destinations (Horizontal scroll tabs, protected against background noise) */}
                 <div className="w-full shrink-0 mb-5 overflow-x-auto hide-scrollbar z-20 pb-2 relative">
                     <div className="flex items-baseline gap-6 md:gap-8 min-w-max">
                         {activeYearData?.destinations.map((dest) => {
@@ -167,16 +171,16 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
                                 <button
                                     key={`dest-${dest.id}`}
                                     onClick={() => setActiveDestId(dest.id)}
-                                    className={`cursor-pointer uppercase tracking-widest font-mono text-xs sm:text-[13px] transition-colors duration-200 relative pb-1.5 flex flex-col items-center ${isActive
-                                            ? 'text-primary-text font-medium'
-                                            : 'text-secondary-text/35 hover:text-secondary-text/75'
+                                    className={`cursor-pointer uppercase tracking-widest font-mono text-xs sm:text-[13px] transition-all duration-200 relative pb-1.5 flex flex-col items-center ${isActive
+                                            ? 'text-primary-text font-semibold dark:text-white dark:[text-shadow:_0_1px_8px_rgba(0,0,0,0.9),_0_0_12px_#0a0a0a]'
+                                            : 'text-secondary-text/65 dark:text-zinc-400 hover:text-primary-text dark:hover:text-white dark:[text-shadow:_0_1px_6px_rgba(0,0,0,0.9)]'
                                         }`}
                                 >
                                     <span>{dest.name}</span>
                                     {isActive && (
                                         <motion.div
                                             layoutId="activeDestUnderline"
-                                            className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-primary-text rounded-full"
+                                            className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-primary-text dark:bg-white rounded-full shadow-sm"
                                             transition={{ type: "spring", stiffness: 450, damping: 35 }}
                                         />
                                     )}
@@ -198,28 +202,28 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
                                 transition={{ duration: 0.18, ease: "easeOut" }}
                                 className="w-full flex flex-col gap-5 sm:gap-6"
                             >
-                                {/* Telemetry Metadata Bar: Clean & Non-redundant */}
-                                <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] sm:text-xs text-secondary-text/60">
+                                {/* Telemetry Metadata Row: Clean Typography */}
+                                <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] sm:text-xs">
                                     <div className="flex items-center gap-2 sm:gap-2.5">
                                         {activeDest.environment && (
-                                            <span className="opacity-90">{activeDest.environment}</span>
+                                            <span className="text-primary-text dark:text-zinc-200 font-medium dark:[text-shadow:_0_1px_6px_#0a0a0a]">{activeDest.environment}</span>
                                         )}
                                         {activeDest.environment && activeDest.coordinates && (
-                                            <span className="opacity-30">/</span>
+                                            <span className="text-secondary-text/40 dark:text-zinc-500">/</span>
                                         )}
                                         {activeDest.coordinates && (
-                                            <span className="opacity-60">{activeDest.coordinates}</span>
+                                            <span className="text-secondary-text dark:text-zinc-300 tracking-tight dark:[text-shadow:_0_1px_6px_#0a0a0a]">{activeDest.coordinates}</span>
                                         )}
                                     </div>
 
                                     {activeDest.dateStr && (
-                                        <span className="opacity-50">{activeDest.dateStr}</span>
+                                        <span className="text-secondary-text dark:text-zinc-300 font-mono tracking-wide dark:[text-shadow:_0_1px_6px_#0a0a0a]">{activeDest.dateStr}</span>
                                     )}
                                 </div>
 
                                 {/* Text Description (Only if present) */}
                                 {activeDest.description && (
-                                    <p className="text-[15px] md:text-base font-light leading-relaxed opacity-90 md:max-w-4xl text-black/85 dark:text-white/85">
+                                    <p className="text-[15px] md:text-base font-light leading-relaxed md:max-w-4xl text-black/90 dark:text-zinc-200 dark:[text-shadow:_0_1px_8px_rgba(0,0,0,0.9)]">
                                         {activeDest.description}
                                     </p>
                                 )}
@@ -257,17 +261,20 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
                                     </div>
                                 )}
 
-                                {/* Action: View Full Log */}
-                                <div className="flex justify-end mt-1 pr-1">
+                                {/* Action: View Full Log & Map Attribution */}
+                                <div className="flex flex-wrap items-center justify-between gap-2 mt-2 pt-2 border-t border-black/5 dark:border-white/5 pr-1">
+                                    <span className="font-mono text-[10px] uppercase tracking-widest text-secondary-text/65 dark:text-zinc-400 dark:[text-shadow:_0_1px_4px_rgba(0,0,0,0.9)]">
+                                        MAP DATA // © OPENSTREETMAP
+                                    </span>
                                     <a 
                                         href={activeDest.detailUrl}
-                                        className="group inline-flex items-center gap-1.5 text-xs md:text-[13px] font-mono uppercase tracking-widest text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors duration-300 active:scale-[0.97]"
+                                        className="group inline-flex items-center gap-1.5 text-xs md:text-[13px] font-mono uppercase tracking-widest text-secondary-text/80 dark:text-zinc-300 hover:text-black dark:hover:text-white transition-colors duration-300 active:scale-[0.97]"
                                     >
                                         <ShinyText 
                                             text="VIEW FULL LOG" 
                                             speed={3} 
-                                            color="rgba(0,0,0,0.5)"
-                                            colorDark="rgba(255,255,255,0.5)"
+                                            color="rgba(0,0,0,0.6)"
+                                            colorDark="rgba(255,255,255,0.7)"
                                             shineColor="rgba(0,0,0,1)"
                                             shineColorDark="rgba(255,255,255,1)"
                                         />

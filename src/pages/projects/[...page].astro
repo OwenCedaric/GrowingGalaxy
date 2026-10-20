@@ -138,7 +138,7 @@ function getProjectSubtitle(entry: ProjectEntry['data']) {
                             >
                                 <SpotlightCard
                                     client:visible
-                                    className="p-4 sm:p-5 relative group"
+                                    className="p-4 sm:p-5 relative group border border-transparent dark:border-white/[0.08] dark:hover:border-white/20 dark:bg-white/[0.015] dark:hover:bg-white/[0.035] transition-all duration-300"
                                 >
                                     {/* Stretched main link for the entire card */}
                                     {(entry.data.url || entry.data.github) && (
@@ -155,13 +155,13 @@ function getProjectSubtitle(entry: ProjectEntry['data']) {
                                         <!-- Top Row: Title & Auto-derived Domain/Repo + Action Buttons -->
                                         <div class="flex items-start justify-between gap-3">
                                             <div class="min-w-0">
-                                                <h2 class="text-sm sm:text-base font-medium tracking-wide text-primary-text group-hover:text-black dark:group-hover:text-white transition-colors truncate">
+                                                <h2 class="text-sm sm:text-base font-medium tracking-wide text-primary-text dark:text-white group-hover:text-black dark:group-hover:text-white transition-colors truncate">
                                                     {entry.data.title}
                                                 </h2>
 
                                                 {/* Auto-derived Hostname or Repo */}
                                                 {getProjectSubtitle(entry.data) && (
-                                                    <p class="font-mono text-[11px] text-secondary-text/80 dark:text-gray-400 truncate mt-0.5">
+                                                    <p class="font-mono text-[11px] text-secondary-text dark:text-zinc-400 group-hover:text-secondary-text/90 dark:group-hover:text-zinc-200 transition-colors truncate mt-0.5">
                                                         {getProjectSubtitle(entry.data)}
                                                     </p>
                                                 )}
@@ -175,7 +175,7 @@ function getProjectSubtitle(entry: ProjectEntry['data']) {
                                                             href={entry.data.github}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            class="p-1.5 -mr-1 rounded-lg text-secondary-text/70 hover:text-black dark:hover:text-white hover:bg-black/[0.05] dark:hover:bg-white/[0.08] transition-colors inline-flex items-center justify-center"
+                                                            class="p-1.5 -mr-1 rounded-lg text-secondary-text/80 dark:text-zinc-300 hover:text-black dark:hover:text-white hover:bg-black/[0.05] dark:hover:bg-white/[0.08] transition-colors inline-flex items-center justify-center"
                                                             title="Source Code"
                                                             aria-label={`Source Code for ${entry.data.title}`}
                                                         >
@@ -184,7 +184,7 @@ function getProjectSubtitle(entry: ProjectEntry['data']) {
                                                     </div>
                                                 )}
                                                 {entry.data.url && (
-                                                    <div class="text-secondary-text/40 dark:text-white/30 group-hover:text-primary-text dark:group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 ml-1">
+                                                    <div class="text-secondary-text/60 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 ml-1">
                                                         <RiArrowRightUpLine size={16} />
                                                     </div>
                                                 )}
@@ -193,7 +193,7 @@ function getProjectSubtitle(entry: ProjectEntry['data']) {
 
                                         <!-- Project Description -->
                                         {entry.data.description && (
-                                            <p class="text-[13px] sm:text-sm font-light text-secondary-text dark:text-gray-300 leading-relaxed opacity-85">
+                                            <p class="text-[13px] sm:text-sm font-light text-secondary-text dark:text-zinc-300 group-hover:text-primary-text/90 dark:group-hover:text-zinc-200 leading-relaxed transition-colors">
                                                 {entry.data.description}
                                             </p>
                                         )}

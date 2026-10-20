@@ -73,7 +73,7 @@ export default function ThemeToggle() {
                         animate={{ opacity: 1, rotate: 0, scale: 1 }}
                         exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
                         transition={{ duration: 0.2 }}
-                        className="h-5 w-5 text-accent-dark absolute"
+                        className="h-5 w-5 text-primary-text dark:text-white absolute"
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
                         fill="none"

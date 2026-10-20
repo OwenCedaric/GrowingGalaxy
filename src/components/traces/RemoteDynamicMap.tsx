@@ -61,6 +61,16 @@ export default function RemoteDynamicMap({ mapUrl, className = "" }: RemoteDynam
                     '$1'
                 );
 
+                // Strip static <text> elements (e.g. fixed "City Name", "data © OpenStreetMap")
+                // to prevent blurry, cut-off watermark artifacts at arbitrary screen coordinates
+                processed = processed.replace(/<text[\s\S]*?<\/text>/gi, '');
+
+                // Normalize stroke on line groups to currentColor for clean theme responsiveness
+                processed = processed.replace(
+                    /(<g\s+id=["']lines["'][^>]*?stroke\s*=\s*["'])[^"']+["']/gi,
+                    '$1currentColor"'
+                );
+
                 svgCache.set(mapUrl, processed);
                 setSvgContent(processed);
             })
@@ -75,7 +85,7 @@ export default function RemoteDynamicMap({ mapUrl, className = "" }: RemoteDynam
 
     if (error) {
         return (
-            <div className={`flex items-center justify-center text-black/30 dark:text-white/30 text-xs font-mono ${className}`}>
+            <div className={`flex items-center justify-center text-black/50 dark:text-zinc-400 text-xs font-mono ${className}`}>
                 <span className="uppercase tracking-widest">MAP_UNAVAILABLE</span>
             </div>
         );
@@ -85,7 +95,7 @@ export default function RemoteDynamicMap({ mapUrl, className = "" }: RemoteDynam
         return (
             <div className={`relative overflow-hidden ${className}`}>
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-[9px] font-mono uppercase tracking-widest text-black/20 dark:text-white/20 animate-pulse">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-black/50 dark:text-zinc-400 animate-pulse">
                         loading...
                     </span>
                 </div>
@@ -95,7 +105,7 @@ export default function RemoteDynamicMap({ mapUrl, className = "" }: RemoteDynam
 
     return (
         <div
-            className={`${className} [&_svg]:w-full [&_svg]:h-full map-blend`}
+            className={`${className} [&_svg]:w-full [&_svg]:h-full`}
             dangerouslySetInnerHTML={{ __html: svgContent }}
         />
     );

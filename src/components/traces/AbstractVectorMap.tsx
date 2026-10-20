@@ -50,16 +50,16 @@ export default function AbstractVectorMap({ coordinates, className = '' }: Abstr
                 y1: 0,
                 x2: random() * 100,
                 y2: 100,
-                opacity: 0.08 + random() * 0.18,
-                strokeWidth: 0.15 + random() * 0.15,
+                opacity: 0.35 + random() * 0.4,
+                strokeWidth: 0.2 + random() * 0.2,
             });
             gridLines.push({
                 x1: 0,
                 y1: random() * 100,
                 x2: 100,
                 y2: random() * 100,
-                opacity: 0.08 + random() * 0.18,
-                strokeWidth: 0.15 + random() * 0.15,
+                opacity: 0.35 + random() * 0.4,
+                strokeWidth: 0.2 + random() * 0.2,
             });
         }
 
@@ -69,7 +69,7 @@ export default function AbstractVectorMap({ coordinates, className = '' }: Abstr
                 cx: random() * 100,
                 cy: random() * 100,
                 r: 0.4 + random() * 1.2,
-                opacity: 0.15 + random() * 0.25,
+                opacity: 0.45 + random() * 0.45,
             });
         }
 
@@ -121,24 +121,24 @@ export default function AbstractVectorMap({ coordinates, className = '' }: Abstr
                 {/* Target Coordinate Reticle */}
                 <g transform={`translate(${pointX}, ${pointY})`}>
                     {/* Outer dashed orbit */}
-                    <circle cx="0" cy="0" r="12" stroke="currentColor" strokeWidth="0.25" fill="none" strokeOpacity="0.5" strokeDasharray="1.2 1.2" className="animate-[spin_20s_linear_infinite]" />
+                    <circle cx="0" cy="0" r="12" stroke="currentColor" strokeWidth="0.3" fill="none" strokeOpacity="0.7" strokeDasharray="1.2 1.2" className="animate-[spin_20s_linear_infinite]" />
                     {/* Middle ring */}
-                    <circle cx="0" cy="0" r="5" fill="none" stroke="currentColor" strokeWidth="0.3" strokeOpacity="0.35" />
+                    <circle cx="0" cy="0" r="5" fill="none" stroke="currentColor" strokeWidth="0.35" strokeOpacity="0.55" />
                     {/* Inner ring */}
-                    <circle cx="0" cy="0" r="2.5" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.75" />
+                    <circle cx="0" cy="0" r="2.5" fill="none" stroke="currentColor" strokeWidth="0.55" strokeOpacity="0.85" />
                     {/* Center dot */}
-                    <circle cx="0" cy="0" r="0.9" fill="currentColor" opacity="0.9" />
+                    <circle cx="0" cy="0" r="0.9" fill="currentColor" opacity="0.95" />
                     {/* Crosshairs */}
-                    <line x1="-16" y1="0" x2="-4" y2="0" stroke="currentColor" strokeWidth="0.3" strokeOpacity="0.45" />
-                    <line x1="4" y1="0" x2="16" y2="0" stroke="currentColor" strokeWidth="0.3" strokeOpacity="0.45" />
-                    <line x1="0" y1="-16" x2="0" y2="-4" stroke="currentColor" strokeWidth="0.3" strokeOpacity="0.45" />
-                    <line x1="0" y1="4" x2="0" y2="16" stroke="currentColor" strokeWidth="0.3" strokeOpacity="0.45" />
+                    <line x1="-16" y1="0" x2="-4" y2="0" stroke="currentColor" strokeWidth="0.35" strokeOpacity="0.6" />
+                    <line x1="4" y1="0" x2="16" y2="0" stroke="currentColor" strokeWidth="0.35" strokeOpacity="0.6" />
+                    <line x1="0" y1="-16" x2="0" y2="-4" stroke="currentColor" strokeWidth="0.35" strokeOpacity="0.6" />
+                    <line x1="0" y1="4" x2="0" y2="16" stroke="currentColor" strokeWidth="0.35" strokeOpacity="0.6" />
                 </g>
             </svg>
             
             {/* Coordinate label */}
-            <div className="absolute bottom-3 left-3 text-[8px] font-mono uppercase tracking-widest text-black/45 dark:text-white/45 pointer-events-none leading-none">
-                <span className="opacity-60">SYS_LOC //</span> {coordinates}
+            <div className="absolute bottom-3 left-3 text-[9px] font-mono uppercase tracking-widest text-black/60 dark:text-white/60 pointer-events-none leading-none">
+                <span className="opacity-50">SYS_LOC //</span> {coordinates}
             </div>
         </div>
     );

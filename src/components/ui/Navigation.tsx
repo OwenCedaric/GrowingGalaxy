@@ -85,7 +85,7 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                         {logoSrc ? (
                             <a href="/" className="block relative group outline-none" aria-label="Home">
                                 <div
-                                    className="h-[18px] sm:h-[22px] aspect-[1.446] bg-current text-primary-text opacity-70 hover:opacity-100 hover:scale-[1.04] transition-all duration-300 ease-out" 
+                                    className="h-[18px] sm:h-[22px] aspect-[1.446] bg-current text-primary-text dark:text-white opacity-85 dark:opacity-100 hover:scale-[1.04] transition-all duration-300 ease-out" 
                                     style={{ 
                                         WebkitMaskImage: `url(${logoSrc})`,
                                         WebkitMaskSize: "contain",
@@ -99,7 +99,7 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                                 />
                             </a>
                         ) : (
-                            <a href="/" className="text-sm font-medium hover:text-primary-text transition-colors block px-2 py-1">
+                            <a href="/" className="text-sm font-medium text-primary-text dark:text-white hover:opacity-80 transition-opacity block px-2 py-1">
                                 {title}
                             </a>
                         )}
@@ -109,17 +109,17 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                     <div className="col-start-2 row-start-1 flex items-center justify-end gap-4 sm:gap-6 order-3 shrink-0">
                         <button
                             onClick={() => setIsSearchActive(!isSearchActive)}
-                            className="opacity-50 hover:opacity-100 dark:opacity-75 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white md:hidden"
+                            className="opacity-60 hover:opacity-100 dark:opacity-90 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white md:hidden"
                             aria-label={isSearchActive ? "Close search" : "Open search"}
                         >
                             {isSearchActive ? <RiCloseLine className="w-4 h-4" /> : <RiSearchLine className="w-4 h-4" />}
                         </button>
                         
                         {/* Divider */}
-                        <div className="hidden md:block w-px h-4 bg-black/15 dark:bg-white/20" />
+                        <div className="hidden md:block w-px h-4 bg-black/15 dark:bg-white/30" />
 
                         {/* Theme Toggle */}
-                        <div className="opacity-40 hover:opacity-100 transition-opacity flex items-center">
+                        <div className="opacity-60 hover:opacity-100 dark:opacity-90 dark:hover:opacity-100 transition-opacity flex items-center text-primary-text dark:text-white">
                             <ThemeToggle />
                         </div>
                     </div>
@@ -140,7 +140,11 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                                                 <div key={item.href} className="relative group/navitem">
                                                     <a 
                                                         href={item.href} 
-                                                        className={`transition-opacity duration-300 ${isActive ? 'opacity-100 text-primary-text font-medium' : 'opacity-40 hover:opacity-100 text-primary-text'}`}
+                                                        className={`transition-all duration-200 ${
+                                                            isActive 
+                                                                ? 'opacity-100 text-primary-text dark:text-white font-medium' 
+                                                                : 'opacity-60 hover:opacity-100 dark:opacity-85 dark:hover:opacity-100 text-primary-text dark:text-zinc-300 dark:hover:text-white'
+                                                        }`}
                                                     >
                                                         {item.text}
                                                     </a>
@@ -168,7 +172,7 @@ export default function Navigation({ title, logoSrc, navItems, pathname = "" }: 
                                     {/* Search Trigger (Desktop only, as mobile is in controls) */}
                                     <button
                                         onClick={() => setIsSearchActive(true)}
-                                        className="hidden md:block opacity-50 hover:opacity-100 dark:opacity-75 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white shrink-0"
+                                        className="hidden md:block opacity-60 hover:opacity-100 dark:opacity-90 dark:hover:opacity-100 transition-opacity cursor-pointer text-primary-text dark:text-white shrink-0"
                                         aria-label="Open search"
                                     >
                                         <RiSearchLine className="w-4 h-4" />
