@@ -46,7 +46,7 @@ const totalCount = elsewhereItems.length;
                             >
                                 <SpotlightCard
                                     client:visible
-                                    className="p-3 sm:p-3.5 relative group flex items-center justify-between"
+                                    className="p-3 sm:p-3.5 relative group flex items-center justify-between border border-transparent dark:border-white/[0.08] dark:hover:border-white/20 dark:bg-white/[0.015] dark:hover:bg-white/[0.035] transition-all duration-300"
                                 >
                                     {/* Stretched main link for the entire card */}
                                     <a
@@ -59,16 +59,16 @@ const totalCount = elsewhereItems.length;
 
                                     <!-- Left Section: Icon + Text -->
                                     <div class="flex items-center gap-3 sm:gap-3.5 min-w-0 relative z-30 pointer-events-none">
-                                        <div class="w-8 h-8 flex items-center justify-center shrink-0 text-secondary-text/80 dark:text-gray-400 group-hover:text-primary-text dark:group-hover:text-white group-hover:scale-110 transition-all duration-300">
+                                        <div class="w-8 h-8 flex items-center justify-center shrink-0 text-secondary-text/80 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white group-hover:scale-110 transition-all duration-300">
                                             <DynamicIcon name={item.name} className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
                                         </div>
 
                                         <div class="min-w-0">
-                                            <h2 class="text-sm sm:text-[15px] font-medium tracking-wide text-primary-text dark:text-gray-100 group-hover:text-black dark:group-hover:text-white transition-colors truncate">
+                                            <h2 class="text-sm sm:text-[15px] font-medium tracking-wide text-primary-text dark:text-white group-hover:text-black dark:group-hover:text-white transition-colors truncate">
                                                 {item.name}
                                             </h2>
                                             {item.handle && (
-                                                <p class="font-mono text-[11px] sm:text-xs text-secondary-text dark:text-gray-400 truncate mt-0.5 opacity-80">
+                                                <p class="font-mono text-[11px] sm:text-xs text-secondary-text dark:text-zinc-400 group-hover:text-secondary-text/90 dark:group-hover:text-zinc-200 transition-colors truncate mt-0.5">
                                                     {item.handle}
                                                 </p>
                                             )}
@@ -76,7 +76,7 @@ const totalCount = elsewhereItems.length;
                                     </div>
 
                                     <!-- Right Section: Arrow Indicator -->
-                                    <div class="text-secondary-text/40 dark:text-white/30 group-hover:text-primary-text dark:group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 shrink-0 ml-3 relative z-30 pointer-events-none">
+                                    <div class="text-secondary-text/60 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300 shrink-0 ml-3 relative z-30 pointer-events-none">
                                         <RiArrowRightUpLine size={16} />
                                     </div>
                                 </SpotlightCard>

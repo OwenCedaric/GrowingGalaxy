@@ -50,15 +50,15 @@ const {
 >
     {/* Ambient Background Map */}
     <div
-        class="fixed inset-0 z-0 pointer-events-none opacity-10 dark:opacity-[0.15] mix-blend-multiply dark:mix-blend-screen transition-opacity duration-1000"
-        style="mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 10%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 10%, transparent 80%);"
+        class="fixed inset-0 z-0 pointer-events-none opacity-10 dark:opacity-[0.18] map-blend transition-opacity duration-1000"
+        style="mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 40%, transparent 85%); -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 40%, transparent 85%);"
     >
         {
             trace.data.baseline.mapUrl ? (
                 <RemoteDynamicMap
                     client:load
                     mapUrl={trace.data.baseline.mapUrl}
-                    className="w-full h-full object-cover sm:object-contain map-blend"
+                    className="w-full h-full object-cover sm:object-contain"
                 />
             ) : (
                 <AbstractVectorMap
@@ -94,7 +94,7 @@ const {
         >
             <a
                 href={`/traces?year=${trace.id.split("/")[0]}&id=${trace.id}`}
-                class="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-secondary-text hover:text-primary-text transition-all duration-300 uppercase opacity-80 hover:opacity-100 group"
+                class="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-secondary-text dark:text-zinc-300 hover:text-primary-text dark:hover:text-white transition-all duration-300 uppercase opacity-85 dark:opacity-100 group"
             >
                 <RiArrowLeftLine
                     className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-1"
@@ -107,23 +107,23 @@ const {
                 class="hidden md:flex flex-col gap-6 font-mono pt-6 mt-6 border-t border-black/5 dark:border-white/5"
             >
                 <div class="flex flex-col gap-1.5">
-                    <span class="text-[10px] uppercase tracking-widest text-secondary-text/50">TIMELINE</span>
-                    <span class="text-xs text-primary-text/90 tracking-wide font-medium whitespace-nowrap">{trace.data.date}</span>
+                    <span class="text-[10px] uppercase tracking-widest text-secondary-text/70 dark:text-zinc-400">TIMELINE</span>
+                    <span class="text-xs text-primary-text dark:text-zinc-200 tracking-wide font-medium whitespace-nowrap">{trace.data.date}</span>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                    <span class="text-[10px] uppercase tracking-widest text-secondary-text/50">COORDINATES</span>
-                    <span class="text-xs text-primary-text/90 tracking-wide font-medium whitespace-nowrap">{trace.data.baseline.coordinates}</span>
+                    <span class="text-[10px] uppercase tracking-widest text-secondary-text/70 dark:text-zinc-400">COORDINATES</span>
+                    <span class="text-xs text-primary-text dark:text-zinc-200 tracking-wide font-medium whitespace-nowrap">{trace.data.baseline.coordinates}</span>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                    <span class="text-[10px] uppercase tracking-widest text-secondary-text/50">ENVIRONMENT</span>
-                    <span class="text-xs text-primary-text/90 tracking-wide font-medium whitespace-nowrap">{trace.data.baseline.environment}</span>
+                    <span class="text-[10px] uppercase tracking-widest text-secondary-text/70 dark:text-zinc-400">ENVIRONMENT</span>
+                    <span class="text-xs text-primary-text dark:text-zinc-200 tracking-wide font-medium whitespace-nowrap">{trace.data.baseline.environment}</span>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                    <span class="text-[10px] uppercase tracking-widest text-secondary-text/50">LOG_ID</span>
-                    <span class="text-xs text-secondary-text/60 tracking-wide whitespace-nowrap">{trace.id}</span>
+                    <span class="text-[10px] uppercase tracking-widest text-secondary-text/70 dark:text-zinc-400">LOG_ID</span>
+                    <span class="text-xs text-secondary-text/80 dark:text-zinc-400 tracking-wide whitespace-nowrap">{trace.id}</span>
                 </div>
             </div>
         </aside>
@@ -136,7 +136,7 @@ const {
             <header class="mb-8 md:mb-10">
                 <div class="flex items-center gap-2 mb-2 sm:mb-2.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-black/40 dark:bg-white/40"></span>
-                    <span class="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-secondary-text">
+                    <span class="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-secondary-text dark:text-zinc-400">
                         {trace.data.site_name || "Spatial Record"}
                     </span>
                 </div>
@@ -150,13 +150,13 @@ const {
             </header>
 
             {/* Mobile Metadata (Hidden on Desktop) */}
-            <div class="block md:hidden mb-8 pb-4 border-b border-black/5 dark:border-white/5 font-mono text-[11px] text-secondary-text/75">
+            <div class="block md:hidden mb-8 pb-4 border-b border-black/5 dark:border-white/10 font-mono text-[11px] text-secondary-text dark:text-zinc-300">
                 <div class="flex flex-wrap items-center gap-x-3.5 gap-y-2">
                     <span>{trace.data.date}</span>
-                    <span class="opacity-30">/</span>
+                    <span class="text-secondary-text/40 dark:text-zinc-500">/</span>
                     <span>{trace.data.baseline.coordinates}</span>
-                    <span class="opacity-30">/</span>
-                    <span>{trace.data.baseline.environment}</span>
+                    <span class="text-secondary-text/40 dark:text-zinc-500">/</span>
+                    <span class="text-primary-text dark:text-zinc-200 font-medium">{trace.data.baseline.environment}</span>
                 </div>
             </div>
 
@@ -171,17 +171,18 @@ const {
             {trace.data.tags && trace.data.tags.length > 0 && (
                 <div class="mt-12 flex flex-wrap gap-2 not-prose">
                     {trace.data.tags.map((tag: string) => (
-                        <span class="inline-flex items-center gap-1 px-3 py-1 bg-black/[0.03] dark:bg-white/[0.05] rounded-full text-xs font-mono text-secondary-text border border-black/5 dark:border-white/5">
-                            <span class="opacity-40">#</span>
-                            <span>{tag}</span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-black/[0.04] dark:bg-white/[0.08] hover:dark:bg-white/[0.12] rounded-full text-xs font-mono text-secondary-text dark:text-zinc-200 border border-black/5 dark:border-white/10 transition-colors">
+                            <span class="text-secondary-text/50 dark:text-zinc-400">#</span>
+                            <span class="font-medium tracking-wide">{tag}</span>
                         </span>
                     ))}
                 </div>
             )}
 
             {/* Colophon / End of Log */}
-            <div class="mt-16 sm:mt-20 pt-6 border-t border-black/5 dark:border-white/5 flex items-center justify-between text-[11px] font-mono text-secondary-text/50 uppercase tracking-widest">
+            <div class="mt-16 sm:mt-20 pt-6 border-t border-black/5 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-secondary-text/75 dark:text-zinc-400 uppercase tracking-widest">
                 <span>LOG_STATUS // ARCHIVED</span>
+                <span class="text-[10px] text-secondary-text/65 dark:text-zinc-400">MAP DATA // © OPENSTREETMAP</span>
                 <span>// EOF</span>
             </div>
         </main>

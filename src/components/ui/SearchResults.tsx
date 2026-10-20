@@ -191,7 +191,7 @@ export default function SearchResults() {
                                             <article className="flex flex-col gap-6 group relative z-10 w-full">
                                                 <div className="space-y-4">
                                                     <a href={r.url} className="block group/link after:absolute after:inset-0 after:z-20 after:cursor-pointer">
-                                                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-primary-text group-hover/link:text-secondary-text transition-colors leading-tight">
+                                                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-primary-text dark:text-white group-hover/link:text-black dark:group-hover/link:text-white transition-colors leading-tight">
                                                             <ScrollFloat
                                                                 text={r.meta?.title || "Untitled"}
                                                                 className="text-2xl md:text-3xl font-bold tracking-tight"
@@ -217,7 +217,7 @@ export default function SearchResults() {
                                             <article className="flex flex-col gap-6 group relative z-10 w-full">
                                                 <div className="space-y-4">
                                                     <a href={r.metadata?.canonical_url || "#"} className="block group/link after:absolute after:inset-0 after:z-20 after:cursor-pointer">
-                                                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-primary-text group-hover/link:text-secondary-text transition-colors leading-tight">
+                                                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-primary-text dark:text-white group-hover/link:text-black dark:group-hover/link:text-white transition-colors leading-tight">
                                                             <ScrollFloat
                                                                 text="Fragment from Content"
                                                                 className="text-xl md:text-2xl font-serif italic mb-2 block opacity-40 dark:opacity-60"

@@ -13,7 +13,7 @@
     --color-primary-text: #050505;
     --color-primary-text-dark: #F5F5F5;
     --color-secondary-text: #555555;
-    --color-secondary-text-dark: #A3A3A3;
+    --color-secondary-text-dark: #B5B5B5;
     --color-accent: #000000;
     --color-decoration: rgba(5, 5, 5, 0.15);
     --color-decoration-dark: rgba(245, 245, 245, 0.2);
@@ -257,7 +257,12 @@
         overflow: hidden;
         --mouse-x: 50%;
         --mouse-y: 50%;
-        --spotlight-color: rgba(0, 0, 0, 0.06);
+        --spotlight-color: rgba(0, 0, 0, 0.04);
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    .dark .card-spotlight {
+        --spotlight-color: rgba(255, 255, 255, 0.07);
     }
 
     .card-spotlight::before {
@@ -267,9 +272,9 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 80%);
+        background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 75%);
         opacity: 0;
-        transition: opacity 0.5s ease;
+        transition: opacity 0.4s ease;
         pointer-events: none;
         z-index: 1;
     }
@@ -555,9 +560,13 @@
     /* Map blend utility: makes SVG map lines blend into the page background */
     .map-blend {
         mix-blend-mode: multiply;
+        color: #1a1a1a;
     }
     .dark .map-blend {
         mix-blend-mode: screen;
-        filter: invert(1);
+        color: #ffffff;
+    }
+    .dark .map-blend svg path {
+        stroke-width: 0.75px;
     }
 }
