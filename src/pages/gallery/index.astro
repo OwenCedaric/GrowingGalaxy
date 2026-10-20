@@ -82,13 +82,14 @@ const ldJsons =
         )
     }
 
-    <div class="max-w-7xl w-full mx-auto pt-4 md:pt-6">
+    <div class="max-w-6xl mx-auto w-full pt-2 sm:pt-4 md:pt-8 pb-16 sm:pb-20">
+        <!-- Background Reveal Watermark -->
         <div class="hidden md:flex fixed top-0 right-0 h-screen z-[-10] select-none pointer-events-none overflow-hidden items-center justify-center">
             <TextReveal
                 client:load
                 text="Gallery"
                 type="char"
-                className="font-bold text-black/[0.03] dark:text-white/[0.15] text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
+                className="font-bold text-black/[0.03] dark:text-white/[0.10] text-[8vh] sm:text-[10vh] lg:text-[18vh] leading-none whitespace-nowrap"
                 style={{
                     writingMode: "vertical-rl",
                     textOrientation: "mixed",
@@ -96,9 +97,38 @@ const ldJsons =
             />
         </div>
 
-        <PhotoGrid
-            client:load
-            photos={photos}
-        />
+        <!-- Horizontal Editorial Header (Balanced, Compact, No Y-axis waste) -->
+        <header class="mb-8 sm:mb-10 md:mb-12 pb-5 border-b border-black/5 dark:border-white/5 flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8">
+            <!-- Left Column: Eyebrow + Large Serif Title -->
+            <div class="shrink-0">
+                <div class="flex items-center gap-2 mb-2 sm:mb-2.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-black/40 dark:bg-white/40"></span>
+                    <span class="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-secondary-text">
+                        Visual Archive & Moments
+                    </span>
+                </div>
+                <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal leading-tight tracking-tight text-primary-text">
+                    Gallery.
+                </h1>
+            </div>
+
+            <!-- Right Column: Description + Total Collection Counter -->
+            <div class="max-w-md md:text-right flex flex-col md:items-end gap-2 pb-0.5">
+                <p class="text-[13px] sm:text-sm font-light leading-relaxed text-secondary-text dark:text-gray-400">
+                    Photographic series, light studies, and spatial fragments captured across journeys and seasons.
+                </p>
+                <div class="text-[10px] sm:text-[11px] font-mono text-secondary-text/50 uppercase tracking-widest">
+                    // {photos.length} {photos.length === 1 ? 'CURATED COLLECTION' : 'CURATED COLLECTIONS'}
+                </div>
+            </div>
+        </header>
+
+        <!-- Full-Width Adaptive Photography Grid (Zero wasted side space, scales gracefully to 50+ albums) -->
+        <div class="w-full">
+            <PhotoGrid
+                client:load
+                photos={photos}
+            />
+        </div>
     </div>
 </Layout>

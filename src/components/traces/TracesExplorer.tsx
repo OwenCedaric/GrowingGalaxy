@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RiArrowRightUpLine, RiCloseLine, RiCalendarLine, RiArrowLeftSLine, RiArrowRightSLine } from '@remixicon/react';
+import { RiArrowRightUpLine, RiCloseLine, RiArrowLeftSLine, RiArrowRightSLine } from '@remixicon/react';
 import AbstractVectorMap from './AbstractVectorMap';
 import RemoteDynamicMap from './RemoteDynamicMap';
 import ShinyText from '../ui/ShinyText';
@@ -9,6 +9,8 @@ import ShinyText from '../ui/ShinyText';
 export interface TraceDestination {
     id: string;
     name: string; // Title / Site name
+    siteName?: string;
+    environment?: string;
     description: string;
     photos: string[];
     detailUrl: string;
@@ -86,13 +88,13 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
                      WebkitMaskImage: 'radial-gradient(ellipse 100% 100% at 50% 50%, black 10%, transparent 80%)'
                  }}
             >
-                <AnimatePresence mode="wait">
+                <AnimatePresence>
                     {activeDest && (
                         <motion.div
                             key={`bg-map-${activeDest.id}`}
                             initial={{ opacity: 0 }}
-                            animate={{ opacity: 1, transition: { duration: 0.8, ease: "easeOut" } }}
-                            exit={{ opacity: 0, transition: { duration: 0.4 } }}
+                            animate={{ opacity: 1, transition: { duration: 0.4, ease: "easeOut" } }}
+                            exit={{ opacity: 0, transition: { duration: 0.2 } }}
                             className="absolute inset-0"
                         >
                             {activeDest.mapUrl ? (
@@ -105,128 +107,172 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
                 </AnimatePresence>
             </div>
 
-            <div className="w-full h-full flex flex-col md:flex-row gap-6 md:gap-10 mt-2 md:mt-6 pb-4 overflow-hidden relative z-10">
+            <div className="w-full flex flex-col md:flex-row gap-8 md:gap-12 lg:gap-16 mt-2 md:mt-4 pb-4 relative z-10 items-start">
 
             {/* Y-Axis: Years (Fixed Sidebar) */}
-            <aside className="w-full md:w-32 lg:w-40 flex-shrink-0 relative z-30 h-auto md:h-full md:overflow-y-auto hide-scrollbar">
-                {/* Desktop: Vertical Timeline */}
-                <div className="hidden md:flex flex-col gap-5 pt-2">
-                    {data.map((yearItem) => (
-                        <button
-                            key={`year-${yearItem.year}`}
-                            onClick={() => setActiveYear(yearItem.year)}
-                            className={`cursor-pointer text-left font-mono transition-all duration-300 relative group flex items-center gap-3 py-1 ${activeYear === yearItem.year
-                                    ? 'text-lg md:text-[19px] text-black dark:text-white font-medium'
-                                    : 'text-base md:text-[17px] text-black/30 dark:text-white/30 hover:text-black/60 dark:hover:text-white/60'
-                                }`}
-                        >
-                            {yearItem.year}
-                        </button>
-                    ))}
+            <aside className="w-full md:w-48 lg:w-52 xl:w-56 flex-shrink-0 relative z-30 h-auto md:sticky md:top-36 md:self-start">
+                {/* Desktop: Vertical Timeline with Zero-Jitter Indicator */}
+                <div className="hidden md:flex flex-col gap-3 pt-1">
+                    {data.map((yearItem) => {
+                        const isYearActive = activeYear === yearItem.year;
+                        return (
+                            <button
+                                key={`year-${yearItem.year}`}
+                                onClick={() => setActiveYear(yearItem.year)}
+                                className={`cursor-pointer text-left font-mono transition-colors duration-200 relative group flex items-center justify-between py-1.5 px-0 w-full ${isYearActive
+                                        ? 'text-primary-text font-medium'
+                                        : 'text-secondary-text/40 hover:text-secondary-text/80'
+                                    }`}
+                            >
+                                <div className="flex items-center gap-2.5">
+                                    <span className={`w-1.5 h-1.5 rounded-full bg-primary-text transition-opacity duration-200 shrink-0 ${
+                                        isYearActive ? 'opacity-100' : 'opacity-0'
+                                    }`} />
+                                    <span className="text-base md:text-lg">{yearItem.year}</span>
+                                </div>
+                                <span className="text-[11px] font-mono text-secondary-text/40 tabular-nums">
+                                    {String(yearItem.destinations.length).padStart(2, '0')}
+                                </span>
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {/* Mobile: Timeline Trigger */}
-                <div className="md:hidden relative pt-2 z-30">
+                <div className="md:hidden relative pt-1 z-30 mb-2">
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="cursor-pointer w-full flex items-center justify-between pb-3 border-b border-black/20 dark:border-white/20 font-mono text-[17px] transition-opacity hover:opacity-70 group"
+                        className="cursor-pointer w-full flex items-center justify-between py-2 font-mono text-[16px] transition-opacity hover:opacity-70 group"
                     >
-                        <span className="font-medium">{activeYear}</span>
+                        <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary-text" />
+                            <span className="font-medium text-primary-text">{activeYear}</span>
+                        </div>
                         <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-80 transition-opacity">
-                            <span className="text-[9px] font-mono uppercase tracking-widest">change</span>
+                            <span className="text-[10px] font-mono uppercase tracking-widest text-secondary-text">change year</span>
                         </div>
                     </button>
                 </div>
             </aside>
 
-            {/* Right Area: X-Axis + Main Content (Takes remaining space) */}
-            <div className="flex-1 min-w-0 flex flex-col h-full relative z-10">
+            {/* Right Area: X-Axis + Main Content */}
+            <div className="flex-1 min-w-0 flex flex-col w-full relative z-10">
 
-                {/* X-Axis: Destinations (Fixed at top of right pane) */}
-                <div className="w-full shrink-0 mb-5 overflow-x-auto hide-scrollbar z-20 pt-1 pb-3 relative">
-                    <div className="flex items-baseline gap-5 md:gap-8 min-w-max">
+                {/* X-Axis: Destinations (Horizontal scroll tabs, stable font dimensions) */}
+                <div className="w-full shrink-0 mb-5 overflow-x-auto hide-scrollbar z-20 pb-2 relative">
+                    <div className="flex items-baseline gap-6 md:gap-8 min-w-max">
                         {activeYearData?.destinations.map((dest) => {
                             const isActive = activeDestId === dest.id;
                             return (
                                 <button
                                     key={`dest-${dest.id}`}
                                     onClick={() => setActiveDestId(dest.id)}
-                                    className={`cursor-pointer uppercase tracking-widest transition-all duration-300 relative pb-3 group flex flex-col items-center ${isActive
-                                            ? 'text-lg md:text-[19px] font-medium text-black dark:text-white'
-                                            : 'text-base md:text-[17px] font-mono text-black/50 dark:text-white/50 hover:text-black/80 dark:hover:text-white/80'
+                                    className={`cursor-pointer uppercase tracking-widest font-mono text-xs sm:text-[13px] transition-colors duration-200 relative pb-1.5 flex flex-col items-center ${isActive
+                                            ? 'text-primary-text font-medium'
+                                            : 'text-secondary-text/35 hover:text-secondary-text/75'
                                         }`}
-                                    style={isActive ? { viewTransitionName: `trace-title-${dest.id}` } : undefined}
                                 >
-                                    {dest.name}
+                                    <span>{dest.name}</span>
+                                    {isActive && (
+                                        <motion.div
+                                            layoutId="activeDestUnderline"
+                                            className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-primary-text rounded-full"
+                                            transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                                        />
+                                    )}
                                 </button>
                             );
                         })}
                     </div>
                 </div>
 
-                {/* Main Content Area */}
-                <div className="flex-1 overflow-y-auto hide-scrollbar relative pb-4">
-                    <AnimatePresence mode="wait">
+                {/* Main Content Area: In-place smooth transition */}
+                <div className="w-full relative pb-4">
+                    <AnimatePresence mode="popLayout">
                         {activeDest && (
                             <motion.div
                                 key={activeDest.id}
-                                initial={{ opacity: 0, y: 5 }}
-                                animate={{ opacity: 1, y: 0, transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
-                                exit={{ opacity: 0, transition: { duration: 0.1 } }}
-                                className="w-full flex flex-col gap-8"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.18, ease: "easeOut" }}
+                                className="w-full flex flex-col gap-5 sm:gap-6"
                             >
-                                {/* Top Section: Text, Button, and Photos */}
-                                <div className="flex flex-col gap-7 relative">
-                                    <p className="text-[15px] md:text-base font-light leading-relaxed opacity-90 md:max-w-4xl text-black/80 dark:text-white/80">
+                                {/* Telemetry Metadata Bar: Clean & Non-redundant */}
+                                <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] sm:text-xs text-secondary-text/60">
+                                    <div className="flex items-center gap-2 sm:gap-2.5">
+                                        {activeDest.environment && (
+                                            <span className="opacity-90">{activeDest.environment}</span>
+                                        )}
+                                        {activeDest.environment && activeDest.coordinates && (
+                                            <span className="opacity-30">/</span>
+                                        )}
+                                        {activeDest.coordinates && (
+                                            <span className="opacity-60">{activeDest.coordinates}</span>
+                                        )}
+                                    </div>
+
+                                    {activeDest.dateStr && (
+                                        <span className="opacity-50">{activeDest.dateStr}</span>
+                                    )}
+                                </div>
+
+                                {/* Text Description (Only if present) */}
+                                {activeDest.description && (
+                                    <p className="text-[15px] md:text-base font-light leading-relaxed opacity-90 md:max-w-4xl text-black/85 dark:text-white/85">
                                         {activeDest.description}
                                     </p>
+                                )}
 
-                                    {/* Photos Grid (Strictly max 3 thumbnails) */}
-                                    {activeDest.photos && activeDest.photos.length > 0 && (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                                            {activeDest.photos.map((photo, idx) => (
-                                                <div
-                                                    key={`photo-${idx}`}
-                                                    className="w-full h-[160px] md:h-[200px] lg:h-[150px] rounded-xl overflow-hidden cursor-pointer group relative ring-1 ring-black/5 dark:ring-white/5"
-                                                    onClick={() => setLightboxPhoto(photo)}
-                                                    style={idx === 0 ? { viewTransitionName: `trace-img-container-${activeDest.id}` } : undefined}
-                                                >
-                                                    <img
-                                                        src={photo}
-                                                        alt={`${activeDest.name} - ${idx}`}
-                                                        loading="lazy"
-                                                        decoding="async"
-                                                        className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${idx === 0
-                                                                ? 'opacity-90 group-hover:opacity-100 dark:opacity-75 dark:group-hover:opacity-100'
-                                                                : 'opacity-75 group-hover:opacity-100 dark:opacity-60 dark:group-hover:opacity-100'
-                                                            }`}
-                                                    />
-                                                    {/* Hover overlay hint */}
-                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 dark:group-hover:bg-white/5 transition-colors duration-300 rounded-xl" />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    <div className="flex justify-end mt-1 pr-4 sm:pr-6">
-                                        <a 
-                                            href={activeDest.detailUrl}
-                                            className="group inline-flex items-center gap-[4px] md:gap-[6px] text-xs md:text-[13px] font-medium tracking-[0.08em] uppercase text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors duration-300 active:scale-[0.97]"
-                                        >
-                                            <span className="relative inline-block pb-[3px]">
-                                                <ShinyText 
-                                                    text="VIEW FULL LOG" 
-                                                    speed={3} 
-                                                    color="rgba(0,0,0,0.5)"
-                                                    colorDark="rgba(255,255,255,0.5)"
-                                                    shineColor="rgba(0,0,0,1)"
-                                                    shineColorDark="rgba(255,255,255,1)"
+                                {/* Photos Grid */}
+                                {activeDest.photos && activeDest.photos.length > 0 && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                                        {activeDest.photos.map((photo, idx) => (
+                                            <div
+                                                key={`photo-${idx}`}
+                                                className="w-full h-[160px] md:h-[200px] lg:h-[155px] rounded-xl overflow-hidden cursor-pointer group relative"
+                                                onClick={() => setLightboxPhoto(photo)}
+                                                style={idx === 0 ? { viewTransitionName: `trace-img-container-${activeDest.id}` } : undefined}
+                                            >
+                                                <img
+                                                    src={photo}
+                                                    alt={`${activeDest.name} - ${idx}`}
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${idx === 0
+                                                            ? 'opacity-90 group-hover:opacity-100 dark:opacity-75 dark:group-hover:opacity-100'
+                                                            : 'opacity-75 group-hover:opacity-100 dark:opacity-60 dark:group-hover:opacity-100'
+                                                        }`}
                                                 />
-                                                <span className="absolute bottom-[1px] left-0 w-full h-[1px] bg-black/50 dark:bg-white/50 scale-x-0 origin-left transition-transform duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-x-100" />
-                                            </span>
-                                            <RiArrowRightUpLine className="w-[15px] h-[15px] mb-[2px] transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-                                        </a>
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 dark:group-hover:bg-white/5 transition-colors duration-300 rounded-xl" />
+                                            </div>
+                                        ))}
                                     </div>
+                                )}
+
+                                {/* Fallback when neither text nor photos exist */}
+                                {!activeDest.description && (!activeDest.photos || activeDest.photos.length === 0) && (
+                                    <div className="py-8 text-center text-secondary-text/50 font-mono text-xs uppercase tracking-widest">
+                                        // COORDINATES_LOGGED // DETAILED ENTRY PENDING
+                                    </div>
+                                )}
+
+                                {/* Action: View Full Log */}
+                                <div className="flex justify-end mt-1 pr-1">
+                                    <a 
+                                        href={activeDest.detailUrl}
+                                        className="group inline-flex items-center gap-1.5 text-xs md:text-[13px] font-mono uppercase tracking-widest text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors duration-300 active:scale-[0.97]"
+                                    >
+                                        <ShinyText 
+                                            text="VIEW FULL LOG" 
+                                            speed={3} 
+                                            color="rgba(0,0,0,0.5)"
+                                            colorDark="rgba(255,255,255,0.5)"
+                                            shineColor="rgba(0,0,0,1)"
+                                            shineColorDark="rgba(255,255,255,1)"
+                                        />
+                                        <RiArrowRightUpLine className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                                    </a>
                                 </div>
                             </motion.div>
                         )}

@@ -1,134 +1,53 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { RiUserLine, RiLoader4Line } from '@remixicon/react';
+import React from 'react';
 import type { PhotoEntry } from '@/types/photo';
-import SpotlightCard from '@/components/reactbits/SpotlightCard';
+import { RiArrowRightUpLine } from '@remixicon/react';
 
 export const PhotoCard: React.FC<{ photo: PhotoEntry }> = ({ photo }) => {
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
-    const [tagOverflows, setTagOverflows] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
-
-    const tagContainerRef = useRef<HTMLDivElement>(null);
-    const imgRef = useRef<HTMLImageElement>(null);
-    const cardRef = useRef<HTMLAnchorElement>(null);
-
-    useEffect(() => {
-        const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 767px)').matches);
-        checkMobile(); // Check on mount
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
-    useEffect(() => {
-        if (!tagContainerRef.current) return;
-        const observer = new ResizeObserver((entries) => {
-            const el = entries[0].target as HTMLElement;
-            setTagOverflows(el.scrollWidth > el.clientWidth);
-        });
-        observer.observe(tagContainerRef.current);
-        return () => observer.disconnect();
-    }, [photo.tag]);
-
-    const description = photo.images[0]?.description;
     const coverUrl = photo.images[0]?.url;
-
-    useEffect(() => {
-        if (imgRef.current?.complete && isVisible) {
-            setIsLoaded(true);
-        }
-    }, [isVisible]);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsVisible(true);
-                    observer.disconnect();
-                }
-            },
-            { rootMargin: isMobile ? '300px' : '600px' }
-        );
-
-        if (cardRef.current) {
-            observer.observe(cardRef.current);
-        }
-
-        return () => observer.disconnect();
-    }, [isMobile]);
 
     return (
         <a
-            ref={cardRef}
             href={`/gallery/${photo.slug}`}
-            className="block relative group overflow-hidden rounded-lg mb-6 break-inside-avoid bg-zinc-100 dark:bg-zinc-800 transition-transform duration-300 hover:scale-[1.01] transform-gpu"
-            style={{ 
-                minHeight: isMobile ? '200px' : 'auto',
-                WebkitMaskImage: '-webkit-radial-gradient(white, black)'
-            }}
+            className="group block relative overflow-hidden rounded-xl border border-black/5 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-sm transition-all duration-300 hover:border-black/20 dark:hover:border-white/20 hover:-translate-y-1 hover:shadow-md dark:hover:shadow-black/40"
         >
-            <SpotlightCard spotlightColor="rgba(255, 255, 255, 0.15)" className="w-full h-full rounded-lg">
-                <div className={`relative w-full overflow-hidden bg-zinc-200 dark:bg-zinc-900 transition-all duration-700 ${!isLoaded ? 'aspect-[4/3]' : ''}`}>
-                    {!isLoaded && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <RiLoader4Line className="w-5 h-5 animate-spin text-zinc-400 opacity-50" />
-                        </div>
-                    )}
-                    {isVisible && (
-                        <img
-                            ref={imgRef}
-                            src={coverUrl}
-                            alt={photo.images[0]?.alt || photo.name}
-                            loading="lazy"
-                            decoding="async"
-                            onLoad={() => setIsLoaded(true)}
-                            className={`w-full h-auto object-cover transition-all duration-1000 ease-out 
-                            ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-[1.03]'}
-                        `}
-                        />
-                    )}
+            {/* 16:10 Compact Cover Container */}
+            <div className="relative w-full aspect-[16/10] overflow-hidden bg-black/5 dark:bg-white/5">
+                {/* Frame count badge */}
+                <div className="absolute top-2.5 right-2.5 z-10 font-mono text-[10px] tracking-wider bg-black/60 dark:bg-black/75 backdrop-blur-md text-white/90 px-2 py-0.5 rounded-md border border-white/10 pointer-events-none">
+                    // {String(photo.images.length).padStart(2, '0')} {photo.images.length === 1 ? 'FRAME' : 'FRAMES'}
                 </div>
 
-                {/* Hover Overlay - Only functional on non-mobile or when loaded */}
-                <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 transition-opacity duration-300 
-                ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
-                ${!isLoaded && !isMobile ? 'hidden' : ''}
-            `}>
-                    <h3 className="text-white font-medium text-lg leading-snug mb-1 line-clamp-2">
+                <img
+                    src={coverUrl}
+                    alt={photo.images[0]?.alt || photo.name}
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                />
+            </div>
+
+            {/* Compact Editorial Metadata (Pure Navigation Focus) */}
+            <div className="p-3.5 sm:p-4 flex flex-col gap-1.5">
+                <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-serif sm:font-sans text-sm sm:text-[15px] font-medium text-primary-text leading-snug truncate group-hover:text-black dark:group-hover:text-white transition-colors">
                         {photo.name}
                     </h3>
+                    <RiArrowRightUpLine className="w-3.5 h-3.5 text-secondary-text/40 group-hover:text-primary-text group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
+                </div>
 
-                    <div className="flex items-center text-white/90 text-sm mb-1">
-                        <RiUserLine className="w-3.5 h-3.5 mr-1.5 opacity-80" />
-                        <span className="font-light">{photo.author}</span>
-                    </div>
-
-                    {description && (
-                        <p className="text-white/80 text-xs mb-3 line-clamp-1 font-light italic">{description}</p>
-                    )}
-
-                    {photo.tag && photo.tag.length > 0 && (
-                        <div className="relative flex items-center mt-1">
-                            <div
-                                ref={tagContainerRef}
-                                className="flex gap-2 w-full overflow-hidden whitespace-nowrap"
-                            >
-                                {photo.tag.slice(0, isMobile ? 3 : undefined).map((t, idx) => (
-                                    <span
-                                        key={idx}
-                                        className="px-2 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] whitespace-nowrap"
-                                    >
-                                        {t}
-                                    </span>
-                                ))}
-                            </div>
-                            {tagOverflows && !isMobile && (
-                                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black/60 to-transparent pointer-events-none" />
-                            )}
-                        </div>
+                <div className="flex items-center gap-1.5 font-mono text-[11px] text-secondary-text/70 truncate">
+                    <span>{photo.date}</span>
+                    {photo.location && (
+                        <>
+                            <span className="opacity-30">•</span>
+                            <span className="truncate">{photo.location}</span>
+                        </>
                     )}
                 </div>
-            </SpotlightCard>
+            </div>
         </a>
     );
 };
+
+export default PhotoCard;
