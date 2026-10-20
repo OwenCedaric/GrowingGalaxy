@@ -1,33 +1,43 @@
 # Growing Galaxy
 
-> A curated digital gallery for storytelling and visual experiences.
+> A curated digital garden, photography exhibition, and field journal with minimalist aesthetics.
 
 ## Features
 
-- **Ultra-minimalist design** with glassmorphism UI
-- **Smooth dark mode** with View Transitions API
-- **Fully responsive** and mobile-optimized
-- **Modern stack**: Astro 5 + React 19 + Tailwind CSS 4
-- **MDX support** for rich content
-- **Smooth animations** powered by Framer Motion
-- **SEO optimized** with sitemap and RSS feed
+- **Ultra-minimalist design** with glassmorphism UI and architectural typography
+- **Smooth dark mode** with native View Transitions API
+- **Curated Photography Gallery**:
+  - Compact 16:10 album catalog directory
+  - Dual viewing modes: **Stage** (cinematic spotlight with centered filmstrip) & **Wall** (masonry grid)
+  - Fullscreen Lightbox mounted via React Portal with light/dark adaptive backdrops
+- **Traces Explorer**:
+  - Interactive cartographic field journal powered by Leaflet
+  - Route tracking, environmental baseline data, and coordinates
+- **Dual Search Architecture**:
+  - Local client-side full-text search with **Pagefind**
+  - AI semantic vector search via **Model Context Protocol (MCP)** & Cloudflare Vectorize
+- **Modern stack**: Astro 7 + React 19 + Tailwind CSS 4 + TypeScript 6 + Motion 14
+- **MDX & KaTeX support** for mathematical notations and rich interactive components
+- **SEO optimized** with schema.org JSON-LD, sitemaps, and RSS feed
 
 ## Design Philosophy
 
-Ceda.is is designed with "content curation" at its core - not just a reader, but a digital art gallery. The experience should feel like browsing a high-end lounge menu, with:
+Growing Galaxy is designed with "content curation" at its core — not just a personal blog, but a digital exhibition space:
 
 - **Airy glassmorphism effects** (backdrop-blur + translucent surfaces)
-- **Generous whitespace** - content "floats" above the background
-- **Soft color palette** - warm sand for light mode, matte black for dark mode
-- **Thin typography** - elegant and breathable
+- **Generous whitespace & clear hierarchy** - content breathes naturally above the canvas
+- **Soft dual palette** - warm sand for light mode, matte carbon black for dark mode
+- **Refined typography** - serif accents (Playfair Display) paired with clean sans-serif (Inter) and technical monospace markers
 
 ## Tech Stack
 
-- **Framework**: [Astro 5](https://astro.build/) - Zero JS by default
-- **UI Library**: [React 19](https://react.dev/) - For interactive components
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) - Custom theme tokens
-- **Animations**: [Framer Motion 12](https://www.framer.com/motion/)
-- **Icons**: [Lucide React](https://lucide.dev/)
+- **Framework**: [Astro 7.4](https://astro.build/) - Zero JS by default, static pre-rendering
+- **UI Library**: [React 19.3](https://react.dev/) - Interactive components & client islands
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) - Custom `@theme` tokens and modern CSS features
+- **Animations**: [Motion 14](https://motion.dev/) (Framer Motion)
+- **Icons**: [Remix Icon](https://remixicon.com/) (`@remixicon/react`)
+- **Maps**: [Leaflet](https://leafletjs.com/) & [React-Leaflet](https://react-leaflet.js.org/)
+- **Search**: [Pagefind](https://pagefind.app/) (static search) + [Cloudflare Vectorize](https://developers.cloudflare.com/vectorize/) (MCP)
 - **Fonts**: Inter (sans-serif), Playfair Display (serif)
 
 ## Quick Start
@@ -39,10 +49,13 @@ pnpm install
 # Start dev server at http://localhost:4321
 pnpm run dev
 
-# Build for production
+# Type check
+pnpm run check
+
+# Build for production (Astro + Pagefind)
 pnpm run build
 
-# Preview production build
+# Preview production build locally
 pnpm run preview
 ```
 
@@ -50,84 +63,99 @@ pnpm run preview
 
 ```text
 .github/workflows/
-└── deploy.yml           # CI/CD: Auto-build, index & Vectorize sync
+└── deploy.yml              # CI/CD: Auto-build, Pagefind indexing & Vectorize sync
 scripts/
-├── build_index.ts      # Local embedding generator (Local AI)
-└── patch_frontmatter.ts # Metadata bulk injection tool
+├── build_index.ts         # Local embedding generator (BGE-small embeddings)
+└── patch_frontmatter.ts    # Metadata bulk injection tool
 src/
 ├── components/
-│   ├── ui/              # Reusable UI components
-│   │   ├── GlassCard.astro
-│   │   ├── Navigation.tsx
-│   │   └── ThemeToggle.tsx
-│   └── BaseHead.astro   # SEO & meta tags
+│   ├── gallery/           # Gallery components (PhotoCard, PhotoGrid, ExhibitionStream)
+│   ├── traces/            # Field journal & Leaflet interactive map components
+│   ├── ui/                # Reusable UI components (Navigation, ThemeToggle, SpotlightCard)
+│   └── BaseHead.astro      # SEO & meta tags
 ├── content/
-│   ├── blog/            # MDX blog posts (w/ MCP metadata)
-│   └── pages/           # Static pages (w/ MCP metadata)
+│   ├── blog/              # MDX blog posts
+│   ├── photos/            # Markdown photo albums with image lists
+│   ├── projects/          # Curated projects & experiments
+│   └── traces/            # Route journals & coordinates
+├── layouts/
+│   └── Layout.astro       # Root layout with navbar & view transitions
 ├── pages/
-│   ├── index.astro      # Homepage
-│   └── raw/             # Dynamic raw MD endpoints for MCP
+│   ├── blog/              # Blog index & post reader
+│   ├── gallery/           # Gallery catalog & album exhibition (/gallery/[...slug])
+│   ├── traces/            # Traces explorer & journal view
+│   ├── projects/          # Projects showcase
+│   ├── search.astro       # Client-side Pagefind search
+│   └── raw/               # Dynamic raw MD endpoints for MCP
 workers/
-└── index.ts            # MCP API Layer (Search/Context)
-init.py                 # Vectorize Index Initializer
-wrangler.json           # Cloudflare deployment config
-```
-
-## Customization
-
-### Color Theme
-
-Edit `src/styles/global.css` to customize the color scheme:
-
-```css
-@theme {
-    --color-canvas: #ffffff;
-    --color-canvas-dark: #141414;
-    --color-surface: rgba(255, 255, 255, 0.8);
-    --color-surface-dark: rgba(30, 30, 30, 0.60);
-    /* ... */
-}
-```
-
-### Site Configuration
-
-Update `src/config.ts` for site metadata, navigation, and footer:
-
-```typescript
-export const SITE_CONFIG = {
-    title: "Your Site Name",
-    description: "Your description",
-    // ...
-}
+└── index.ts               # Cloudflare MCP API layer (Search / Context)
 ```
 
 ## Creating Content
 
-### New Blog Post
+### 1. New Blog Post
 
-> **Tip:** Check out our [Markdown & MDX Syntax Guide](./MARKDOWN_SYNTAX.md) for a full list of supported features, including Math formulas and JSX components.
-
-Create a new `.mdx` file in `src/content/blog/`:
+Create a `.mdx` file in `src/content/blog/`:
 
 ```mdx
 ---
-title: "Your Post Title"
-description: "Brief description"
-pubDate: 2026-02-03
+title: "Post Title"
+description: "A brief summary of the post."
+pubDate: 2026-10-20
 category: "Design"
-tags: ["web", "design"]
+tags: ["minimalism", "web"]
 depth: "Intermediate"
-heroImage: "/path/to/image.jpg"
+heroImage: "/path/to/hero.jpg"
 ---
 
 Your content here...
 ```
 
-### New Project Entry
+### 2. New Photo Collection (Gallery)
+
+Create a `.md` file in `src/content/photos/[year]/`:
+
+```markdown
+---
+name: "Shinjuku Gyoen Cherry Blossoms"
+date: 2025-04-05
+author: "Author Name"
+location: "Tokyo, Japan"
+tag: ["Spring", "Cherry Blossom", "Tokyo"]
+---
+
+![Cover Photo](https://example.com/photo1.jpg)
+First photo description
+
+![Photo Two](https://example.com/photo2.jpg)
+Second photo description
+```
+
+### 3. New Trace Entry
+
+Create a `.md` file in `src/content/traces/[year]/`:
+
+```markdown
+---
+title: "Tokyo Urban Transit"
+site_name: "Tokyo"
+date: "2025-04"
+endDate: 2025-04-10
+tags: ["City", "Metro", "Japan"]
+baseline:
+  coordinates: "35.6762, 139.6503"
+  environment: "Urban / Spring"
+  mapUrl: "/maps/tokyo.geojson"
+---
+
+Field journal notes, observations, and route log...
+```
+
+### 4. New Project Entry
 
 Add a `.md` file in `src/content/projects/`:
 
-```md
+```markdown
 ---
 title: "Project Name"
 description: "Brief project overview"
@@ -140,51 +168,30 @@ github: "https://github.com/user/repo"
 
 | Command | Description |
 | --- | --- |
-| `pnpm run dev` | Start dev server at `localhost:4321` |
-| `pnpm run build` | Build for production to `./dist/` |
-| `pnpm run build_index` | Generate local embeddings & MCP assets |
-| `pnpm run patch_meta` | Batch update MD frontmatter for MCP |
+| `pnpm run dev` | Start development server at `localhost:4321` |
+| `pnpm run check` | Run TypeScript & Astro diagnostics (`astro check`) |
+| `pnpm run build` | Full production build: static site + Pagefind search index |
 | `pnpm run preview` | Preview production build locally |
-
-## Performance
-
-This site is optimized for performance:
-
-- ✅ **Static site generation** - Pre-rendered at build time
-- ✅ **Zero JS by default** - Only interactive components ship JS
-- ✅ **Image optimization** - Automatic format conversion
-- ✅ **Font optimization** - Variable fonts with subsetting
-
-Target: **Lighthouse Performance 95+**
+| `pnpm run build_index` | Generate offline embeddings & MCP vector assets |
+| `pnpm run audit` | Run dependency security audit via pnpm |
 
 ## MCP (Model Context Protocol) Integration
 
-This project natively supports **Model Context Protocol (MCP)**, allowing AI agents (like Cursor, Windsurf, or custom LLMs) to semantically "understand" and retrieve your content.
+This project natively supports **Model Context Protocol (MCP)**, allowing AI agents (Cursor, Windsurf, Claude Code, etc.) to semantically index and query your content.
 
-### 1. Initialization (One-time)
-Use the provided `init.py` to create your Vectorize database via API, or use Wrangler:
+### 1. Initialization
+Create your Cloudflare Vectorize database:
 ```bash
 npx wrangler vectorize create growing-galaxy-mcp --dimensions=1024 --metric=cosine
 ```
 
 ### 2. Building & Indexing
-Embeddings are generated **offline** during build time using `@huggingface/transformers` (BGE Small model), ensuring no API costs:
+Embeddings are generated offline during build time using `@huggingface/transformers` (BGE Small model):
 ```bash
 pnpm run build_index
 ```
-This produces `vectors.ndjson` (for Cloudflare) and `public/mcp/chunks.json` (for the Worker).
 
 ### 3. Usage with AI Tools
-
-#### Cursor / Windsurf
-Add your deployed site as a **Context Provider** or **Custom Docs** source:
-- **Search URL**: `https://your-domain.com/mcp/search`
-- **Context URL**: `https://your-domain.com/mcp/context`
-- **Direct Capability**: Semantic search across all blog posts and pages.
-
-#### Claude Code / Claude Desktop
-
-**Standard MCP-over-HTTP** is natively supported.
 
 **Claude Code**:
 ```bash
@@ -196,48 +203,23 @@ claude mcp add growing-galaxy https://your-domain.com/mcp
 {
   "mcpServers": {
     "growing-galaxy": {
-      "url": "https://your-domain.com/mcp" 
+      "url": "https://your-domain.com/mcp"
     }
   }
 }
 ```
 
-### 4. Available Tools
-
-- `search`: Semantically search all contents (blog + pages).
-- `get_context`: Retrieve full markdown context for specific chunks based on search results.
-
-### 5. API Endpoints
-- `POST /mcp`: Standard JSON-RPC root (Supports both SSE and raw POST)
-- `GET /mcp/list_docs`: Metadata catalog for all searchable content.
-- `GET /mcp/version`: Protocol health check.
-
 ## Full-Auto Deployment (GitHub Actions)
 
-We provide a production-ready CI/CD pipeline in `.github/workflows/deploy.yml`.
+Production-ready CI/CD pipeline is provided in `.github/workflows/deploy.yml`.
 
 ### Prerequisites
-In your GitHub Repo Settings, add these **Secrets**:
-1. `CLOUDFLARE_API_TOKEN`: Must have permissions for `Account.Vectorize (Edit)`, `Account.Workers AI (Read)`, and `Account.Workers Scripts (Edit)`.
-2. `CLOUDFLARE_ACCOUNT_ID`: Found in your Cloudflare Dashboard sidebar.
+Configure repository secrets:
+1. `CLOUDFLARE_API_TOKEN`: Permissions for `Account.Vectorize (Edit)`, `Account.Workers AI (Read)`, and `Account.Workers Scripts (Edit)`.
+2. `CLOUDFLARE_ACCOUNT_ID`: Found in Cloudflare Dashboard.
 
-### Workflow
-Every `git push` to `main` will:
-1. Install dependencies & build the Astro site.
-2. **Generate AI Embeddings** in the cloud runner.
-3. Sync the `vectors.ndjson` to Cloudflare Vectorize.
-4. Deploy the Workers & Static Assets to the edge.
+Every `git push` to `main` will build the static Astro site, generate Pagefind indexes, produce AI embeddings, sync vectors to Vectorize, and deploy to Cloudflare Edge.
 
 ## License
 
-MIT - feel free to use this template for your own projects!
-
-## Credits
-
-- Design inspiration from minimalist lounge aesthetics
-- Built with [Astro](https://astro.build/)
-- Powered by modern web technologies
-
----
-
-**Designed with intention.**
+MIT © Growing Galaxy
