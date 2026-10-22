@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RiArrowRightUpLine, RiCloseLine, RiArrowLeftSLine, RiArrowRightSLine } from '@remixicon/react';
-import AbstractVectorMap from './AbstractVectorMap';
-import RemoteDynamicMap from './RemoteDynamicMap';
+import CityRoadMap from './CityRoadMap';
 import ShinyText from '../ui/ShinyText';
 
 export interface TraceDestination {
@@ -15,7 +14,6 @@ export interface TraceDestination {
     photos: string[];
     detailUrl: string;
     coordinates: string; // for the map
-    mapUrl?: string; // specific map svg path
     dateStr: string;
 }
 
@@ -97,11 +95,11 @@ export default function TracesExplorer({ data }: TracesExplorerProps) {
                             exit={{ opacity: 0, transition: { duration: 0.2 } }}
                             className="absolute inset-0"
                         >
-                            {activeDest.mapUrl ? (
-                                <RemoteDynamicMap mapUrl={activeDest.mapUrl} className="w-full h-full object-cover sm:object-contain" />
-                            ) : (
-                                <AbstractVectorMap coordinates={activeDest.coordinates} />
-                            )}
+                            <CityRoadMap
+                                siteName={activeDest.siteName || activeDest.name}
+                                coordinates={activeDest.coordinates}
+                                className="w-full h-full object-cover sm:object-contain"
+                            />
                         </motion.div>
                     )}
                 </AnimatePresence>

@@ -7,7 +7,6 @@ tags: ["Seattle", "Tech"]
 baseline:
   coordinates: "47.6062° N, 122.3321° W"
   environment: "Spring / Rain"
-  mapUrl: "/Seattle.svg"
 ---
 
 

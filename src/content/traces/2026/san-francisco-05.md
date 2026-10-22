@@ -7,7 +7,6 @@ tags: ["SF", "Golden Gate"]
 baseline:
   coordinates: "37.7749° N, 122.4194° W"
   environment: "Summer / Fog"
-  mapUrl: "/SanFrancisco.svg"
 ---
 
 

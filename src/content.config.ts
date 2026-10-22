@@ -64,7 +64,6 @@ const traces = defineCollection({
         baseline: z.object({
             coordinates: z.string(),
             environment: z.string(),
-            mapUrl: z.string().optional(),
         }),
     }),
 });
