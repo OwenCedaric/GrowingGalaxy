@@ -7,7 +7,6 @@ tags: ["Paris", "Louvre"]
 baseline:
   coordinates: "48.8566° N, 2.3522° E"
   environment: "Summer / Overcast"
-  mapUrl: "/Paris.svg"
 ---
 
 

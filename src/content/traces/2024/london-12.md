@@ -7,7 +7,6 @@ tags: ["London", "Thames"]
 baseline:
   coordinates: "51.5074° N, 0.1278° W"
   environment: "Winter / Drizzle"
-  mapUrl: "/London.svg"
 ---
 
 

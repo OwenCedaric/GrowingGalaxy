@@ -8,7 +8,6 @@ tags: ["Tokyo", "ShinjukuGyoen"]
 baseline:
   coordinates: "35.6852° N, 139.7100° E"
   environment: "Spring / Clear Sky"
-  mapUrl: "/Shibuya.svg"
 ---
 
 

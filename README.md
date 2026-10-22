@@ -145,7 +145,6 @@ tags: ["City", "Metro", "Japan"]
 baseline:
   coordinates: "35.6762, 139.6503"
   environment: "Urban / Spring"
-  mapUrl: "/maps/tokyo.geojson"
 ---
 
 Field journal notes, observations, and route log...

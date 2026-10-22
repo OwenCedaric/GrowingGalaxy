@@ -7,7 +7,6 @@ tags: ["NYC", "Manhattan"]
 baseline:
   coordinates: "40.7128° N, 74.0060° W"
   environment: "Winter / Snow"
-  mapUrl: "/Manhattan.svg"
 ---
 
 

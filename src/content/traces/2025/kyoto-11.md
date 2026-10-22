@@ -7,7 +7,6 @@ tags: ["Kyoto", "Temple"]
 baseline:
   coordinates: "35.0116° N, 135.7681° E"
   environment: "Autumn / Clear"
-  mapUrl: "/Kyoto.svg"
 ---
 
 
