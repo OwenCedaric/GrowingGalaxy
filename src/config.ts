@@ -3,6 +3,7 @@ export const SITE_CONFIG = {
     logoSrc: "/favicon.svg",
     description: "A curated space for digital galleries and storytelling.",
     author: "DG",
+    authorPhonetic: "/daʊ/",
     signature: "DGX",
     site: "https://galaxy.ceda.is",
     imageServer: ["https://images.pexels.com"],

@@ -1,5 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 import { MCP_CONFIG } from '../mcp.config';
+import { SITE_CONFIG } from '../src/config';
 
 export interface Env {
   VECTORIZE: VectorizeIndex;
@@ -89,6 +90,18 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
     if (path === routes.version) {
         return new Response(JSON.stringify({ version: server.version }), { headers: corsHeaders() });
     }
+
+    if (path === routes.profile || path === '/mcp/profile' || path === '/mcp/elsewhere') {
+        return new Response(JSON.stringify({
+            title: SITE_CONFIG.title,
+            description: SITE_CONFIG.description,
+            author: SITE_CONFIG.author,
+            authorPhonetic: SITE_CONFIG.authorPhonetic,
+            signature: SITE_CONFIG.signature,
+            site: SITE_CONFIG.site,
+            elsewhere: SITE_CONFIG.elsewhere
+        }, null, 2), { headers: corsHeaders() });
+    }
     
     if (path === routes.listDocs) {
       const res = await env.ASSETS.fetch(new Request(new URL(routes.indexJson, request.url)));
@@ -119,7 +132,17 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
   if (request.method === 'POST') {
     try {
       const body = await request.json() as any;
-      const { method, params, id, jsonrpc } = body;
+
+      // 处理 batch 请求中全为 Notifications 或 Responses 的场景 (MCP 传输层规范)
+      if (Array.isArray(body)) {
+        const isNotificationOrResponse = (msg: any) =>
+          msg && typeof msg === 'object' && (!msg.id || msg.method?.startsWith('notifications/') || (!msg.method && (msg.result !== undefined || msg.error !== undefined)));
+        if (body.length > 0 && body.every(isNotificationOrResponse)) {
+          return new Response(null, { status: 202, headers: corsHeaders() });
+        }
+      }
+
+      const { method, params, id, jsonrpc } = body || {};
 
       if (method || jsonrpc === "2.0") {
         if (method === 'initialize') {
@@ -130,18 +153,86 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
           });
         }
         
-        if (!id) return new Response(null, { status: 204, headers: corsHeaders() });
-        if (method === 'notifications/initialized') return new Response(null, { status: 204, headers: corsHeaders() });
+        // MCP Streamable HTTP 规范：当 Server 收到仅包含 Notifications 或 Responses 的 payload 时，必须返回 202 Accepted（且无 body）
+        if (!id || method?.startsWith('notifications/') || (!method && (body.result !== undefined || body.error !== undefined))) {
+          return new Response(null, { status: 202, headers: corsHeaders() });
+        }
+
+        if (method === 'resources/list') {
+          return mcpResponse(id, {
+            resources: [
+              {
+                uri: "site://profile",
+                name: "Site & Author Profile",
+                description: "Basic site metadata, author bio, phonetic pronunciation, and digital garden overview.",
+                mimeType: "application/json"
+              },
+              {
+                uri: "site://elsewhere",
+                name: "Elsewhere (Social & External Channels)",
+                description: "Author's public social platforms, handles, and communication channels (X, GitHub, Instagram, Email).",
+                mimeType: "application/json"
+              }
+            ]
+          });
+        }
+
+        if (method === 'resources/read') {
+          const { uri } = params || {};
+          if (uri === 'site://elsewhere') {
+            return mcpResponse(id, {
+              contents: [
+                {
+                  uri: 'site://elsewhere',
+                  mimeType: 'application/json',
+                  text: JSON.stringify({
+                    author: SITE_CONFIG.author,
+                    elsewhere: SITE_CONFIG.elsewhere
+                  }, null, 2)
+                }
+              ]
+            });
+          }
+          if (uri === 'site://profile') {
+            return mcpResponse(id, {
+              contents: [
+                {
+                  uri: 'site://profile',
+                  mimeType: 'application/json',
+                  text: JSON.stringify({
+                    title: SITE_CONFIG.title,
+                    description: SITE_CONFIG.description,
+                    author: SITE_CONFIG.author,
+                    authorPhonetic: SITE_CONFIG.authorPhonetic,
+                    signature: SITE_CONFIG.signature,
+                    site: SITE_CONFIG.site,
+                    elsewhere: SITE_CONFIG.elsewhere
+                  }, null, 2)
+                }
+              ]
+            });
+          }
+          return mcpError(id, -32602, `Resource not found: ${uri}`);
+        }
 
         if (method === 'tools/list') {
           return mcpResponse(id, {
             tools: [
               {
                 name: "search",
-                description: "Semantically search the blog and pages.",
+                description: "Semantically search the blog, projects, traces, and pages.",
                 inputSchema: {
                   type: "object",
-                  properties: { query: { type: "string" }, top_k: { type: "number", default: search.defaultTopK } },
+                  properties: {
+                    query: { type: "string", description: "Search query or natural language question." },
+                    top_k: { type: "number", default: search.defaultTopK, description: "Maximum number of results to return." },
+                    namespace: {
+                      type: "string",
+                      description: "Filter by content namespace (e.g. 'all', 'blog', 'projects', 'traces', 'pages')",
+                      enum: ["all", "blog", "projects", "traces", "pages"],
+                      default: "all"
+                    }
+                  },
                   required: ["query"]
                 }
               },
@@ -171,8 +262,16 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
               return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ results: [], error: "Invalid vector format" }) }] });
             }
 
-            const m = await env.VECTORIZE.query(vector, { topK: args.top_k || search.defaultTopK, returnMetadata: true });
-            const results = (m.matches || []).map((x: any) => ({
+            const requestedNamespace = args.namespace && args.namespace !== 'all' ? args.namespace : null;
+            const fetchTopK = requestedNamespace ? Math.max((args.top_k || search.defaultTopK) * 3, 15) : (args.top_k || search.defaultTopK);
+
+            const m = await env.VECTORIZE.query(vector, { topK: fetchTopK, returnMetadata: true });
+            let matches = m.matches || [];
+            if (requestedNamespace) {
+              matches = matches.filter((x: any) => x.metadata?.namespace === requestedNamespace);
+            }
+
+            const results = matches.slice(0, args.top_k || search.defaultTopK).map((x: any) => ({
               chunk_id: x.id,
               score: x.score,
               metadata: x.metadata || {}
@@ -180,7 +279,8 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
             return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ results }) }] });
           }
           if (name === 'get_context' && args?.chunk_ids) {
-            const res = await env.ASSETS.fetch(new Request(new URL(routes.chunksJson, request.url)));
+            const chunksPath = (routes as any).chunksJson || '/mcp/chunks.json';
+            const res = await env.ASSETS.fetch(new Request(new URL(chunksPath, request.url)));
             if (!res.ok) return mcpResponse(id, { content: [{ type: "text", text: JSON.stringify({ error: "Chunks Error" }) }] });
             const allChunks = await res.json() as any[];
             const context = allChunks
@@ -215,7 +315,8 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
       }
       
       if (path === routes.context && body.chunk_ids) {
-        const res = await env.ASSETS.fetch(new Request(new URL(routes.chunksJson, request.url)));
+        const chunksPath = (routes as any).chunksJson || '/mcp/chunks.json';
+        const res = await env.ASSETS.fetch(new Request(new URL(chunksPath, request.url)));
         if (!res.ok) return new Response(JSON.stringify({ error: "Chunks Error" }), { status: 500, headers: corsHeaders() });
         const allChunks = await res.json() as any[];
         const context = allChunks
@@ -236,6 +337,12 @@ async function handleMcpRequest(url: URL, request: Request, env: Env): Promise<R
 
 function mcpResponse(id: any, result: any) {
   return new Response(JSON.stringify({ jsonrpc: "2.0", id, result }), {
+    headers: corsHeaders()
+  });
+}
+
+function mcpError(id: any, code: number, message: string) {
+  return new Response(JSON.stringify({ jsonrpc: "2.0", id, error: { code, message } }), {
     headers: corsHeaders()
   });
 }

@@ -5,6 +5,7 @@ export async function GET() {
     const site = SITE_CONFIG.site;
     const blogs = await getCollection('blog');
     const pages = await getCollection('pages');
+    const projects = await getCollection('projects');
     const photos = await getCollection('photos');
     const traces = await getCollection('traces');
 
@@ -19,6 +20,10 @@ ${blogs.map(entry => `- [${entry.data.title}](${site}/blog/${entry.id}) ([Raw Ma
 ## Pages
 
 ${pages.map(entry => `- [${entry.data.title}](${site}/${entry.id}) ([Raw Markdown](${site}/raw/pages/${entry.id}.md))`).join('\n')}
+
+## Projects
+
+${projects.map(entry => `- [${entry.data.title}](${site}/projects#${entry.id}) ([Raw Markdown](${site}/raw/projects/${entry.id}.md)) - ${entry.data.description || ''}`).join('\n')}
 
 ## Gallery & Photos (Web Only)
 

@@ -44,17 +44,29 @@ import HarmonicSystemSVG from "@/components/ui/HarmonicSystemSVG.astro";
             <!-- Header Area -->
             <div>
                 <h1
-                    class="animate-cascade-header font-serif text-5xl md:text-7xl font-normal leading-none tracking-tight text-black dark:text-white mb-2"
+                    class="animate-cascade-header font-serif text-5xl md:text-7xl font-normal leading-none tracking-tight text-black dark:text-white mb-2 inline-flex items-start"
                 >
-                    <DecryptedText
-                        client:idle
-                        text={SITE_CONFIG.author}
-                        speed={40}
-                        maxIterations={20}
-                        sequential={true}
-                        revealDirection="start"
-                        animateOn="view"
-                    />.
+                    <span>
+                        <DecryptedText
+                            client:idle
+                            text={SITE_CONFIG.author}
+                            speed={40}
+                            maxIterations={20}
+                            sequential={true}
+                            revealDirection="start"
+                            animateOn="view"
+                        />.
+                    </span>
+                    {
+                        SITE_CONFIG.authorPhonetic && (
+                            <span
+                                class="font-mono text-xs md:text-sm font-normal tracking-wider text-neutral-400 dark:text-neutral-500 ml-1.5 mt-1 md:mt-1.5 select-all"
+                                title="Phonetic transcription"
+                            >
+                                {SITE_CONFIG.authorPhonetic}
+                            </span>
+                        )
+                    }
                 </h1>
 
                 <!-- Description -->

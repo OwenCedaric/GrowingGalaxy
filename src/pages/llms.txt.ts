@@ -13,6 +13,7 @@ export async function GET() {
 
 - [Homepage](${site}/)
 - [Blog](${site}/blog)
+- [Projects](${site}/projects)
 - [Gallery](${site}/gallery)
 - [Traces](${site}/traces)
 - [About](${site}/about)

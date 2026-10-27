@@ -1,7 +1,7 @@
 export const MCP_CONFIG = {
   server: {
     name: 'growing-galaxy-mcp',
-    version: '1.4.0',
+    version: '1.5.0',
     protocolVersion: '2024-11-05'
   },
   ai: {
@@ -24,7 +24,9 @@ export const MCP_CONFIG = {
   build: {
     inputs: {
       blogDir: 'dist/raw/blog',
-      pagesDir: 'dist/raw/pages'
+      pagesDir: 'dist/raw/pages',
+      projectsDir: 'dist/raw/projects',
+      tracesDir: 'dist/raw/traces'
     },
     outputs: {
       mcpDir: 'public/mcp',
@@ -34,12 +36,15 @@ export const MCP_CONFIG = {
     },
     namespaces: {
       blog: 'blog',
-      pages: 'pages'
+      pages: 'pages',
+      projects: 'projects',
+      traces: 'traces'
     }
   },
   routes: {
     base: '/mcp',
     version: '/mcp/version',
+    profile: '/mcp/profile',
     listDocs: '/mcp/list_docs',
     indexJson: '/mcp/index.json',
     chunksJson: '/mcp/chunks.json',

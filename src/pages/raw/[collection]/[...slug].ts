@@ -6,41 +6,34 @@ import path from 'node:path';
 import { SITE_CONFIG } from '@/config';
 
 export async function getStaticPaths() {
-    const blogs = await getCollection('blog');
-    const pages = await getCollection('pages');
+    const collectionsToExport = [
+        { name: 'blog', baseDir: 'src/content/blog', entries: await getCollection('blog') },
+        { name: 'pages', baseDir: 'src/content/pages', entries: await getCollection('pages') },
+        { name: 'projects', baseDir: 'src/content/projects', entries: await getCollection('projects') },
+        { name: 'traces', baseDir: 'src/content/traces', entries: await getCollection('traces') }
+    ];
 
     const paths = [];
 
-    // Blog entries
-    for (const entry of blogs) {
-        let extension = '.md';
-        try {
-            // Check if .mdx version exists
-            await fs.access(path.join(process.cwd(), 'src/content/blog', entry.id + '.mdx'));
-            extension = '.mdx';
-        } catch (e) {
-            // Fallback to .md (already set as default)
+    for (const { name, baseDir, entries } of collectionsToExport) {
+        for (const entry of entries) {
+            let extension = '.md';
+            if (entry.filePath && entry.filePath.endsWith('.mdx')) {
+                extension = '.mdx';
+            } else {
+                try {
+                    // Check if .mdx version exists
+                    await fs.access(path.join(process.cwd(), baseDir, entry.id + '.mdx'));
+                    extension = '.mdx';
+                } catch (e) {
+                    // Fallback to .md
+                }
+            }
+            paths.push({
+                params: { collection: name, slug: entry.id + extension },
+                props: { entry, baseDir, collection: name, extension }
+            });
         }
-        paths.push({
-            params: { collection: 'blog', slug: entry.id + extension },
-            props: { entry, baseDir: 'src/content/blog', collection: 'blog', extension }
-        });
-    }
-
-    // Pages entries
-    for (const entry of pages) {
-        let extension = '.md';
-        try {
-            // Check if .mdx version exists
-            await fs.access(path.join(process.cwd(), 'src/content/pages', entry.id + '.mdx'));
-            extension = '.mdx';
-        } catch (e) {
-            // Fallback to .md
-        }
-        paths.push({
-            params: { collection: 'pages', slug: entry.id + extension },
-            props: { entry, baseDir: 'src/content/pages', collection: 'pages', extension }
-        });
     }
 
     return paths;
@@ -52,7 +45,9 @@ export async function GET({ props }: APIContext) {
     let content;
 
     try {
-        const filePath = path.join(process.cwd(), baseDir, entry.id + extension);
+        const filePath = entry.filePath 
+            ? path.join(process.cwd(), entry.filePath)
+            : path.join(process.cwd(), baseDir, entry.id + extension);
         content = await fs.readFile(filePath, 'utf-8');
     } catch (e) {
         // Fallback for case-insensitive or slugified matches if needed, 
@@ -60,8 +55,9 @@ export async function GET({ props }: APIContext) {
         const dirPath = path.join(process.cwd(), baseDir);
         const files = await fs.readdir(dirPath);
         for (const file of files) {
-            const slugified = file.toLowerCase().replace(/\s+/g, '-');
-            if (slugified === (entry.id + extension).toLowerCase().replace(/\s+/g, '-')) {
+            const clean1 = file.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const clean2 = (entry.id + extension).toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (clean1 === clean2) {
                 content = await fs.readFile(path.join(dirPath, file), 'utf-8');
                 break;
             }
@@ -79,8 +75,17 @@ export async function GET({ props }: APIContext) {
     // Calculate canonical URL - should include full slug/id
     const site = SITE_CONFIG.site;
     const id = entry.id; // full relative path like "2026/foo"
-    const urlNamespace = collection === 'blog' ? 'blog' : '';
-    const canonicalUrl = `${site}/${urlNamespace}/${id}`.replace(/\/+/g, '/').replace(':/', '://');
+    let canonicalUrl: string;
+    if (collection === 'blog') {
+        canonicalUrl = `${site}/blog/${id}`;
+    } else if (collection === 'traces') {
+        canonicalUrl = `${site}/traces/${id}`;
+    } else if (collection === 'projects') {
+        canonicalUrl = `${site}/projects#${id}`;
+    } else {
+        canonicalUrl = `${site}/${id}`;
+    }
+    canonicalUrl = canonicalUrl.replace(/\/+/g, '/').replace(':/', '://');
 
     return new Response('\uFEFF' + supplementedContent, {
         headers: {

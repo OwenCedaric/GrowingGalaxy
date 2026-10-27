@@ -122,13 +122,39 @@ async function main() {
         await fs.mkdir(stateDir, { recursive: true });
     }
 
-    try {
-        await fs.access(inputs.blogDir);
-        await fs.access(inputs.pagesDir);
-    } catch (e) {
-        console.error(`[Warn] Some distribution directories are missing. Proceeding with available files...`);
+    const candidateConfigs = [
+        { dirPath: inputs.blogDir, namespace: namespaces.blog },
+        { dirPath: inputs.pagesDir, namespace: namespaces.pages },
+        { dirPath: (inputs as any).projectsDir, namespace: (namespaces as any).projects },
+        { dirPath: (inputs as any).tracesDir, namespace: (namespaces as any).traces }
+    ];
+
+    const inputConfigs = candidateConfigs
+        .filter((item): item is { dirPath: string; namespace: string } => Boolean(item.dirPath && item.namespace))
+        .map(({ dirPath, namespace }) => ({
+            dir: path.join(process.cwd(), dirPath),
+            namespace
+        }));
+
+    const fileEntries: { file: string; namespace: string; baseDir: string }[] = [];
+    for (const { dir, namespace } of inputConfigs) {
+        try {
+            await fs.access(dir);
+            const files = await walkDir(dir);
+            for (const file of files) {
+                fileEntries.push({ file, namespace, baseDir: dir });
+            }
+        } catch (e) {
+            console.warn(`[Warn] Input directory not found: ${dir}`);
+        }
     }
-    
+
+    const allFiles = fileEntries.map(e => e.file);
+    console.log(`Found ${allFiles.length} markdown files across collections.`);
+
+    const mcpDir = path.join(process.cwd(), outputs.mcpDir);
+    await fs.mkdir(mcpDir, { recursive: true });
+
     // 初始化特征提取管线（延迟加载由按需构建触发）
     let extractor: any = null;
     const getExtractor = async () => {
@@ -138,19 +164,6 @@ async function main() {
         }
         return extractor;
     };
-    
-    const blogDir = path.join(process.cwd(), inputs.blogDir);
-    const pagesDir = path.join(process.cwd(), inputs.pagesDir);
-    
-    const allFiles = [
-        ...(await walkDir(blogDir)),
-        ...(await walkDir(pagesDir))
-    ];
-    
-    console.log(`Found ${allFiles.length} markdown files.`);
-
-    const mcpDir = path.join(process.cwd(), outputs.mcpDir);
-    await fs.mkdir(mcpDir, { recursive: true });
 
     const newManifest: Record<string, ManifestEntry> = {};
     const idsToDelete: string[] = [];
@@ -159,15 +172,10 @@ async function main() {
     const indexJson = [];
     const vectorsNdjson = [];
     
-    for (const file of allFiles) {
+    for (const { file, namespace, baseDir } of fileEntries) {
         const rawContent = await fs.readFile(file, 'utf-8');
         const parsed = matter(rawContent);
-        
-        const namespace = file.includes(`/${namespaces.blog}/`) || file.includes(`\\${namespaces.blog}\\`) 
-            ? namespaces.blog 
-            : namespaces.pages;
             
-        const baseDir = namespace === namespaces.blog ? blogDir : pagesDir;
         // 使用相对路径保留子目录结构，并统一转换为正斜杠
         const extension = path.extname(file);
         const filename = path.relative(baseDir, file)
@@ -184,8 +192,17 @@ async function main() {
         const currentHash = hashText(rawContent);
 
         const url = `/raw/${namespace}/${filename}${extension}`;
-        const urlNamespace = namespace === namespaces.blog ? namespaces.blog : '';
-        const canonical_url = `/${urlNamespace}/${filename}`.replace(/\/+/g, '/');
+        let canonical_url: string;
+        if (namespace === namespaces.blog) {
+            canonical_url = `/blog/${filename}`;
+        } else if (namespace === namespaces.traces) {
+            canonical_url = `/traces/${filename}`;
+        } else if (namespace === namespaces.projects) {
+            canonical_url = `/projects#${filename}`;
+        } else {
+            canonical_url = `/${filename}`;
+        }
+        canonical_url = canonical_url.replace(/\/+/g, '/');
         
         indexJson.push({
             id,
@@ -208,9 +225,30 @@ async function main() {
             idsToDelete.push(...manifest[id].chunk_ids);
         }
 
+        let contentToChunk = parsed.content || '';
+        if (namespace === namespaces.traces) {
+            const metaParts: string[] = [];
+            if (parsed.data.site_name) metaParts.push(`Location: ${parsed.data.site_name}`);
+            if (parsed.data.baseline?.coordinates) metaParts.push(`Coordinates: ${parsed.data.baseline.coordinates}`);
+            if (parsed.data.baseline?.environment) metaParts.push(`Environment: ${parsed.data.baseline.environment}`);
+            if (parsed.data.date) metaParts.push(`Date: ${parsed.data.date}`);
+            if (parsed.data.tags?.length) metaParts.push(`Tags: ${parsed.data.tags.join(', ')}`);
+            if (metaParts.length > 0) {
+                contentToChunk = `[Trace Spatial Context: ${metaParts.join(' | ')}]\n\n` + contentToChunk;
+            }
+        } else if (namespace === namespaces.projects) {
+            const metaParts: string[] = [];
+            if (parsed.data.description) metaParts.push(`Description: ${parsed.data.description}`);
+            if (parsed.data.github) metaParts.push(`GitHub: ${parsed.data.github}`);
+            if (parsed.data.url) metaParts.push(`Demo URL: ${parsed.data.url}`);
+            if (metaParts.length > 0) {
+                contentToChunk = `[Project Context: ${metaParts.join(' | ')}]\n\n` + contentToChunk;
+            }
+        }
+
         const modelExtractor = await getExtractor();
         const effectiveChunkSize = parsed.data.ai?.chunk_size || CHUNK_SIZE;
-        const textChunks = structuralChunkText(parsed.content || '', parsed.data.title || filename, effectiveChunkSize);
+        const textChunks = structuralChunkText(contentToChunk, parsed.data.title || filename, effectiveChunkSize);
         const newChunkIds: string[] = [];
 
         for (let i = 0; i < textChunks.length; i++) {

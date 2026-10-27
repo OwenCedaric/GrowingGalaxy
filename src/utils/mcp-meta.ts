@@ -59,9 +59,18 @@ export function supplementMCPMeta(content: string, slug: string, overrideNamespa
         }
     }
 
-    // Both blog and pages are served at root /slug
-    const urlNamespace = namespace === 'blog' ? 'blog' : '';
-    const standardCanonical = `${SITE_CONFIG.site}/${urlNamespace}/${slug}`.replace(/\/+/g, '/').replace(':/', '://');
+    // Determine canonical URL based on namespace
+    let standardCanonical: string;
+    if (namespace === 'blog') {
+        standardCanonical = `${SITE_CONFIG.site}/blog/${slug}`;
+    } else if (namespace === 'traces') {
+        standardCanonical = `${SITE_CONFIG.site}/traces/${slug}`;
+    } else if (namespace === 'projects') {
+        standardCanonical = `${SITE_CONFIG.site}/projects#${slug}`;
+    } else {
+        standardCanonical = `${SITE_CONFIG.site}/${slug}`;
+    }
+    standardCanonical = standardCanonical.replace(/\/+/g, '/').replace(':/', '://');
     const standardRaw = `${SITE_CONFIG.site}/raw/${namespace}/${slug}${extension}`.replace(/\/+/g, '/').replace(':/', '://');
 
     data.canonical_url = standardCanonical;
